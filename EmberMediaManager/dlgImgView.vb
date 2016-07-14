@@ -17,9 +17,9 @@
 ' # You should have received a copy of the GNU General Public License            #
 ' # along with Ember Media Manager.  If not, see <http://www.gnu.org/licenses/>. #
 ' ################################################################################
+
 Imports EmberAPI
 Imports NLog
-Imports System.Diagnostics
 
 Public Class dlgImgView
 
@@ -33,184 +33,131 @@ Public Class dlgImgView
 
 #Region "Methods"
 
+    Public Sub New()
+        ' This call is required by the designer.
+        InitializeComponent()
+        Left = Master.AppPos.Left + (Master.AppPos.Width - Width) \ 2
+        Top = Master.AppPos.Top + (Master.AppPos.Height - Height) \ 2
+        StartPosition = FormStartPosition.Manual
+    End Sub
+
     Public Overloads Function ShowDialog(ByVal iImage As Image) As Windows.Forms.DialogResult
-        '//
-        ' Overload to pass data
-        '\\
-
-        Me.pbCache.Image = iImage
-
-        Return MyBase.ShowDialog()
+        pbCache.Image = iImage
+        Return ShowDialog()
     End Function
 
     Private Sub dlgImgView_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         If e.KeyCode = Keys.Escape OrElse e.KeyCode = Keys.Enter Then
-            Me.Close()
+            Close()
         End If
     End Sub
 
     Private Sub dlgImgView_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        '//
-        ' Default to Fit method
-        '\\
-
-        Me.SetUp()
-
-        Me.DoFit()
-
-        Me.Activate()
+        SetUp()
+        DoFit(True)
+        Activate()
     End Sub
 
-    Private Sub DoFit()
-        '//
-        ' Resize the image/form to fit within the bounds of the screen
-        '\\
+    Private Sub DoFit(ByVal firstCall As Boolean)
+        If isFull OrElse firstCall Then
+            Visible = False 'hide form until resizing is done... hides Full -> Fit position whackiness not fixable by .SuspendLayout
+            ResetScroll()
+            isFull = False
+            pnlBG.AutoScroll = False
 
-        Try
-            Me.Visible = False 'hide form until resizing is done... hides Full -> Fit position whackiness not fixable by .SuspendLayout
-            Me.ResetScroll()
-            Me.isFull = False
-            Me.pnlBG.AutoScroll = False
+            ImageUtils.ResizePB(pbPicture, pbCache, My.Computer.Screen.WorkingArea.Height - 60, My.Computer.Screen.WorkingArea.Width)
 
-            ImageUtils.ResizePB(Me.pbPicture, Me.pbCache, My.Computer.Screen.WorkingArea.Height - 60, My.Computer.Screen.WorkingArea.Width)
+            Width = pbPicture.Width + 16
+            Height = pbPicture.Height + 64
+            Left = Convert.ToInt32((My.Computer.Screen.WorkingArea.Width - Width) / 2)
+            Top = Convert.ToInt32((My.Computer.Screen.WorkingArea.Height - Height) / 2)
 
-            Me.Width = Me.pbPicture.Width + 16
-            Me.Height = Me.pbPicture.Height + 64
-            Me.Left = Convert.ToInt32((My.Computer.Screen.WorkingArea.Width - Me.Width) / 2)
-            Me.Top = Convert.ToInt32((My.Computer.Screen.WorkingArea.Height - Me.Height) / 2)
-
-        Catch ex As Exception
-            Logger.Error(New StackFrame().GetMethod().Name,ex)
-        End Try
-
-        Me.Visible = True
+            Visible = True
+        End If
     End Sub
 
     Private Sub DoFull()
-        '//
-        ' Set image to full size, then fill the screen as much as possible
-        '\\
-
-        Try
-            Me.Visible = False 'hide form until resizing is done... hides Full -> Fit position whackiness not fixable by .SuspendLayout
+        If Not isFull Then
+            Visible = False 'hide form until resizing is done... hides Full -> Fit position whackiness not fixable by .SuspendLayout
             Dim screenHeight As Integer = My.Computer.Screen.WorkingArea.Height
             Dim screenWidth As Integer = My.Computer.Screen.WorkingArea.Width
             Dim HasVertBar As Boolean = False
 
-            Me.ResetScroll()
-            Me.isFull = True
+            ResetScroll()
+            isFull = True
 
-            Me.pbPicture.Image = Me.pbCache.Image
-            Me.pbPicture.SizeMode = PictureBoxSizeMode.AutoSize
-            Me.pnlBG.AutoScroll = True
+            pbPicture.Image = CType(pbCache.Image.Clone, Image)
+            pbPicture.SizeMode = PictureBoxSizeMode.AutoSize
+            pnlBG.AutoScroll = True
 
             'set dlg size
 
-            If Me.pbPicture.Height >= (screenHeight - 32) Then
-                Me.Height = screenHeight
+            If pbPicture.Height >= (screenHeight - 32) Then
+                Height = screenHeight
                 HasVertBar = True
             Else
-                Me.Height = pbPicture.Height + 64
+                Height = pbPicture.Height + 64
             End If
-            Me.Top = Convert.ToInt32((screenHeight - Me.Height) / 2)
+            Top = Convert.ToInt32((screenHeight - Height) / 2)
 
-            If Me.pbPicture.Width >= (screenWidth - 25) Then
-                Me.Width = screenWidth
+            If pbPicture.Width >= (screenWidth - 25) Then
+                Width = screenWidth
             Else
                 If HasVertBar Then
-                    Me.Width = Me.pbPicture.Width + 33
+                    Width = pbPicture.Width + 33
                 Else
-                    Me.Width = Me.pbPicture.Width + 16
+                    Width = pbPicture.Width + 16
                 End If
             End If
-            Me.Left = Convert.ToInt32((screenWidth - Me.Width) / 2)
+            Left = Convert.ToInt32((screenWidth - Width) / 2)
 
-        Catch ex As Exception
-            Logger.Error(New StackFrame().GetMethod().Name,ex)
-        End Try
-
-        Me.Visible = True
+            Visible = True
+        End If
     End Sub
 
     Private Sub pbPicture_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles pbPicture.DoubleClick
-        '//
-        ' close on doubleclick
-        '\\
-
-        Me.Close()
+        Close()
     End Sub
 
     Private Sub pbPicture_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pbPicture.MouseDown
-        '//
-        ' Set up for panning picture
-        '\\
-
-        If Me.isFull Then
+        If isFull Then
             PanStartPoint = New Point(e.X, e.Y)
             pbPicture.Cursor = Cursors.NoMove2D
         End If
     End Sub
 
     Private Sub pbPicture_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pbPicture.MouseMove
-        '//
-        ' Pan picture by dragging it around
-        '\\
+        If e.Button = Windows.Forms.MouseButtons.Left AndAlso pbPicture.Cursor = Cursors.NoMove2D Then
 
-        Try
-            If e.Button = Windows.Forms.MouseButtons.Left AndAlso pbPicture.Cursor = Cursors.NoMove2D Then
+            Dim DeltaX As Integer = (PanStartPoint.X - e.X)
+            Dim DeltaY As Integer = (PanStartPoint.Y - e.Y)
 
-                Dim DeltaX As Integer = (PanStartPoint.X - e.X)
-                Dim DeltaY As Integer = (PanStartPoint.Y - e.Y)
+            pnlBG.AutoScrollPosition = New Drawing.Point((DeltaX - pnlBG.AutoScrollPosition.X), (DeltaY - pnlBG.AutoScrollPosition.Y))
 
-                Me.pnlBG.AutoScrollPosition = New Drawing.Point((DeltaX - pnlBG.AutoScrollPosition.X), (DeltaY - pnlBG.AutoScrollPosition.Y))
-
-            End If
-        Catch ex As Exception
-            Logger.Error(New StackFrame().GetMethod().Name,ex)
-        End Try
+        End If
     End Sub
 
     Private Sub pbPicture_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pbPicture.MouseUp
-        '//
-        ' Stop Panning
-        '\\
-
-        Me.pbPicture.Cursor = Cursors.Default
+        pbPicture.Cursor = Cursors.Default
     End Sub
 
     Private Sub ResetScroll()
-        '//
-        ' Move the picture back to upper-left corner
-        '\\
-
-        Try
-            Me.pnlBG.AutoScrollPosition = New Drawing.Point(0, 0)
-            Me.pbPicture.Location = New Point(0, 25)
-        Catch ex As Exception
-            Logger.Error(New StackFrame().GetMethod().Name,ex)
-        End Try
+        pnlBG.AutoScrollPosition = New Drawing.Point(0, 0)
+        pbPicture.Location = New Point(0, 25)
     End Sub
 
     Private Sub SetUp()
-        Me.Text = Master.eLang.GetString(184, "Image Viewer")
-        Me.tsbFit.Text = Master.eLang.GetString(185, "Fit")
-        Me.tsbFull.Text = Master.eLang.GetString(186, "Full Size")
+        Text = Master.eLang.GetString(184, "Image Viewer")
+        tsbFit.Text = Master.eLang.GetString(185, "Fit")
+        tsbFull.Text = Master.eLang.GetString(186, "Full Size")
     End Sub
 
     Private Sub tsbFit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbFit.Click
-        '//
-        ' Fit pic to screen
-        '\\
-
-        Me.DoFit()
+        DoFit(False)
     End Sub
 
     Private Sub tsbFull_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsbFull.Click
-        '//
-        ' Show pic in full size
-        '\\
-
-        Me.DoFull()
+        DoFull()
     End Sub
 
 #End Region 'Methods

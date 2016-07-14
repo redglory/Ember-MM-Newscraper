@@ -19,7 +19,6 @@
   <string control="IMDBMovieInfo_chkDirector">Enable scraping movie director.</string>
   <string control="IMDBMovieInfo_chkTagline">Enable scraping movie tagline.</string>
   <string control="IMDBMovieInfo_chkCast">Enable scraping movie cast.</string>
-  <string control="IMDBMovieInfo_chkVotes">Enable scraping movie votes.</string>
   <string control="IMDBMovieInfo_chkTrailer">Enable scraping movie trailer url.</string>
   <string control="IMDBMovieInfo_chkRating">Enable scraping movie rating.</string>
   <string control="IMDBMovieInfo_chkRelease">Enable scraping movie release date.</string>
@@ -46,7 +45,7 @@
   <string control="TMDBMovieInfo_btnUp">Move this scraper module up in order. (Scraper modules will be processed in order from top to bottom)</string>
   <string control="TMDBMovieInfo_chkFallBackEng">If no record is available for selected language try English</string>
   <string control="TMDBMovieInfo_cbTMDBPrefLanguage">Selected language for TMDB searches</string>
-  <string control="TMDBMovieInfo_txtTMDBApiKey">API Key from the TMDB site. Sharing the API key is forbidden.</string>
+  <string control="TMDBMovieInfo_txtTMDBApiKey">Private API. Press ENTER at the end to confirm the API</string>
   <string control="TMDBMovieInfo_chkCrew">Enable scraping movie other crew. (Scrape Full Crew must be enabled)</string>
   <string control="TMDBMovieInfo_chkCountry"></string>
   <string control="TMDBMovieInfo_chkStudio">Enable scraping movie studio.</string>
@@ -55,14 +54,13 @@
   <string control="TMDBMovieInfo_chkGenre">Enable scraping movie genre.</string>
   <string control="TMDBMovieInfo_chkTagline">Enable scraping movie tagline.</string>
   <string control="TMDBMovieInfo_chkCast">Enable scraping movie cast.</string>
-  <string control="TMDBMovieInfo_chkVotes">Enable scraping movie votes.</string>
   <string control="TMDBMovieInfo_chkTrailer"></string>
   <string control="TMDBMovieInfo_chkRating">Enable scraping movie rating.</string>
   <string control="TMDBMovieInfo_chkRelease">Enable scraping movie release date.</string>
   <string control="TMDBMovieInfo_chkMPAA">Enable scraping movie MPAA.</string>
   <string control="TMDBMovieInfo_chkYear">Enable scraping movie year.</string>
   <string control="TMDBMovieInfo_chkTitle">Enable scraping movie title.</string>
-  <string control="FanartTVMovieMedia_txtFANARTTVApiKey"></string>
+  <string control="FanartTVMovieMedia_txtFANARTTVApiKey">Private API. Press ENTER at the end to confirm the API</string>
   <string control="FanartTVMovieMedia_btnDown">Move this scraper module down in order. (Scraper modules will be processed in order from top to bottom)</string>
   <string control="FanartTVMovieMedia_btnUp">Move this scraper module up in order. (Scraper modules will be processed in order from top to bottom)</string>
   <string control="FanartTVMovieMedia_cbEnabled">Enable or disable this module.</string>
@@ -77,7 +75,7 @@
   <string control="MPDBMovieMedia_cbEnabled">Enable or disable this module.</string>
   <string control="TMDBMovieMedia_chkFallBackEng">If no record is available for selected language try English</string>
   <string control="TMDBMovieMedia_cbTMDBPrefLanguage">Selected language for TMDB searches</string>
-  <string control="TMDBMovieMedia_txtTMDBApiKey">API Key from the TMDB site. Sharing the API key is forbidden.</string>
+  <string control="TMDBMovieMedia_txtTMDBApiKey">Private API. Press ENTER at the end to confirm the API</string>
   <string control="TMDBMovieMedia_chkScrapePoster">Enable scraping posters from this module. (Refer to global poster settings for more options)</string>
   <string control="TMDBMovieMedia_chkScrapeFanart">Enable scraping fanart from this module. (Refer to global fanart settings for more options)</string>
   <string control="TMDBMovieMedia_btnDown">Move this scraper module down in order. (Scraper modules will be processed in order from top to bottom)</string>
@@ -89,15 +87,15 @@
   <string control="IMDBTrailer_cbEnabled">Enable or disable this module.</string>
   <string control="TMDBTrailer_chkFallBackEng"></string>
   <string control="TMDBTrailer_cbTMDBPrefLanguage"></string>
-  <string control="TMDBTrailer_txtTMDBApiKey"></string>
+  <string control="TMDBTrailer_txtTMDBApiKey">Private API. Press ENTER at the end to confirm the API</string>
   <string control="TMDBTrailer_btnDown">Move this scraper module down in order. (Scraper modules will be processed in order from top to bottom)</string>
   <string control="TMDBTrailer_btnUp">Move this scraper module up in order. (Scraper modules will be processed in order from top to bottom)</string>
   <string control="TMDBTrailer_cbEnabled">Enable or disable this module.</string>
-  <string control="TVDBMedia_txtTVDBApiKey"></string>
+  <string control="TVDBMedia_txtTVDBApiKey">Private API. Press ENTER at the end to confirm the API</string>
   <string control="TVDBMedia_btnDown">Move this scraper module down in order. (Scraper modules will be processed in order from top to bottom)</string>
   <string control="TVDBMedia_cbEnabled">Enable or disable this module.</string>
   <string control="TVDBMedia_btnUp">Move this scraper module up in order. (Scraper modules will be processed in order from top to bottom)</string>
-  <string control="TVDBData_txtTVDBApiKey"></string>
+  <string control="TVDBData_txtTVDBApiKey">Private API. Press ENTER at the end to confirm the API</string>
   <string control="TVDBData_btnDown">Move this scraper module down in order. (Scraper modules will be processed in order from top to bottom)</string>
   <string control="TVDBData_cbEnabled"></string>
   <string control="TVDBData_btnUp">Move this scraper module up in order. (Scraper modules will be processed in order from top to bottom)</string>
@@ -238,7 +236,7 @@
   <string control="Core_chkAutoBD">If enabled, Ember will automatically save new fanart images to the entered backdrops folder.</string>
   <string control="Core_btnBrowse">Open a folder browser to select a backdrops folder.</string>
   <string control="Core_txtBDPath">The path to the backdrops folder.</string>
-  <string control="Core_txtMoviesetsPath">The artwork folder for Movieset images. Posters will be saved as setname-poster.jpg/png, fanart will be saved as setname-fanart.jpg</string>
+  <string control="Core_txtMoviesetsPath">The artwork folder for Movieset images. Posters will be saved as settitle-poster.jpg/png, fanart will be saved as settitle-fanart.jpg</string>
   <string control="Core_btnTVShowFrodo"></string>
   <string control="Core_lvTVSources">The list of all current TV Show sources. (Paths that will be scanned for TV Show files)</string>
   <string control="Core_txtTVSkipLessThan">Ember will use the entered size as the minimum size for episode files. Any files smaller than this will be skipped when updating the library.</string>
@@ -258,30 +256,22 @@
   <string control="Core_chkEpisodeJPG">Save episode poster files as "&lt;episode&gt;.jpg".</string>
   <string control="Core_chkEpisodeTBN">Save episode poster files as "&lt;episode&gt;.tbn".</string>
   <string control="Core_chkSeasonXXDashFanartJPG"></string>
-  <string control="Core_chkSeasonDotFanart">
-    Save season fanart files as "&lt;season&gt;.fanart.jpg". (Will only save inside the season directory, if it exists)</string>
-  <string control="Core_chkSeasonDashFanart">
-    Save season fanart files as "&lt;season&gt;-fanart.jpg". (Will only save inside the season directory, if it exists)</string>
+  <string control="Core_chkSeasonDotFanart">Save season fanart files as "&lt;season&gt;.fanart.jpg". (Will only save inside the season directory, if it exists)</string>
+  <string control="Core_chkSeasonDashFanart">Save season fanart files as "&lt;season&gt;-fanart.jpg". (Will only save inside the season directory, if it exists)</string>
   <string control="Core_chkSeasonFanartJPG">Save season fanart files as "fanart.jpg". (Will only save inside the season directory, if it exists)</string>
   <string control="Core_chkSeasonXXDashPosterJPG"></string>
   <string control="Core_chkSeasonFolderJPG">Save season fanart files as "folder.jpg". (Will only save inside the season directory, if it exists)</string>
-  <string control="Core_chkSeasonNameJPG">
-    Save season poster files as "&lt;season&gt;.jpg". (Will only save inside the season directory, if it exists)</string>
-  <string control="Core_chkSeasonNameTBN">
-    Save season poster files as "&lt;season&gt;.tbn". (Will only save inside the season directory, if it exists)</string>
+  <string control="Core_chkSeasonNameJPG">Save season poster files as "&lt;season&gt;.jpg". (Will only save inside the season directory, if it exists)</string>
+  <string control="Core_chkSeasonNameTBN">Save season poster files as "&lt;season&gt;.tbn". (Will only save inside the season directory, if it exists)</string>
   <string control="Core_chkSeasonPosterJPG">Save season poster files as "poster.jpg". (Will only save inside the season directory, if it exists)</string>
   <string control="Core_chkSeasonPosterTBN">Save season poster files as "poster.tbn". (Will only save inside the season directory, if it exists)</string>
   <string control="Core_chkSeasonXTBN">Save season poster files as "seasonX.tbn". (Example: season2.tbn)</string>
   <string control="Core_chkSeasonXXTBN">Save season poster files as "seasonXX.tbn". (Example: season02.tbn)</string>
-  <string control="Core_chkShowDotFanart">
-    Save show fanart files as "&lt;show&gt;.fanart.jpg".</string>
-  <string control="Core_chkShowDashFanart">
-    Save show fanart files as "&lt;show&gt;-fanart.jpg".</string>
+  <string control="Core_chkShowDotFanart">Save show fanart files as "&lt;show&gt;.fanart.jpg".</string>
+  <string control="Core_chkShowDashFanart">Save show fanart files as "&lt;show&gt;-fanart.jpg".</string>
   <string control="Core_chkShowFanartJPG">Save show fanart files as "fanart.jpg".</string>
-  <string control="Core_chkShowJPG">
-    Save show poster files as "&lt;show&gt;.jpg".</string>
-  <string control="Core_chkShowTBN">
-    Save show poster files as "&lt;show&gt;.tbn".</string>
+  <string control="Core_chkShowJPG">Save show poster files as "&lt;show&gt;.jpg".</string>
+  <string control="Core_chkShowTBN">Save show poster files as "&lt;show&gt;.tbn".</string>
   <string control="Core_chkShowPosterJPG">Save show poster files as "poster.jpg".</string>
   <string control="Core_chkShowPosterTBN">Save show poster files as "poster.tbn".</string>
   <string control="Core_chkShowFolderJPG">Save show poster files as "folder.jpg".</string>
@@ -343,7 +333,6 @@
   <string control="Core_chkDirector">Enable scraping movie director.</string>
   <string control="Core_chkTagline">Enable scraping movie tagline.</string>
   <string control="Core_chkCast">Enable scraping movie cast.</string>
-  <string control="Core_chkVotes">Enable scraping movie votes.</string>
   <string control="Core_chkTrailer">Enable scraping movie trailer url.</string>
   <string control="Core_chkRating">Enable scraping movie rating.</string>
   <string control="Core_chkRelease">Enable scraping movie release date.</string>
@@ -613,7 +602,25 @@
   <string control="Core_txtMovieLandscapeExpertBDMV">You can use &lt;filename&gt;, e.g. &lt;filename&gt;-landscape.jpg. You can also enter multiple file names separated by a comma.</string>
   <string control="Core_txtMovieNFOExpertBDMV">You can use &lt;filename&gt;, e.g. &lt;filename&gt;.nfo. You can also enter multiple file names separated by a comma.</string>
   <string control="Core_txtMoviePosterExpertBDMV">You can use &lt;filename&gt;, e.g. &lt;filename&gt;-poster.jpg. You can also enter multiple file names separated by a comma.</string>
-  <string control="Core_txtMovieTrailerExpertBDMV">You can use &lt;filename&gt;, e.g. &lt;filename&gt;-trailer (without a file name extension). You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieTrailerExpertBDMV">You can use &lt;filename&gt;, e.g. &lt;filename&gt;-trailer (without a file name extension). You can also enter multiple file names separated by a comma.</string>  
+  <string control="Core_txtMovieSetBannerExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-banner.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetClearArtExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-clearart.png. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetClearLogoExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-clearlogo.png. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetDiscArtExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-discart.png. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetFanartExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-fanart.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetLandscapeExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-landscape.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetNFOExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;.nfo. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetPosterExpertSingle">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-poster.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetBannerExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-banner.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetClearArtExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-clearart.png. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetClearLogoExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-clearlogo.png. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetDiscArtExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-discart.png. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetFanartExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-fanart.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetLandscapeExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-landscape.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetNFOExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;.nfo. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtMovieSetPosterExpertParent">You can use &lt;settitle&gt;, e.g. &lt;settitle&gt;-poster.jpg. You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtTVSeasonBannerExpert">You can use &lt;seasonpath&gt;, e.g. &lt;seasonpath&gt;\banner.jpg. You also can use {1} and {2} as season number pattern, e.g. season{1}-banner.jpg (season3-banner.jpg) or season{2}-banner.jpg (season03-banner.jpg). You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtTVSeasonFanartExpert">You can use &lt;seasonpath&gt;, e.g. &lt;seasonpath&gt;\fanart.jpg. You also can use {1} and {2} as season number pattern, e.g. season{1}-fanart.jpg (season3-fanart.jpg) or season{2}-fanart.jpg (season03-fanart.jpg). You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtTVSeasonLandscapeExpert">You can use &lt;seasonpath&gt;, e.g. &lt;seasonpath&gt;\landscape.jpg. You also can use {1} and {2} as season number pattern, e.g. season{1}-landscape.jpg (season3-landscape.jpg) or season{2}-landscape.jpg (season03-landscape.jpg). You can also enter multiple file names separated by a comma.</string>
+  <string control="Core_txtTVSeasonPosterExpert">You can use &lt;seasonpath&gt;, e.g. &lt;seasonpath&gt;\poster.jpg. You also can use {1} and {2} as season number pattern, e.g. season{1}-poster.jpg (season3-poster.jpg) or season{2}-poster.jpg (season03-poster.jpg). You can also enter multiple file names separated by a comma.</string>
 </strings>
-
-

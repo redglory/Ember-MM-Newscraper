@@ -23,7 +23,6 @@ Imports System.Text.RegularExpressions
 Imports System.Xml.Serialization
 Imports System.Drawing
 Imports System.Windows.Forms
-Imports System.Xml.Linq
 Imports NLog
 
 Public Class Containers
@@ -31,16 +30,43 @@ Public Class Containers
 #Region "Nested Types"
 
 
-    <XmlRoot("CommandFile")> _
+    <XmlType(AnonymousType:=True),
+     XmlRoot([Namespace]:="", IsNullable:=False, ElementName:="CommandFile")>
     Public Class InstallCommands
+        '''<remarks/>
 
 #Region "Fields"
 
-        <XmlArray("Commands")> _
-        <XmlArrayItem("Command")> _
-        Public Command As New List(Of InstallCommand)
+        Private transactionField As New List(Of CommandsTransaction)
+
+        Private noTransactionField As New List(Of CommandsNoTransactionCommand)
 
 #End Region 'Fields
+
+#Region "Properties"
+
+        '''<remarks/>
+        <XmlElement("transaction")>
+        Public Property transaction() As List(Of CommandsTransaction)
+            Get
+                Return transactionField
+            End Get
+            Set(value As List(Of CommandsTransaction))
+                transactionField = value
+            End Set
+        End Property
+
+        '''<remarks/>
+        <XmlElement("noTransaction")>
+        Public Property noTransaction() As List(Of CommandsNoTransactionCommand)
+            Get
+                Return noTransactionField
+            End Get
+            Set(value As List(Of CommandsNoTransactionCommand))
+                noTransactionField = value
+            End Set
+        End Property
+#End Region
 
 #Region "Methods"
 
@@ -55,28 +81,130 @@ Public Class Containers
             If Not File.Exists(fpath) Then Return New Containers.InstallCommands
             Dim xmlSer As XmlSerializer
             xmlSer = New XmlSerializer(GetType(Containers.InstallCommands))
-            Using xmlSW As New StreamReader(Path.Combine(Functions.AppPath, fpath))
+            Using xmlSW As New StreamReader(fpath)
                 Return DirectCast(xmlSer.Deserialize(xmlSW), Containers.InstallCommands)
             End Using
         End Function
 #End Region 'Methods
 
-    End Class 'InstallCommands
+    End Class
 
-    Public Class InstallCommand
+    '''<remarks/>
+    <XmlType(AnonymousType:=True)>
+    Partial Public Class CommandsTransaction
 
-#Region "Fields"
+        Private commandField As New List(Of CommandsTransactionCommand)
 
-        <XmlElement("Description")> _
-        Public CommandDescription As String
-        <XmlElement("Execute")> _
-        Public CommandExecute As String
-        <XmlAttribute("Type")> _
-        Public CommandType As String
+        Private nameField As String
 
-#End Region 'Fields
+        '''<remarks/>
+        <XmlElement("command")>
+        Public Property command() As List(Of CommandsTransactionCommand)
+            Get
+                Return commandField
+            End Get
+            Set(value As List(Of CommandsTransactionCommand))
+                commandField = value
+            End Set
+        End Property
 
-    End Class 'InstallCommand
+        '''<remarks/>
+        <XmlAttribute()>
+        Public Property name() As String
+            Get
+                Return nameField
+            End Get
+            Set(value As String)
+                nameField = value
+            End Set
+        End Property
+    End Class 'CommandsTransaction
+
+    '''<remarks/>
+    <XmlType(AnonymousType:=True)>
+    Partial Public Class CommandsTransactionCommand
+
+        Private descriptionField As String
+
+        Private executeField As String
+
+        Private typeField As String
+
+        '''<remarks/>
+        Public Property description() As String
+            Get
+                Return descriptionField
+            End Get
+            Set(value As String)
+                descriptionField = value
+            End Set
+        End Property
+
+        '''<remarks/>
+        Public Property execute() As String
+            Get
+                Return executeField
+            End Get
+            Set(value As String)
+                executeField = value
+            End Set
+        End Property
+
+        '''<remarks/>
+        <XmlAttribute()>
+        Public Property type() As String
+            Get
+                Return typeField
+            End Get
+            Set(value As String)
+                typeField = value
+            End Set
+        End Property
+
+    End Class 'CommandsTransactionCommand
+
+    '''<remarks/>
+    <XmlType(AnonymousType:=True)>
+    Partial Public Class CommandsNoTransactionCommand
+
+        Private descriptionField As String
+
+        Private executeField As String
+
+        Private typeField As String
+
+        '''<remarks/>
+        Public Property description() As String
+            Get
+                Return descriptionField
+            End Get
+            Set(value As String)
+                descriptionField = value
+            End Set
+        End Property
+
+        '''<remarks/>
+        Public Property execute() As String
+            Get
+                Return executeField
+            End Get
+            Set(value As String)
+                executeField = value
+            End Set
+        End Property
+
+        '''<remarks/>
+        <XmlAttribute()>
+        Public Property type() As String
+            Get
+                Return typeField
+            End Get
+            Set(value As String)
+                typeField = value
+            End Set
+        End Property
+
+    End Class 'CommandsNoTransactionCommand
 
     Public Class ImgResult
 
@@ -91,7 +219,7 @@ Public Class Containers
 #Region "Constructors"
 
         Public Sub New()
-            Me.Clear()
+            Clear()
         End Sub
 
 #End Region 'Constructors
@@ -161,7 +289,7 @@ Public Class Containers
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New()
-            Me.Clear()
+            Clear()
         End Sub
 
 #End Region 'Constructors
@@ -170,84 +298,84 @@ Public Class Containers
 
         Public Property ImageIndex() As Integer
             Get
-                Return Me._imageindex
+                Return _imageindex
             End Get
             Set(ByVal value As Integer)
-                Me._imageindex = value
+                _imageindex = value
             End Set
         End Property
 
-        <System.Xml.Serialization.XmlIgnore()> _
+        <XmlIgnore()>
         Public Property Image() As Image
             Get
-                Return Me._image
+                Return _image
             End Get
             Set(ByVal value As Image)
-                Me._image = value
+                _image = value
             End Set
         End Property
 
         Public Property Name() As String
             Get
-                Return Me._name
+                Return _name
             End Get
             Set(ByVal value As String)
-                Me._name = value
+                _name = value
             End Set
         End Property
 
         Public Property Order() As Integer
             Get
-                Return Me._order
+                Return _order
             End Get
             Set(ByVal value As Integer)
-                Me._order = value
+                _order = value
             End Set
         End Property
 
-        <System.Xml.Serialization.XmlIgnore()> _
+        <XmlIgnore()>
         Public Property Panel() As Panel
             Get
-                Return Me._panel
+                Return _panel
             End Get
             Set(ByVal value As Panel)
-                Me._panel = value
+                _panel = value
             End Set
         End Property
 
         Public Property Parent() As String
             Get
-                Return Me._parent
+                Return _parent
             End Get
             Set(ByVal value As String)
-                Me._parent = value
+                _parent = value
             End Set
         End Property
 
         Public Property Prefix() As String
             Get
-                Return Me._prefix
+                Return _prefix
             End Get
             Set(ByVal value As String)
-                Me._prefix = value
+                _prefix = value
             End Set
         End Property
 
         Public Property Text() As String
             Get
-                Return Me._text
+                Return _text
             End Get
             Set(ByVal value As String)
-                Me._text = value
+                _text = value
             End Set
         End Property
 
         Public Property Type() As String
             Get
-                Return Me._type
+                Return _type
             End Get
             Set(ByVal value As String)
-                Me._type = value
+                _type = value
             End Set
         End Property
 
@@ -256,70 +384,20 @@ Public Class Containers
 #Region "Methods"
 
         Public Sub Clear()
-            Me._imageindex = 0
-            Me._image = Nothing
-            Me._name = String.Empty
-            Me._order = 0
-            Me._panel = New Panel
-            Me._parent = String.Empty
-            Me._prefix = String.Empty
-            Me._text = String.Empty
-            Me._type = String.Empty
+            _imageindex = 0
+            _image = Nothing
+            _name = String.Empty
+            _order = 0
+            _panel = New Panel
+            _parent = String.Empty
+            _prefix = String.Empty
+            _text = String.Empty
+            _type = String.Empty
         End Sub
 
 #End Region 'Methods
 
     End Class 'SettingsPanel
-
-    Public Class TVLanguage
-
-#Region "Fields"
-
-        Private _longlang As String
-        Private _shortlang As String
-
-#End Region 'Fields
-
-#Region "Constructors"
-
-        Public Sub New()
-            Me.Clear()
-        End Sub
-
-#End Region 'Constructors
-
-#Region "Properties"
-
-        Public Property LongLang() As String
-            Get
-                Return Me._longlang
-            End Get
-            Set(ByVal value As String)
-                Me._longlang = value
-            End Set
-        End Property
-
-        Public Property ShortLang() As String
-            Get
-                Return Me._shortlang
-            End Get
-            Set(ByVal value As String)
-                Me._shortlang = value
-            End Set
-        End Property
-
-#End Region 'Properties
-
-#Region "Methods"
-
-        Public Sub Clear()
-            Me._longlang = String.Empty
-            Me._shortlang = String.Empty
-        End Sub
-
-#End Region 'Methods
-
-    End Class 'TVLanguage
 
     Public Class Addon
 #Region "Fields"
@@ -333,140 +411,140 @@ Public Class Containers
         Private _maxeversion As Single
         Private _screenshotpath As String
         Private _screenshotimage As Image
-        Private _files As Generic.SortedList(Of String, String)
+        Private _files As SortedList(Of String, String)
         Private _deletefiles As List(Of String)
 #End Region 'Fields
 
 #Region "Properties"
         Public Property ID() As Integer
             Get
-                Return Me._id
+                Return _id
             End Get
             Set(ByVal value As Integer)
-                Me._id = value
+                _id = value
             End Set
         End Property
 
         Public Property Name() As String
             Get
-                Return Me._name
+                Return _name
             End Get
             Set(ByVal value As String)
-                Me._name = value
+                _name = value
             End Set
         End Property
 
         Public Property Author() As String
             Get
-                Return Me._author
+                Return _author
             End Get
             Set(ByVal value As String)
-                Me._author = value
+                _author = value
             End Set
         End Property
 
         Public Property Description() As String
             Get
-                Return Me._description
+                Return _description
             End Get
             Set(ByVal value As String)
-                Me._description = value
+                _description = value
             End Set
         End Property
 
         Public Property Category() As String
             Get
-                Return Me._category
+                Return _category
             End Get
             Set(ByVal value As String)
-                Me._category = value
+                _category = value
             End Set
         End Property
 
         Public Property Version() As Single
             Get
-                Return Me._version
+                Return _version
             End Get
             Set(ByVal value As Single)
-                Me._version = value
+                _version = value
             End Set
         End Property
 
         Public Property MinEVersion() As Single
             Get
-                Return Me._mineversion
+                Return _mineversion
             End Get
             Set(ByVal value As Single)
-                Me._mineversion = value
+                _mineversion = value
             End Set
         End Property
 
         Public Property MaxEVersion() As Single
             Get
-                Return Me._maxeversion
+                Return _maxeversion
             End Get
             Set(ByVal value As Single)
-                Me._maxeversion = value
+                _maxeversion = value
             End Set
         End Property
 
         Public Property ScreenShotPath() As String
             Get
-                Return Me._screenshotpath
+                Return _screenshotpath
             End Get
             Set(ByVal value As String)
-                Me._screenshotpath = value
+                _screenshotpath = value
             End Set
         End Property
 
         Public Property ScreenShotImage() As Image
             Get
-                Return Me._screenshotimage
+                Return _screenshotimage
             End Get
             Set(ByVal value As Image)
-                Me._screenshotimage = value
+                _screenshotimage = value
             End Set
         End Property
 
-        Public Property Files() As Generic.SortedList(Of String, String)
+        Public Property Files() As SortedList(Of String, String)
             Get
-                Return Me._files
+                Return _files
             End Get
-            Set(ByVal value As Generic.SortedList(Of String, String))
-                Me._files = value
+            Set(ByVal value As SortedList(Of String, String))
+                _files = value
             End Set
         End Property
 
         Public Property DeleteFiles() As List(Of String)
             Get
-                Return Me._deletefiles
+                Return _deletefiles
             End Get
             Set(ByVal value As List(Of String))
-                Me._deletefiles = value
+                _deletefiles = value
             End Set
         End Property
 #End Region 'Properties
 
 #Region "Constructors"
         Public Sub New()
-            Me.Clear()
+            Clear()
         End Sub
 #End Region 'Constructors
 
 #Region "Methods"
         Public Sub Clear()
-            Me._id = -1
-            Me._name = String.Empty
-            Me._author = String.Empty
-            Me._description = String.Empty
-            Me._category = String.Empty
-            Me._version = -1
-            Me._mineversion = -1
-            Me._maxeversion = -1
-            Me._screenshotpath = String.Empty
-            Me._screenshotimage = Nothing
-            Me._files = New Generic.SortedList(Of String, String)
-            Me._deletefiles = New List(Of String)
+            _id = -1
+            _name = String.Empty
+            _author = String.Empty
+            _description = String.Empty
+            _category = String.Empty
+            _version = -1
+            _mineversion = -1
+            _maxeversion = -1
+            _screenshotpath = String.Empty
+            _screenshotimage = Nothing
+            _files = New SortedList(Of String, String)
+            _deletefiles = New List(Of String)
         End Sub
 #End Region 'Methods
 
@@ -476,230 +554,312 @@ Public Class Containers
 
 End Class 'Containers
 
-Public Class Globals
-
-#Region "Fields"
-
-    Public backdrop_names(3) As Structures.v3Size
-    Public poster_names(5) As Structures.v3Size
-
-#End Region 'Fields
-
-#Region "Methods"
-
-    Public Sub New()
-        poster_names(0).description = "thumb"
-        poster_names(0).index = Enums.PosterSize.Small
-        poster_names(0).size = "w92"
-        poster_names(0).width = 92
-        poster_names(1).description = "w154"
-        poster_names(1).index = -1 'not used in combo box
-        poster_names(1).size = "w154"
-        poster_names(1).width = 154
-        poster_names(2).description = "cover"
-        poster_names(2).index = Enums.PosterSize.Mid
-        poster_names(2).size = "w185"
-        poster_names(2).width = 185
-        poster_names(3).description = "w342"
-        poster_names(3).index = -1 'not used in combo box
-        poster_names(3).size = "w342"
-        poster_names(3).width = 342
-        poster_names(4).description = "mid"
-        poster_names(4).index = Enums.PosterSize.Lrg
-        poster_names(4).size = "w500"
-        poster_names(4).width = 500
-        poster_names(5).description = "original"
-        poster_names(5).index = Enums.PosterSize.Xlrg
-        poster_names(5).size = "original"
-        poster_names(5).width = 0
-
-        backdrop_names(0).description = "thumb"
-        backdrop_names(0).index = Enums.PosterSize.Small
-        backdrop_names(0).size = "w300"
-        backdrop_names(0).width = 300
-        backdrop_names(1).description = "poster"
-        backdrop_names(1).index = Enums.PosterSize.Mid
-        backdrop_names(1).size = "w780"
-        backdrop_names(1).width = 780
-        backdrop_names(2).description = "w1280"
-        backdrop_names(2).index = Enums.PosterSize.Lrg
-        backdrop_names(2).size = "w1280"
-        backdrop_names(2).width = 1280
-        backdrop_names(3).description = "original"
-        backdrop_names(3).index = Enums.PosterSize.Xlrg
-        backdrop_names(3).size = "original"
-        backdrop_names(3).width = 0
-    End Sub
-#End Region 'Methods
-
-End Class 'Globals
-
 Public Class Enums
 
 #Region "Enumerations"
 
-	Public Enum DefaultType As Integer
-		All = 0
-		MovieFilters = 1
-		ShowFilters = 2
-		EpFilters = 3
-		ValidExts = 4
-        ShowRegex = 5
+    Public Enum SortMethod_MovieSet As Integer
+        Year = 0    'default in Kodi, so have to be on the first position of enumeration
+        Title = 1
+    End Enum
+    ''' <summary>
+    ''' 0 results in using the current datetime when adding a video
+    ''' 1 results in prefering to use the files mtime (if it's valid) and only using the file's ctime if the mtime isn't valid
+    ''' 2 results in using the newer datetime of the file's mtime and ctime
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Enum DateTime As Integer
+        Now = 0
+        ctime = 1
+        mtime = 2
+        Newer = 3
+    End Enum
+
+    Public Enum DefaultType As Integer
+        All = 0
+        MovieFilters = 1
+        ShowFilters = 2
+        EpFilters = 3
+        ValidExts = 4
+        TVShowMatching = 5
         TrailerCodec = 6
         ValidThemeExts = 7
-	End Enum
-
-    Public Enum DelType As Integer
-        Movies = 0
-        Shows = 1
-        Seasons = 2
-        Episodes = 3
+        ValidSubtitleExts = 8
+        MovieListSorting = 9
+        MovieSetListSorting = 10
+        TVEpisodeListSorting = 11
+        TVSeasonListSorting = 12
+        TVShowListSorting = 13
+        MovieSortTokens = 14
+        MovieSetSortTokens = 15
+        TVSortTokens = 16
     End Enum
 
-    Public Enum FanartSize As Integer
-        Xlrg = 0
-        Lrg = 1
-        Mid = 2
-        Small = 3
+    Public Enum ContentType As Integer
+        None = 0
+        Generic = 1
+        Movie = 2
+        MovieSet = 3
+        Music = 4
+        TV = 5
+        TVEpisode = 6
+        TVSeason = 7
+        TVShow = 8
     End Enum
-    ''' <summary>
-    ''' Enum representing possible scrape data types
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Enum MovieModType As Integer
-        NFO = 0
-        Poster = 1
-        Fanart = 2
-        EThumbs = 3
-        Trailer = 4
-        Meta = 5
-        All = 6
-        DoSearch = 7
-        ActorThumbs = 8
-        EFanarts = 9
-        Banner = 10
-        DiscArt = 11
-        ClearLogo = 12
-        ClearArt = 13
-        Landscape = 14
-        WatchedFile = 15
-        CharacterArt = 16
-        Theme = 17
-    End Enum
-    ''' <summary>
-    ''' Enum representing possible scrape data types
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Enum TVModType As Integer
+
+    Public Enum ModifierType As Integer
         All = 0
-        DoSearch = 1
-        AllSeasonsBanner = 2
-        AllSeasonsFanart = 3
-        AllSeasonsLandscape = 4
-        AllSeasonsPoster = 5
-        EpisodeFanart = 6
-        EpisodeMeta = 7
-        EpisodeNfo = 8
-        EpisodePoster = 9
-        SeasonBanner = 10
-        SeasonFanart = 11
-        SeasonLandscape = 12
-        SeasonPoster = 13
-        ShowBanner = 14
-        ShowCharacterArt = 15
-        ShowClearArt = 16
-        ShowClearLogo = 17
-        ShowEFanarts = 18
-        ShowFanart = 19
-        ShowLandscape = 20
-        ShowNfo = 21
-        ShowPoster = 22
-        ShowTheme = 23
-    End Enum
-    ''' <summary>
-    ''' Enum representing possible scraper capabilities
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Enum ScraperCapabilities
-        Poster = 0
-        Fanart = 1
-        Trailer = 2
-        ActorThumbs = 3
-        Banner = 4
-        CharacterArt = 5
-        ClearArt = 6
-        ClearLogo = 7
-        DiscArt = 8
-        Landscape = 9
-        Theme = 10
+        AllSeasonsBanner = 1
+        AllSeasonsFanart = 2
+        AllSeasonsLandscape = 3
+        AllSeasonsPoster = 4
+        DoSearch = 5
+        EpisodeActorThumbs = 6
+        EpisodeFanart = 7
+        EpisodePoster = 8
+        EpisodeMeta = 9
+        EpisodeNFO = 10
+        EpisodeSubtitle = 11
+        EpisodeWatchedFile = 12
+        MainActorThumbs = 13
+        MainBanner = 14
+        MainCharacterArt = 15
+        MainClearArt = 16
+        MainClearLogo = 17
+        MainDiscArt = 18
+        MainExtrafanarts = 19
+        MainExtrathumbs = 20
+        MainFanart = 21
+        MainLandscape = 22
+        MainMeta = 23
+        MainNFO = 24
+        MainPoster = 25
+        MainSubtitle = 26
+        MainTheme = 27
+        MainTrailer = 28
+        MainWatchedFile = 29
+        SeasonBanner = 30
+        SeasonFanart = 31
+        SeasonLandscape = 32
+        SeasonNFO = 33
+        SeasonPoster = 34
+        withEpisodes = 35
+        withSeasons = 36
     End Enum
 
     Public Enum ModuleEventType As Integer
-        Generic = 0
-        Notification = 1
-        MovieScraperRDYtoSave = 2       ' Called when scraper finishs but before save
-        RenameMovie = 3                 ' Called when need to rename a Movie ... from several places
-        RenameMovieManual = 4           ' Will call only First Register Module (use Master.currMovie)
-        MovieFrameExtrator = 5
-        TVFrameExtrator = 6
-        RandomFrameExtrator = 7
-        CommandLine = 8                 ' Command Line Module Call
-        MovieSync = 9
-        ShowMovie = 10                  ' Called after displaying Movie  (not in place yet)
-        ShowTVShow = 11                 ' Called after displaying TVShow (not in place yet)
-        BeforeEditMovie = 12            ' Called when Manual editing or reading from nfo
-        OnMovieNFOSave = 13
-        OnMoviePosterSave = 14
-        OnMovieFanartSave = 15
-        OnMoviePosterDelete = 16
-        OnMovieFanartDelete = 17
-        TVImageNaming = 18
-        MovieImageNaming = 19
-        SyncModuleSettings = 20
-        OnTVShowNFOSave = 21
-        OnTVShowNFORead = 22
-        OnMovieLandscapeSave = 23
-        OnMovieBannerSave = 24
-        OnMovieClearArtSave = 24
-        OnMovieClearLogoSave = 24
-        OnMovieDiscArtSave = 24
-    End Enum
-
-    Public Enum MovieScraperEventType As Integer
-        NFOItem = 0
-        PosterItem = 1
-        FanartItem = 2
-        TrailerItem = 3
-        EThumbsItem = 4
-        SortTitle = 5
-        ListTitle = 6
-        BannerItem = 7
-        LandscapeItem = 8
-        ThemeItem = 9
-        ClearArtItem = 10
-        ClearLogoItem = 11
-        DiscArtItem = 12
-        EFanartsItem = 13
+        ''' <summary>
+        ''' Called after edit movie
+        ''' </summary>
+        ''' <remarks></remarks>
+        AfterEdit_Movie = 0
+        ''' <summary>
+        ''' Called after edit movieset
+        ''' </summary>
+        ''' <remarks></remarks>
+        AfterEdit_MovieSet = 1
+        ''' <summary>
+        ''' Called after edit episode
+        ''' </summary>
+        ''' <remarks></remarks>
+        AfterEdit_TVEpisode = 2
+        ''' <summary>
+        ''' Called after edit season
+        ''' </summary>
+        ''' <remarks></remarks>
+        AfterEdit_TVSeason = 3
+        ''' <summary>
+        ''' Called after edit show
+        ''' </summary>
+        ''' <remarks></remarks>
+        AfterEdit_TVShow = 4
+        ''' <summary>
+        ''' Called after update DB process
+        ''' </summary>
+        ''' <remarks></remarks>
+        AfterUpdateDB_TV = 5
+        ''' <summary>
+        ''' Called after update DB process
+        ''' </summary>
+        ''' <remarks></remarks>
+        AfterUpdateDB_Movie = 6
+        ''' <summary>
+        ''' Called when Manual editing or reading from nfo
+        ''' </summary>
+        ''' <remarks></remarks>
+        BeforeEdit_Movie = 7
+        ''' <summary>
+        ''' Called when Manual editing or reading from nfo
+        ''' </summary>
+        ''' <remarks></remarks>
+        BeforeEdit_MovieSet = 8
+        ''' <summary>
+        ''' Called when Manual editing or reading from nfo
+        ''' </summary>
+        ''' <remarks></remarks>
+        BeforeEdit_TVEpisode = 9
+        ''' <summary>
+        ''' Called when Manual editing or reading from nfo
+        ''' </summary>
+        ''' <remarks></remarks>
+        BeforeEdit_TVSeason = 10
+        ''' <summary>
+        ''' Called when Manual editing or reading from nfo
+        ''' </summary>
+        ''' <remarks></remarks>
+        BeforeEdit_TVShow = 11
+        ''' <summary>
+        ''' Command Line Module Call
+        ''' </summary>
+        ''' <remarks></remarks>
+        CommandLine = 12
+        FrameExtrator_Movie = 13
+        FrameExtrator_TVEpisode = 14
+        Generic = 15
+        MediaPlayer_Audio = 16
+        MediaPlayer_Video = 17
+        MediaPlayerPlay_Audio = 18
+        MediaPlayerPlay_Video = 19
+        MediaPlayerPlaylistAdd_Audio = 20
+        MediaPlayerPlaylistAdd_Video = 21
+        MediaPlayerPlaylistClear_Audio = 22
+        MediaPlayerPlaylistClear_Video = 23
+        MediaPlayerStop_Audio = 24
+        MediaPlayerStop_Video = 25
+        Notification = 26
+        OnBannerSave_Movie = 24
+        OnClearArtSave_Movie = 28
+        OnClearLogoSave_Movie = 29
+        OnDiscArtSave_Movie = 30
+        OnFanartDelete_Movie = 31
+        OnFanartSave_Movie = 32
+        OnLandscapeSave_Movie = 33
+        OnNFORead_TVShow = 34
+        OnNFOSave_Movie = 35
+        OnNFOSave_TVShow = 36
+        OnPosterDelete_Movie = 37
+        OnPosterSave_Movie = 38
+        OnThemeSave_Movie = 39
+        OnTrailerSave_Movie = 40
+        RandomFrameExtrator = 41
+        Remove_Movie = 42
+        Remove_MovieSet = 43
+        Remove_TVEpisode = 44
+        Remove_TVSeason = 45
+        Remove_TVShow = 46
+        ''' <summary>
+        ''' Called during auto scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperMulti_Movie = 47
+        ''' <summary>
+        ''' Called during auto scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperMulti_TVEpisode = 48
+        ''' <summary>
+        ''' Called during manual scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperSingle_Movie = 49
+        ''' <summary>
+        ''' Called during manual scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperSingle_TVEpisode = 50
+        ShowMovie = 51
+        ShowTVShow = 52
+        SyncModuleSettings = 53
+        Sync_Movie = 54
+        Sync_MovieSet = 55
+        Sync_TVEpisode = 56
+        Sync_TVSeason = 57
+        Sync_TVShow = 58
+        Task = 59
+        ''' <summary>
+        ''' Called during auto scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperMulti_TVShow = 60
+        ''' <summary>
+        ''' Called during manual scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperSingle_TVShow = 61
+        ''' <summary>
+        ''' Called during auto scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperMulti_TVSeason = 62
+        ''' <summary>
+        ''' Called during manual scraping
+        ''' </summary>
+        ''' <remarks></remarks>
+        ScraperSingle_TVSeason = 63
+        DuringUpdateDB_TV = 64
     End Enum
     ''' <summary>
     ''' Enum representing valid TV series ordering.
     ''' </summary>
     ''' <remarks></remarks>
-    Public Enum Ordering As Integer
+    Public Enum EpisodeOrdering As Integer
         Standard = 0
         DVD = 1
         Absolute = 2
+        DayOfYear = 3
     End Enum
     ''' <summary>
-    ''' Enum represeting valid poster sizes
+    ''' Enum representing Order of displaying Episodes
     ''' </summary>
     ''' <remarks></remarks>
-    Public Enum PosterSize As Integer
-        Xlrg = 0
-        Lrg = 1
-        Mid = 2
-        Small = 3
-        Wide = 4
+    Public Enum EpisodeSorting As Integer
+        Episode = 0
+        Aired = 1
+    End Enum
+
+    Public Enum MovieBannerSize As Integer
+        HD185 = 0       'Fanart.tv has only 1000x185
+        Any = 99
+    End Enum
+
+    Public Enum MovieFanartSize As Integer
+        UHD2160 = 0
+        QHD1440 = 1
+        HD1080 = 2
+        HD720 = 3
+        Thumb = 4
+        Any = 99
+    End Enum
+
+    Public Enum MoviePosterSize As Integer
+        HD3000 = 0
+        HD2100 = 1
+        HD1500 = 2
+        HD1426 = 3
+        Any = 99
+    End Enum
+
+    Public Enum ScannerEventType As Integer
+        AddedMovie = 0
+        AddedTVEpisode = 1
+        CleaningDatabase = 2
+        PreliminaryTasks = 3
+    End Enum
+
+    Public Enum ScraperEventType As Integer
+        BannerItem = 0
+        CharacterArtItem = 1
+        ClearArtItem = 2
+        ClearLogoItem = 3
+        DiscArtItem = 4
+        ExtrafanartsItem = 5
+        ExtrathumbsItem = 6
+        FanartItem = 7
+        LandscapeItem = 8
+        NFOItem = 9
+        PosterItem = 10
+        ThemeItem = 11
+        TrailerItem = 12
     End Enum
     ''' <summary>
     ''' Enum representing which Movies/TVShows should be scraped,
@@ -707,149 +867,147 @@ Public Class Enums
     ''' </summary>
     ''' <remarks></remarks>
     Public Enum ScrapeType As Integer
-        SingleScrape = 0
-        FullAuto = 1
-        FullAsk = 2
-        FullSkip = 3
-        UpdateAuto = 4
-        UpdateAsk = 5
-        UpdateSkip = 6
-        CleanFolders = 7
-        NewAuto = 8
-        NewAsk = 9
-        NewSkip = 10
-        MarkAuto = 11
-        MarkAsk = 12
-        MarkSkip = 13
-        FilterAuto = 14
-        FilterAsk = 15
-        FilterSkip = 16
-        CopyBackdrops = 17
-        SingleField = 18
+        AllAuto = 0
+        AllAsk = 1
+        AllSkip = 2
+        MissingAuto = 3
+        MissingAsk = 4
+        MissingSkip = 5
+        NewAuto = 6
+        NewAsk = 7
+        NewSkip = 8
+        MarkedAuto = 9
+        MarkedAsk = 10
+        MarkedSkip = 11
+        FilterAuto = 12
+        FilterAsk = 13
+        FilterSkip = 14
+        SingleScrape = 15
+        SingleField = 16
+        SingleAuto = 17
+        SelectedAuto = 18
+        SelectedAsk = 19
+        SelectedSkip = 20
         None = 99
     End Enum
 
-    Public Enum TVFanartSize As Integer
-        HD1080 = 0      'TVDB has only 1280x720 and 1920x1080
-        HD720 = 1
+    Public Enum TaskManagerEventType As Integer
+        RefreshRow = 0
+        SimpleMessage = 1
     End Enum
 
-    Public Enum TVPosterSize As Integer
-        HD1000 = 0      'TVDB has only 680x1000
+    Public Enum TaskManagerType As Integer
+        CopyBackdrops = 0
+        Reload = 1
+        SetWatchedState = 2
     End Enum
 
-    Public Enum TVSeasonPosterType As Integer
-        None = 0
-        Poster = 1
-        Wide = 2
+    Public Enum TVBannerSize As Integer
+        HD185 = 0       'Fanart.tv only 1000x185 (season and tv show banner)
+        HD140 = 1       'TVDB has only 758x140 (season and tv show banner)
+        Any = 99
     End Enum
 
-    Public Enum MovieBannerType As Integer 'TODO: add correct fanart.tv types
-        None = 0
-        Blank = 1
-        Graphical = 2
-        Text = 3
-    End Enum
-
-    Public Enum TVSeasonBannerType As Integer
+    Public Enum TVBannerType As Integer
         Blank = 0       'will leave the title and show logo off the banner
         Graphical = 1   'will show the series name in the show's official font or will display the actual logo for the show
         Text = 2        'will show the series name as plain text in an Arial font
+        Any = 99
     End Enum
 
-    Public Enum TVShowBannerType As Integer
-        None = 0
-        Blank = 1       'will leave the title and show logo off the banner
-        Graphical = 2   'will show the series name in the show's official font or will display the actual logo for the show
-        Text = 3        'will show the series name as plain text in an Arial font
+    Public Enum TVFanartSize As Integer
+        UHD2160 = 0
+        QHD1440 = 1
+        HD1080 = 2      'Fanart.tv has only 1920x1080
+        HD720 = 3      'TVDB has 1280x720 and 1920x1080
+        Any = 99
+    End Enum
+
+    Public Enum TVPosterSize As Integer
+        HD3000 = 0
+        HD1500 = 1
+        HD1426 = 2      'Fanart.tv has only 1000x1426
+        HD1000 = 3      'TVDB has only 680x1000
+        Any = 99
+    End Enum
+
+    Public Enum TVEpisodePosterSize As Integer
+        UHD2160 = 0
+        HD1080 = 1
+        HD720 = 2
+        SD225 = 3      'TVDB has only 400 x 300 (400x225 for 16:9 images)
+        Any = 99
+    End Enum
+
+    Public Enum TVSeasonPosterSize As Integer
+        HD1500 = 0
+        HD1426 = 1
+        HD578 = 2
+        Any = 99
     End Enum
     ''' <summary>
     ''' Enum representing the trailer codec options
     ''' </summary>
     ''' <remarks></remarks>
-    Public Enum TrailerCodec As Integer
+    Public Enum TrailerAudioCodec As Integer
         MP4 = 0
         WebM = 1
-        v3GP = 2
-        FLV = 3
-        OTHERS = 4
+        UNKNOWN = 99
     End Enum
     ''' <summary>
     ''' Enum representing the trailer quality options
     ''' </summary>
     ''' <remarks></remarks>
-    Public Enum TrailerQuality As Integer
-        All = 0
-        HD1080p = 1
-        HD720p = 2
-        HQ480p = 3
-        SQ360p = 4
-        SQ240p = 5
-        SQ144p = 6
-        OTHERS = 7
+    Public Enum TrailerAudioQuality As Integer
+        AAC256kbps = 0
+        AAC128kbps = 1
+        AAC48kbps = 2
+        Vorbis192kbps = 3
+        Vorbis128kbps = 4
+        UNKNOWN = 5
+        Any = 99
     End Enum
     ''' <summary>
-    ''' Enum represeting valid movie image types
+    ''' Enum representing the trailer type options
     ''' </summary>
     ''' <remarks></remarks>
-    Public Enum MovieImageType As Integer
-        Banner = 0
-        CharacterArt = 1
-        ClearArt = 2
-        ClearLogo = 3
-        DiscArt = 4
-        EFanarts = 5
-        EThumbs = 6
-        Fanart = 7
-        Landscape = 8
-        Poster = 9
+    Public Enum TrailerType As Integer
+        Clip = 0
+        Featurette = 1
+        Teaser = 2
+        Trailer = 3
+        Any = 99
     End Enum
     ''' <summary>
-    ''' Enum representing valid TV image types
+    ''' Enum representing the trailer codec options
     ''' </summary>
     ''' <remarks></remarks>
-    Public Enum TVImageType As Integer
-        All = 0
-        AllSeasonsBanner = 1
-        AllSeasonsFanart = 2
-        AllSeasonsLandscape = 3
-        AllSeasonsPoster = 4
-        EpisodeFanart = 5
-        EpisodePoster = 6
-        SeasonBanner = 7
-        SeasonFanart = 8
-        SeasonLandscape = 9
-        SeasonPoster = 10
-        ShowBanner = 11
-        ShowCharacterArt = 12
-        ShowClearArt = 13
-        ShowClearLogo = 14
-        ShowFanart = 15
-        ShowLandscape = 16
-        ShowPoster = 17
+    Public Enum TrailerVideoCodec As Integer
+        MP4 = 0
+        WebM = 1
+        v3GP = 2
+        FLV = 3
+        UNKNOWN = 4
     End Enum
-
-    Public Enum TVScraperEventType As Integer
-        Progress = 0
-        SearchResultsDownloaded = 1
-        StartingDownload = 2
-        ShowDownloaded = 3
-        SavingStarted = 4
-        ScraperDone = 5
-        LoadingEpisodes = 6
-        Searching = 7
-        SelectImages = 8
-        Verifying = 9
-        Cancelled = 10
-        SaveAuto = 11
-    End Enum
-
-    Public Enum TVScraperUpdateTime As Integer
-        Week = 0
-        BiWeekly = 1
-        Month = 2
-        Never = 3
-        Always = 4
+    ''' <summary>
+    ''' Enum representing the trailer quality options
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Enum TrailerVideoQuality As Integer
+        HD2160p = 0
+        HD2160p60fps = 1
+        HD1440p = 2
+        HD1080p = 3
+        HD1080p60fps = 4
+        HD720p = 5
+        HD720p60fps = 6
+        HQ480p = 7 'or 576 for 4:3 media
+        SQ360p = 8
+        SQ240p = 9 'or 270
+        SQ144p = 10
+        SQ144p15fps = 11
+        UNKNOWN = 12
+        Any = 99
     End Enum
 
 #End Region 'Enumerations
@@ -857,9 +1015,12 @@ Public Class Enums
 End Class 'Enums
 
 Public Class Functions
+
 #Region "Fields"
-    Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
-#End Region
+
+    Shared logger As Logger = LogManager.GetCurrentClassLogger()
+
+#End Region 'Fields
 
 #Region "Methods"
 
@@ -972,41 +1133,16 @@ Public Class Functions
         Dim diff As System.TimeSpan = data - origin
         Return Math.Floor(diff.TotalSeconds)
     End Function
-    ' TODO DOC Need appropriate header and tests
-    Public Shared Function LocksToOptions() As Structures.ScrapeOptions
-        Dim options As New Structures.ScrapeOptions
-        With options
-            .bCast = True
-            .bCert = True
-            .bCleanPlotOutline = True
-            .bCollection = True
-            .bCountry = True
-            .bDirector = True
-            .bFullCast = True
-            .bFullCrew = True
-            .bGenre = Not Master.eSettings.MovieLockGenre    'Dekker500 This used to just be =True
-            .bLanguageA = Not Master.eSettings.MovieLockLanguageA
-            .bLanguageV = Not Master.eSettings.MovieLockLanguageV
-            .bMPAA = True
-            .bMusicBy = True
-            .bOtherCrew = True
-            .bOutline = Not Master.eSettings.MovieLockOutline
-            .bPlot = Not Master.eSettings.MovieLockPlot
-            .bProducers = True
-            .bRating = Not Master.eSettings.MovieLockRating
-            .bRelease = True
-            .bRuntime = True
-            .bStudio = Not Master.eSettings.MovieLockStudio
-            .bTagline = Not Master.eSettings.MovieLockTagline
-            .bTitle = Not Master.eSettings.MovieLockTitle
-            .bTop250 = True
-            .bTrailer = Not Master.eSettings.MovieLockTrailer
-            .bVotes = True
-            .bWriters = True
-            .bYear = True
-            .buseMPAAForFSK = Not Master.eSettings.MovieScraperUseMPAAFSK
-        End With
-        Return options
+
+    Public Shared Function ConvertToProperDateTime(ByVal strDateTime As String) As String
+        If String.IsNullOrEmpty(strDateTime) Then Return String.Empty
+
+        Dim parsedDateTime As DateTime
+        If DateTime.TryParse(strDateTime, parsedDateTime) Then
+            Return parsedDateTime.ToString("yyyy-MM-dd HH:mm:ss")
+        Else
+            Return String.Empty
+        End If
     End Function
     ''' <summary>
     ''' Create a collection of default Movie and TV scrape options
@@ -1016,58 +1152,62 @@ Public Class Functions
     ''' <remarks></remarks>
     Public Shared Sub CreateDefaultOptions()
         'TODO need proper unit test
-        With Master.DefaultMovieOptions
-            'TODO Dekker500 - These seem to be missing Add fields to Master!!!???
-            '.bLanguageA = Master.eSettings.FieldLanguageA
-            '.bLanguageV = Master.eSettings.FieldLanguageV
-            '.buseMPAAForFSK = Master.eSettings.UseMPAAForFSK
-            .bCast = Master.eSettings.MovieScraperCast
-            .bCert = Master.eSettings.MovieScraperCertification
-            .bCollection = Master.eSettings.MovieScraperCollection
-            .bCountry = Master.eSettings.MovieScraperCountry
-            .bDirector = Master.eSettings.MovieScraperDirector
-            .bFullCast = Master.eSettings.MovieScraperFullCast
-            .bFullCrew = Master.eSettings.MovieScraperFullCrew
-            .bGenre = Master.eSettings.MovieScraperGenre
-            .bMPAA = Master.eSettings.MovieScraperMPAA
-            .bMusicBy = Master.eSettings.MovieScraperMusicBy
-            .bOtherCrew = Master.eSettings.MovieScraperCrew
-            .bOutline = Master.eSettings.MovieScraperOutline
-            .bPlot = Master.eSettings.MovieScraperPlot
-            .bProducers = Master.eSettings.MovieScraperProducers
-            .bRating = Master.eSettings.MovieScraperRating
-            .bRelease = Master.eSettings.MovieScraperRelease
-            .bRuntime = Master.eSettings.MovieScraperRuntime
-            .bStudio = Master.eSettings.MovieScraperStudio
-            .bTagline = Master.eSettings.MovieScraperTagline
-            .bTitle = Master.eSettings.MovieScraperTitle
-            .bTop250 = Master.eSettings.MovieScraperTop250
-            .bTrailer = Master.eSettings.MovieScraperTrailer
-            .bVotes = Master.eSettings.MovieScraperVotes
-            .bWriters = Master.eSettings.MovieScraperWriters
-            .bYear = Master.eSettings.MovieScraperYear
+        With Master.DefaultOptions_Movie
+            .bMainActors = Master.eSettings.MovieScraperCast
+            .bMainCertifications = Master.eSettings.MovieScraperCert
+            .bMainCollectionID = Master.eSettings.MovieScraperCollectionID
+            .bMainCountries = Master.eSettings.MovieScraperCountry
+            .bMainDirectors = Master.eSettings.MovieScraperDirector
+            .bMainGenres = Master.eSettings.MovieScraperGenre
+            .bMainMPAA = Master.eSettings.MovieScraperMPAA
+            .bMainOriginalTitle = Master.eSettings.MovieScraperOriginalTitle
+            .bMainOutline = Master.eSettings.MovieScraperOutline
+            .bMainPlot = Master.eSettings.MovieScraperPlot
+            .bMainRating = Master.eSettings.MovieScraperRating
+            .bMainRelease = Master.eSettings.MovieScraperRelease
+            .bMainRuntime = Master.eSettings.MovieScraperRuntime
+            .bMainStudios = Master.eSettings.MovieScraperStudio
+            .bMainTagline = Master.eSettings.MovieScraperTagline
+            .bMainTitle = Master.eSettings.MovieScraperTitle
+            .bMainTop250 = Master.eSettings.MovieScraperTop250
+            .bMainTrailer = Master.eSettings.MovieScraperTrailer
+            .bMainWriters = Master.eSettings.MovieScraperCredits
+            .bMainYear = Master.eSettings.MovieScraperYear
         End With
 
-        With Master.DefaultTVOptions
-            .bEpActors = Master.eSettings.TVScraperEpisodeActors
-            .bEpAired = Master.eSettings.TVScraperEpisodeAired
-            .bEpCredits = Master.eSettings.TVScraperEpisodeCredits
-            .bEpDirector = Master.eSettings.TVScraperEpisodeDirector
-            .bEpEpisode = Master.eSettings.TVScraperEpisodeEpisode
-            .bEpPlot = Master.eSettings.TVScraperEpisodePlot
-            .bEpRating = Master.eSettings.TVScraperEpisodeRating
-            .bEpSeason = Master.eSettings.TVScraperEpisodeSeason
-            .bEpTitle = Master.eSettings.TVScraperEpisodeTitle
-            .bShowActors = Master.eSettings.TVScraperShowActors
-            .bShowEpisodeGuide = Master.eSettings.TVScraperShowEpiGuideURL
-            .bShowGenre = Master.eSettings.TVScraperShowGenre
-            .bShowMPAA = Master.eSettings.TVScraperShowMPAA
-            .bShowPlot = Master.eSettings.TVScraperShowPlot
-            .bShowPremiered = Master.eSettings.TVScraperShowPremiered
-            .bShowRating = Master.eSettings.TVScraperShowRating
-            .bShowStatus = Master.eSettings.TVScraperShowStatus
-            .bShowStudio = Master.eSettings.TVScraperShowStudio
-            .bShowTitle = Master.eSettings.TVScraperShowTitle
+        With Master.DefaultOptions_MovieSet
+            .bMainPlot = Master.eSettings.MovieSetScraperPlot
+            .bMainTitle = Master.eSettings.MovieSetScraperTitle
+        End With
+
+        With Master.DefaultOptions_TV
+            .bEpisodeActors = Master.eSettings.TVScraperEpisodeActors
+            .bEpisodeAired = Master.eSettings.TVScraperEpisodeAired
+            .bEpisodeCredits = Master.eSettings.TVScraperEpisodeCredits
+            .bEpisodeDirectors = Master.eSettings.TVScraperEpisodeDirector
+            .bEpisodeGuestStars = Master.eSettings.TVScraperEpisodeGuestStars
+            .bEpisodePlot = Master.eSettings.TVScraperEpisodePlot
+            .bEpisodeRating = Master.eSettings.TVScraperEpisodeRating
+            .bEpisodeRuntime = Master.eSettings.TVScraperEpisodeRuntime
+            .bEpisodeTitle = Master.eSettings.TVScraperEpisodeTitle
+            .bMainActors = Master.eSettings.TVScraperShowActors
+            .bMainCertifications = Master.eSettings.TVScraperShowCert
+            .bMainCountries = Master.eSettings.TVScraperShowCountry
+            .bMainCreators = Master.eSettings.TVScraperShowCreators
+            .bMainEpisodeGuide = Master.eSettings.TVScraperShowEpiGuideURL
+            .bMainGenres = Master.eSettings.TVScraperShowGenre
+            .bMainMPAA = Master.eSettings.TVScraperShowMPAA
+            .bMainOriginalTitle = Master.eSettings.TVScraperShowOriginalTitle
+            .bMainPlot = Master.eSettings.TVScraperShowPlot
+            .bMainPremiered = Master.eSettings.TVScraperShowPremiered
+            .bMainRating = Master.eSettings.TVScraperShowRating
+            .bMainRuntime = Master.eSettings.TVScraperShowRuntime
+            .bMainStatus = Master.eSettings.TVScraperShowStatus
+            .bMainStudios = Master.eSettings.TVScraperShowStudio
+            .bMainTitle = Master.eSettings.TVScraperShowTitle
+            .bSeasonAired = Master.eSettings.TVScraperSeasonAired
+            .bSeasonPlot = Master.eSettings.TVScraperSeasonPlot
+            .bSeasonTitle = Master.eSettings.TVScraperSeasonTitle
         End With
     End Sub
     ''' <summary>
@@ -1117,7 +1257,40 @@ Public Class Functions
     ''' </summary>
     ''' <param name="sPath">Full path to extrathumbs directory</param>
     ''' <returns>Last detected number of the discovered extrathumbs.</returns>
-    Public Shared Function GetExtraModifier(ByVal sPath As String) As Integer
+    Public Shared Function GetExtrafanartsModifier(ByVal sPath As String) As Integer
+        Dim iMod As Integer = 0
+        Dim lThumbs As New List(Of String)
+
+        Try
+            If Directory.Exists(sPath) Then
+
+                Try
+                    lThumbs.AddRange(Directory.GetFiles(sPath, "extrafanart*.jpg"))
+                Catch
+                End Try
+
+                If lThumbs.Count > 0 Then
+                    Dim cur As Integer = 0
+                    For Each t As String In lThumbs
+                        cur = Convert.ToInt32(Regex.Match(t, "(\d+).jpg").Groups(1).ToString)
+                        iMod = Math.Max(iMod, cur)
+                    Next
+                End If
+            End If
+
+        Catch ex As Exception
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "Failed trying to identify last Extrafanart from path: " & sPath)
+        End Try
+
+        Return iMod
+    End Function
+
+    ''' <summary>
+    ''' Get the number of the last sequential extrathumb to make sure we're not overwriting current ones.
+    ''' </summary>
+    ''' <param name="sPath">Full path to extrathumbs directory</param>
+    ''' <returns>Last detected number of the discovered extrathumbs.</returns>
+    Public Shared Function GetExtrathumbsModifier(ByVal sPath As String) As Integer
         Dim iMod As Integer = 0
         Dim lThumbs As New List(Of String)
 
@@ -1139,7 +1312,7 @@ Public Class Functions
             End If
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name & vbTab & "Failed trying to identify last thumb from path: " & sPath, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "Failed trying to identify last Extrathumb from path: " & sPath)
         End Try
 
         Return iMod
@@ -1159,15 +1332,29 @@ Public Class Functions
     End Function
 
     ''' <summary>
+    ''' Get a path to the FFProbe included with the Ember distribution
+    ''' </summary>
+    ''' <returns>A path to an instance of FFProbe</returns>
+    ''' <remarks>Windows distributions have FFProbe in the Bin subdirectory.
+    ''' Note that no validation is done to ensure that FFProbe actually exists.</remarks>
+    Public Shared Function GetFFProbe() As String
+        If Master.isWindows Then
+            Return String.Concat(Functions.AppPath, "Bin", Path.DirectorySeparatorChar, "ffprobe.exe")
+        Else
+            Return "ffprobe"
+        End If
+    End Function
+
+    ''' <summary>
     ''' Populate Master.SourcesList with a list of paths to all (media?) sources stored in the database
     ''' </summary>
     Public Shared Sub GetListOfSources()
         Master.SourcesList.Clear()
         Using SQLcommand As SQLite.SQLiteCommand = Master.DB.MyVideosDBConn.CreateCommand()
-            SQLcommand.CommandText = "SELECT sources.Path FROM sources;"
+            SQLcommand.CommandText = "SELECT strPath FROM moviesource;"
             Using SQLreader As SQLite.SQLiteDataReader = SQLcommand.ExecuteReader()
                 While SQLreader.Read
-                    Master.SourcesList.Add(SQLreader("Path").ToString)
+                    Master.SourcesList.Add(SQLreader("strPath").ToString)
                 End While
             End Using
         End Using
@@ -1181,17 +1368,21 @@ Public Class Functions
     ''' <remarks></remarks>
     Public Shared Function GetSeasonDirectoryFromShowPath(ByVal ShowPath As String, ByVal iSeason As Integer) As String
         If Directory.Exists(ShowPath) Then
+            Dim SeasonFolderPattern As New List(Of String)
+            SeasonFolderPattern.Add("(?<season>specials?)$")
+            SeasonFolderPattern.Add("^(s(eason)?)?[\W_]*(?<season>[0-9]+)$")
+            SeasonFolderPattern.Add("[^\w]s(eason)?[\W_]*(?<season>[0-9]+)")
             Dim dInfo As New DirectoryInfo(ShowPath)
 
             For Each sDir As DirectoryInfo In dInfo.GetDirectories
-                For Each rShow As Settings.TVShowRegEx In Master.eSettings.TVShowRegexes.Where(Function(s) s.SeasonFromDirectory = True)
-                    For Each sMatch As Match In Regex.Matches(FileUtils.Common.GetDirectory(sDir.FullName), rShow.SeasonRegex, RegexOptions.IgnoreCase)
+                For Each pattern In SeasonFolderPattern
+                    For Each sMatch As Match In Regex.Matches(FileUtils.Common.GetDirectory(sDir.FullName), pattern, RegexOptions.IgnoreCase)
                         Try
-                            If (IsNumeric(sMatch.Groups("season").Value) AndAlso iSeason = Convert.ToInt32(sMatch.Groups("season").Value)) OrElse (Regex.IsMatch(sMatch.Groups("season").Value, "specials?", RegexOptions.IgnoreCase) AndAlso iSeason = 0) Then
+                            If (Integer.TryParse(sMatch.Groups("season").Value, 0) AndAlso iSeason = Convert.ToInt32(sMatch.Groups("season").Value)) OrElse (Regex.IsMatch(sMatch.Groups("season").Value, "specials?", RegexOptions.IgnoreCase) AndAlso iSeason = 0) Then
                                 Return sDir.FullName
                             End If
                         Catch ex As Exception
-                            logger.Error(New StackFrame().GetMethod().Name & vbTab & " Failed to determine path for season " & iSeason & " in path: " & ShowPath, ex)
+                            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & " Failed to determine path for season " & iSeason & " in path: " & ShowPath)
                         End Try
                     Next
                 Next
@@ -1200,16 +1391,40 @@ Public Class Functions
         'no matches
         Return String.Empty
     End Function
-    ''' <summary>
-    ''' Determine whether user has specified a subset of the scrapable items (Master.GlobalScrapeMod).
-    ''' </summary>
-    ''' <returns><c>True</c> if at least one modifier has been selected, <c>False</c>if no item has been selected.</returns>
-    Public Shared Function HasModifier() As Boolean
-        With Master.GlobalScrapeMod
-            If .EThumbs OrElse .EFanarts OrElse .Fanart OrElse .Meta OrElse .NFO OrElse .Poster OrElse .Trailer Then Return True
-        End With
 
-        Return False
+    Public Shared Function GetWindowsClientVersion() As String
+        Dim major As Integer = System.Environment.OSVersion.Version.Major
+        Dim minor As Integer = System.Environment.OSVersion.Version.Minor
+        Dim build As Integer = System.Environment.OSVersion.Version.Build
+        If major = 4 AndAlso minor = 0 AndAlso build = 950 Then
+            Return "Win95 Release 1"
+        ElseIf major = 4 AndAlso minor = 0 AndAlso build = 1111 Then
+            Return "Win95 Release 2"
+        ElseIf major = 4 AndAlso minor = 3 AndAlso (build = 1212 OrElse build = 1213 OrElse build = 1214) Then
+            Return "Win95 Release 2.1"
+        ElseIf major = 4 AndAlso minor = 10 AndAlso build = 1998 Then
+            Return "Win98"
+        ElseIf major = 4 AndAlso minor = 10 AndAlso build = 2222 Then
+            Return "Win98 Second Edition"
+        ElseIf major = 4 AndAlso minor = 90 Then
+            Return "WinMe"
+        ElseIf major = 5 AndAlso minor = 0 Then
+            Return "Win2000"
+        ElseIf major = 5 AndAlso minor = 1 AndAlso build = 2600 Then
+            Return "WinXP"
+        ElseIf major = 6 AndAlso minor = 0 Then
+            Return "Vista"
+        ElseIf major = 6 AndAlso minor = 1 Then
+            Return "Win7"
+        ElseIf major = 6 AndAlso minor = 2 AndAlso build = 9200 Then
+            Return "Win8"
+        ElseIf major = 6 AndAlso minor = 2 AndAlso build = 9600 Then
+            Return "Win8"
+        ElseIf major = 10 AndAlso minor = 0 AndAlso build = 10240 Then
+            Return "Win10"
+        Else
+            Return "Can not find os version."
+        End If
     End Function
     ''' <summary>
     ''' Determine whether the supplied path is already defined as a TV Show season subdirectory
@@ -1219,8 +1434,12 @@ Public Class Functions
     ''' <remarks></remarks>
     Public Shared Function IsSeasonDirectory(ByVal sPath As String) As Boolean
         'TODO Warning - Potential for false positives and false negatives as paths can be defined in different ways to arrive at the same destination
-        For Each rShow As Settings.TVShowRegEx In Master.eSettings.TVShowRegexes.Where(Function(s) s.SeasonFromDirectory = True)
-            If Regex.IsMatch(FileUtils.Common.GetDirectory(sPath), rShow.SeasonRegex, RegexOptions.IgnoreCase) Then Return True
+        Dim SeasonFolderPattern As New List(Of String)
+        SeasonFolderPattern.Add("(?<season>specials?)$")
+        SeasonFolderPattern.Add("^(s(eason)?)?[\W_]*(?<season>[0-9]+)$")
+        SeasonFolderPattern.Add("[^\w]s(eason)?[\W_]*(?<season>[0-9]+)")
+        For Each pattern In SeasonFolderPattern
+            If Regex.IsMatch(FileUtils.Common.GetDirectory(sPath), pattern, RegexOptions.IgnoreCase) Then Return True
         Next
         'no matches
         Return False
@@ -1282,181 +1501,207 @@ Public Class Functions
         End Using
     End Function
     ''' <summary>
-    ''' Determine the Structures.ScrapeModifier options that are in common between the two parameters
+    ''' Determine the Structures.MovieScrapeOptions options that are in common between the two parameters
     ''' </summary>
-    ''' <param name="Options">Base Structures.ScrapeModifier</param>
-    ''' <param name="Options2">Secondary Structures.ScrapeModifier</param>
-    ''' <returns>Structures.ScrapeModifier representing the AndAlso union of the two parameters</returns>
-    ''' <remarks></remarks>
-    Public Shared Function ScrapeModifierAndAlso(ByVal Options As Structures.ScrapeModifier, ByVal Options2 As Structures.ScrapeModifier) As Structures.ScrapeModifier
-        Dim filterModifier As New Structures.ScrapeModifier
-        filterModifier.DoSearch = Options.DoSearch AndAlso Options2.DoSearch
-        filterModifier.EThumbs = Options.EThumbs AndAlso Options2.EThumbs
-        filterModifier.EFanarts = Options.EFanarts AndAlso Options2.EFanarts
-        filterModifier.Fanart = Options.Fanart AndAlso Options2.Fanart
-        filterModifier.Meta = Options.Meta AndAlso Options2.Meta
-        filterModifier.NFO = Options.NFO AndAlso Options2.NFO
-        filterModifier.Poster = Options.Poster AndAlso Options2.Poster
-        filterModifier.Trailer = Options.Trailer AndAlso Options2.Trailer
-        filterModifier.ActorThumbs = Options.ActorThumbs AndAlso Options2.ActorThumbs
-        Return filterModifier
-    End Function
-    ''' <summary>
-    ''' Determine the Structures.ScrapeOptions options that are in common between the two parameters
-    ''' </summary>
-    ''' <param name="Options">Base Structures.ScrapeOptions</param>
-    ''' <param name="Options2">Secondary Structures.ScrapeOptions</param>
-    ''' <returns>Structures.ScrapeOptions representing the AndAlso union of the two parameters</returns>
+    ''' <param name="Options">Base Structures.MovieScrapeOptions</param>
+    ''' <param name="Options2">Secondary Structures.MovieScrapeOptions</param>
+    ''' <returns>Structures.MovieScrapeOptions representing the AndAlso union of the two parameters</returns>
     ''' <remarks></remarks>
     Public Shared Function ScrapeOptionsAndAlso(ByVal Options As Structures.ScrapeOptions, ByVal Options2 As Structures.ScrapeOptions) As Structures.ScrapeOptions
-        Dim filterOptions As New Structures.ScrapeOptions
-        filterOptions.bCast = Options.bCast AndAlso Options2.bCast
-        filterOptions.bCert = Options.bCert AndAlso Options2.bCert
-        filterOptions.bCleanPlotOutline = Options.bCleanPlotOutline AndAlso Options2.bCleanPlotOutline
-        filterOptions.bCollection = Options.bCollection AndAlso Options2.bCollection
-        filterOptions.bCountry = Options.bCountry AndAlso Options2.bCountry
-        filterOptions.bDirector = Options.bDirector AndAlso Options2.bDirector
-        filterOptions.bFullCast = Options.bFullCast AndAlso Options2.bFullCast
-        filterOptions.bFullCrew = Options.bFullCrew AndAlso Options2.bFullCrew
-        filterOptions.bGenre = Options.bGenre AndAlso Options2.bGenre
-        filterOptions.bLanguageA = Options.bLanguageA AndAlso Options2.bLanguageA
-        filterOptions.bLanguageV = Options.bLanguageV AndAlso Options2.bLanguageV
-        filterOptions.bMPAA = Options.bMPAA AndAlso Options2.bMPAA
-        filterOptions.bMusicBy = Options.bMusicBy AndAlso Options2.bMusicBy
-        filterOptions.bOtherCrew = Options.bOtherCrew AndAlso Options2.bOtherCrew
-        filterOptions.bOutline = Options.bOutline AndAlso Options2.bOutline
-        filterOptions.bPlot = Options.bPlot AndAlso Options2.bPlot
-        filterOptions.bProducers = Options.bProducers AndAlso Options2.bProducers
-        filterOptions.bRating = Options.bRating AndAlso Options2.bRating
-        filterOptions.bRelease = Options.bRelease AndAlso Options2.bRelease
-        filterOptions.bRuntime = Options.bRuntime AndAlso Options2.bRuntime
-        filterOptions.bStudio = Options.bStudio AndAlso Options2.bStudio
-        filterOptions.bTagline = Options.bTagline AndAlso Options2.bTagline
-        filterOptions.bTitle = Options.bTitle AndAlso Options2.bTitle
-        filterOptions.bTop250 = Options.bTop250 AndAlso Options2.bTop250
-        filterOptions.bTrailer = Options.bTrailer AndAlso Options2.bTrailer
-        filterOptions.bVotes = Options.bVotes AndAlso Options2.bVotes
-        filterOptions.bWriters = Options.bWriters AndAlso Options2.bWriters
-        filterOptions.bYear = Options.bYear AndAlso Options2.bYear
-        filterOptions.buseMPAAForFSK = Options.buseMPAAForFSK AndAlso Options2.buseMPAAForFSK
-        Return filterOptions
+        Dim FilteredOptions As New Structures.ScrapeOptions
+        FilteredOptions.bEpisodeActors = Options.bEpisodeActors AndAlso Options2.bEpisodeActors
+        FilteredOptions.bEpisodeAired = Options.bEpisodeAired AndAlso Options2.bEpisodeAired
+        FilteredOptions.bEpisodeCredits = Options.bEpisodeCredits AndAlso Options2.bEpisodeCredits
+        FilteredOptions.bEpisodeDirectors = Options.bEpisodeDirectors AndAlso Options2.bEpisodeDirectors
+        FilteredOptions.bEpisodeGuestStars = Options.bEpisodeGuestStars AndAlso Options2.bEpisodeGuestStars
+        FilteredOptions.bEpisodePlot = Options.bEpisodePlot AndAlso Options2.bEpisodePlot
+        FilteredOptions.bEpisodeRating = Options.bEpisodeRating AndAlso Options2.bEpisodeRating
+        FilteredOptions.bEpisodeRuntime = Options.bEpisodeRuntime AndAlso Options2.bEpisodeRuntime
+        FilteredOptions.bEpisodeTitle = Options.bEpisodeTitle AndAlso Options2.bEpisodeTitle
+        FilteredOptions.bMainActors = Options.bMainActors AndAlso Options2.bMainActors
+        FilteredOptions.bMainCertifications = Options.bMainCertifications AndAlso Options2.bMainCertifications
+        FilteredOptions.bMainCollectionID = Options.bMainCollectionID AndAlso Options2.bMainCollectionID
+        FilteredOptions.bMainCountries = Options.bMainCountries AndAlso Options2.bMainCountries
+        FilteredOptions.bMainCreators = Options.bMainCreators AndAlso Options2.bMainCreators
+        FilteredOptions.bMainDirectors = Options.bMainDirectors AndAlso Options2.bMainDirectors
+        FilteredOptions.bMainEpisodeGuide = Options.bMainEpisodeGuide AndAlso Options2.bMainEpisodeGuide
+        FilteredOptions.bMainGenres = Options.bMainGenres AndAlso Options2.bMainGenres
+        FilteredOptions.bMainMPAA = Options.bMainMPAA AndAlso Options2.bMainMPAA
+        FilteredOptions.bMainOriginalTitle = Options.bMainOriginalTitle AndAlso Options2.bMainOriginalTitle
+        FilteredOptions.bMainOutline = Options.bMainOutline AndAlso Options2.bMainOutline
+        FilteredOptions.bMainPlot = Options.bMainPlot AndAlso Options2.bMainPlot
+        FilteredOptions.bMainPremiered = Options.bMainPremiered AndAlso Options2.bMainPremiered
+        FilteredOptions.bMainRating = Options.bMainRating AndAlso Options2.bMainRating
+        FilteredOptions.bMainRelease = Options.bMainRelease AndAlso Options2.bMainRelease
+        FilteredOptions.bMainRuntime = Options.bMainRuntime AndAlso Options2.bMainRuntime
+        FilteredOptions.bMainStatus = Options.bMainStatus AndAlso Options2.bMainStatus
+        FilteredOptions.bMainStudios = Options.bMainStudios AndAlso Options2.bMainStudios
+        FilteredOptions.bMainTagline = Options.bMainTagline AndAlso Options2.bMainTagline
+        FilteredOptions.bMainTitle = Options.bMainTitle AndAlso Options2.bMainTitle
+        FilteredOptions.bMainTop250 = Options.bMainTop250 AndAlso Options2.bMainTop250
+        FilteredOptions.bMainTrailer = Options.bMainTrailer AndAlso Options2.bMainTrailer
+        FilteredOptions.bMainWriters = Options.bMainWriters AndAlso Options2.bMainWriters
+        FilteredOptions.bMainYear = Options.bMainYear AndAlso Options2.bMainYear
+        FilteredOptions.bSeasonAired = Options.bSeasonAired AndAlso Options2.bSeasonAired
+        FilteredOptions.bSeasonPlot = Options.bSeasonPlot AndAlso Options2.bSeasonPlot
+        FilteredOptions.bSeasonTitle = Options.bSeasonTitle AndAlso Options2.bSeasonTitle
+        Return FilteredOptions
     End Function
-    ''' <summary>
-    ''' Determine the Structures.TVScrapeOptions options that are in common between the two parameters
-    ''' </summary>
-    ''' <param name="Options">Base Structures.TVScrapeOptions</param>
-    ''' <param name="Options2">Secondary Structures.TVScrapeOptions</param>
-    ''' <returns>Structures.TVScrapeOptions representing the AndAlso union of the two parameters</returns>
-    ''' <remarks></remarks>
-    Public Shared Function TVScrapeOptionsAndAlso(ByVal Options As Structures.TVScrapeOptions, ByVal Options2 As Structures.TVScrapeOptions) As Structures.TVScrapeOptions
 
-        Dim filterOptions As New Structures.TVScrapeOptions
-        filterOptions.bEpActors = Options.bEpActors AndAlso Options2.bEpActors
-        filterOptions.bEpAired = Options.bEpAired AndAlso Options2.bEpAired
-        filterOptions.bEpCredits = Options.bEpCredits AndAlso Options2.bEpCredits
-        filterOptions.bEpDirector = Options.bEpDirector AndAlso Options2.bEpDirector
-        filterOptions.bEpEpisode = Options.bEpEpisode AndAlso Options2.bEpEpisode
-        filterOptions.bEpPlot = Options.bEpPlot AndAlso Options2.bEpPlot
-        filterOptions.bEpRating = Options.bEpRating AndAlso Options2.bEpRating
-        filterOptions.bEpSeason = Options.bEpSeason AndAlso Options2.bEpSeason
-        filterOptions.bEpTitle = Options.bEpTitle AndAlso Options2.bEpTitle
-        filterOptions.bShowActors = Options.bShowActors AndAlso Options2.bShowActors
-        filterOptions.bShowEpisodeGuide = Options.bShowEpisodeGuide AndAlso Options2.bShowEpisodeGuide
-        filterOptions.bShowGenre = Options.bShowGenre AndAlso Options2.bShowGenre
-        filterOptions.bShowMPAA = Options.bShowMPAA AndAlso Options2.bShowMPAA
-        filterOptions.bShowPlot = Options.bShowPlot AndAlso Options2.bShowPlot
-        filterOptions.bShowPremiered = Options.bShowPremiered AndAlso Options2.bShowPremiered
-        filterOptions.bShowRating = Options.bShowRating AndAlso Options2.bShowRating
-        filterOptions.bShowStatus = Options.bShowStatus AndAlso Options2.bShowStatus
-        filterOptions.bShowStudio = Options.bShowStudio AndAlso Options2.bShowStudio
-        filterOptions.bShowTitle = Options.bShowTitle AndAlso Options2.bShowTitle
-        Return filterOptions
+    Public Shared Function ScrapeModifiersAndAlso(ByVal Options As Structures.ScrapeModifiers, ByVal Options2 As Structures.ScrapeModifiers) As Structures.ScrapeModifiers
+        Dim FilteredModifiers As New Structures.ScrapeModifiers
+        FilteredModifiers.AllSeasonsBanner = Options.AllSeasonsBanner AndAlso Options2.AllSeasonsBanner
+        FilteredModifiers.AllSeasonsFanart = Options.AllSeasonsFanart AndAlso Options2.AllSeasonsFanart
+        FilteredModifiers.AllSeasonsLandscape = Options.AllSeasonsLandscape AndAlso Options2.AllSeasonsLandscape
+        FilteredModifiers.AllSeasonsPoster = Options.AllSeasonsPoster AndAlso Options2.AllSeasonsPoster
+        FilteredModifiers.DoSearch = Options.DoSearch AndAlso Options2.DoSearch
+        FilteredModifiers.EpisodeActorThumbs = Options.EpisodeActorThumbs AndAlso Options2.EpisodeActorThumbs
+        FilteredModifiers.EpisodeFanart = Options.EpisodeFanart AndAlso Options2.EpisodeFanart
+        FilteredModifiers.EpisodeMeta = Options.EpisodeMeta AndAlso Options2.EpisodeMeta
+        FilteredModifiers.EpisodeNFO = Options.EpisodeNFO AndAlso Options2.EpisodeNFO
+        FilteredModifiers.EpisodePoster = Options.EpisodePoster AndAlso Options2.EpisodePoster
+        FilteredModifiers.EpisodeSubtitles = Options.EpisodeSubtitles AndAlso Options2.EpisodeSubtitles
+        FilteredModifiers.EpisodeWatchedFile = Options.EpisodeWatchedFile AndAlso Options2.EpisodeWatchedFile
+        FilteredModifiers.MainActorthumbs = Options.MainActorthumbs AndAlso Options2.MainActorthumbs
+        FilteredModifiers.MainBanner = Options.MainBanner AndAlso Options2.MainBanner
+        FilteredModifiers.MainCharacterArt = Options.MainCharacterArt AndAlso Options2.MainCharacterArt
+        FilteredModifiers.MainClearArt = Options.MainClearArt AndAlso Options2.MainClearArt
+        FilteredModifiers.MainClearLogo = Options.MainClearLogo AndAlso Options2.MainClearLogo
+        FilteredModifiers.MainDiscArt = Options.MainDiscArt AndAlso Options2.MainDiscArt
+        FilteredModifiers.MainExtrafanarts = Options.MainExtrafanarts AndAlso Options2.MainExtrafanarts
+        FilteredModifiers.MainExtrathumbs = Options.MainExtrathumbs AndAlso Options2.MainExtrathumbs
+        FilteredModifiers.MainFanart = Options.MainFanart AndAlso Options2.MainFanart
+        FilteredModifiers.MainLandscape = Options.MainLandscape AndAlso Options2.MainLandscape
+        FilteredModifiers.MainNFO = Options.MainNFO AndAlso Options2.MainNFO
+        FilteredModifiers.MainPoster = Options.MainPoster AndAlso Options2.MainPoster
+        FilteredModifiers.MainSubtitles = Options.MainSubtitles AndAlso Options2.MainSubtitles
+        FilteredModifiers.MainTheme = Options.MainTheme AndAlso Options2.MainTheme
+        FilteredModifiers.MainTrailer = Options.MainTrailer AndAlso Options2.MainTrailer
+        FilteredModifiers.MainWatchedFile = Options.MainWatchedFile AndAlso Options2.MainWatchedFile
+        FilteredModifiers.SeasonBanner = Options.SeasonBanner AndAlso Options2.SeasonBanner
+        FilteredModifiers.SeasonFanart = Options.SeasonFanart AndAlso Options2.SeasonFanart
+        FilteredModifiers.SeasonLandscape = Options.SeasonLandscape AndAlso Options2.SeasonLandscape
+        FilteredModifiers.SeasonPoster = Options.SeasonPoster AndAlso Options2.SeasonPoster
+        FilteredModifiers.withEpisodes = Options.withEpisodes AndAlso Options2.withEpisodes
+        FilteredModifiers.withSeasons = Options.withSeasons AndAlso Options2.withSeasons
+        Return FilteredModifiers
     End Function
-    ''' <summary>
-    ''' Sets the Master.GlobalScrapeMod to the given MValue
-    ''' </summary>
-    ''' <param name="MType">The Enums.ModType that should be changed. Note that this could be All.</param>
-    ''' <param name="MValue">The <c>Boolean</c> value that you wish to change the ModType to.</param>
-    ''' <param name="DoClear">If <c>True</c>, pre-initialize all Mod values to False before setting the options. 
-    ''' If <c>False</c>, leave the existing options untouched wile setting the options</param>
-    ''' <remarks></remarks>
-    Public Shared Sub SetScraperMod(ByVal MType As Enums.MovieModType, ByVal MValue As Boolean, Optional ByVal DoClear As Boolean = True)
-        With Master.GlobalScrapeMod
-            If DoClear Then
-                .ActorThumbs = False
-                .Banner = False
-                .CharacterArt = False
-                .ClearArt = False
-                .ClearLogo = False
-                .DiscArt = False
-                .DoSearch = False
-                .EFanarts = False
-                .EThumbs = False
-                .Fanart = False
-                .Landscape = False
-                .Meta = False
-                .NFO = False
-                .Poster = False
-                .Trailer = False
-                .Theme = False
-            End If
 
+    Public Shared Sub SetScrapeModifiers(ByRef ScrapeModifiers As Structures.ScrapeModifiers, ByVal MType As Enums.ModifierType, ByVal MValue As Boolean)
+        With ScrapeModifiers
             Select Case MType
-                Case Enums.MovieModType.All
+                Case Enums.ModifierType.All
+                    .AllSeasonsBanner = MValue
+                    .AllSeasonsFanart = MValue
+                    .AllSeasonsLandscape = MValue
+                    .AllSeasonsPoster = MValue
                     '.DoSearch should not be set here as it is only needed for a re-search of a movie (first scraping or movie change).
-                    .ActorThumbs = MValue
-                    .Banner = MValue
-                    .CharacterArt = MValue
-                    .ClearArt = MValue
-                    .ClearLogo = MValue
-                    .DiscArt = MValue
-                    .EFanarts = MValue
-                    .EThumbs = MValue
-                    .Fanart = MValue
-                    .Landscape = MValue
-                    .Meta = MValue
-                    .NFO = MValue
-                    .Poster = MValue
-                    .Trailer = MValue
-                    .Theme = MValue
-                Case Enums.MovieModType.ActorThumbs
-                    .ActorThumbs = MValue
-                Case Enums.MovieModType.Banner
-                    .Banner = MValue
-                Case Enums.MovieModType.CharacterArt
-                    .CharacterArt = MValue
-                Case Enums.MovieModType.ClearArt
-                    .ClearArt = MValue
-                Case Enums.MovieModType.ClearLogo
-                    .ClearLogo = MValue
-                Case Enums.MovieModType.DiscArt
-                    .DiscArt = MValue
-                Case Enums.MovieModType.DoSearch
+                    .EpisodeActorThumbs = MValue
+                    .EpisodeFanart = MValue
+                    .EpisodeMeta = MValue
+                    .EpisodeNFO = MValue
+                    .EpisodePoster = MValue
+                    .EpisodeSubtitles = MValue
+                    .EpisodeWatchedFile = MValue
+                    .MainActorthumbs = MValue
+                    .MainBanner = MValue
+                    .MainCharacterArt = MValue
+                    .MainClearArt = MValue
+                    .MainClearLogo = MValue
+                    .MainDiscArt = MValue
+                    .MainExtrafanarts = MValue
+                    .MainExtrathumbs = MValue
+                    .MainFanart = MValue
+                    .MainLandscape = MValue
+                    .MainMeta = MValue
+                    .MainNFO = MValue
+                    .MainPoster = MValue
+                    .MainSubtitles = MValue
+                    .MainTheme = MValue
+                    .MainTrailer = MValue
+                    .MainWatchedFile = MValue
+                    .SeasonBanner = MValue
+                    .SeasonFanart = MValue
+                    .SeasonLandscape = MValue
+                    .SeasonNFO = MValue
+                    .SeasonPoster = MValue
+                '.withEpisodes should not be set here
+                '.withSeasons should not be set here
+                Case Enums.ModifierType.AllSeasonsBanner
+                    .AllSeasonsBanner = MValue
+                Case Enums.ModifierType.AllSeasonsFanart
+                    .AllSeasonsFanart = MValue
+                Case Enums.ModifierType.AllSeasonsLandscape
+                    .AllSeasonsLandscape = MValue
+                Case Enums.ModifierType.AllSeasonsPoster
+                    .AllSeasonsPoster = MValue
+                Case Enums.ModifierType.DoSearch
                     .DoSearch = MValue
-                Case Enums.MovieModType.EFanarts
-                    .EFanarts = MValue
-                Case Enums.MovieModType.EThumbs
-                    .EThumbs = MValue
-                Case Enums.MovieModType.Fanart
-                    .Fanart = MValue
-                Case Enums.MovieModType.Landscape
-                    .Landscape = MValue
-                Case Enums.MovieModType.Meta
-                    .Meta = MValue
-                Case Enums.MovieModType.NFO
-                    .NFO = MValue
-                Case Enums.MovieModType.Poster
-                    .Poster = MValue
-                Case Enums.MovieModType.Trailer
-                    .Trailer = MValue
-                Case Enums.MovieModType.Theme
-                    .Theme = MValue
+                Case Enums.ModifierType.EpisodeActorThumbs
+                    .EpisodeActorThumbs = MValue
+                Case Enums.ModifierType.EpisodeFanart
+                    .EpisodeFanart = MValue
+                Case Enums.ModifierType.EpisodeMeta
+                    .EpisodeMeta = MValue
+                Case Enums.ModifierType.EpisodeNFO
+                    .EpisodeNFO = MValue
+                Case Enums.ModifierType.EpisodePoster
+                    .EpisodePoster = MValue
+                Case Enums.ModifierType.EpisodeSubtitle
+                    .EpisodeSubtitles = MValue
+                Case Enums.ModifierType.EpisodeWatchedFile
+                    .EpisodeWatchedFile = MValue
+                Case Enums.ModifierType.MainActorThumbs
+                    .MainActorthumbs = MValue
+                Case Enums.ModifierType.MainBanner
+                    .MainBanner = MValue
+                Case Enums.ModifierType.MainCharacterArt
+                    .MainCharacterArt = MValue
+                Case Enums.ModifierType.MainClearArt
+                    .MainClearArt = MValue
+                Case Enums.ModifierType.MainClearLogo
+                    .MainClearLogo = MValue
+                Case Enums.ModifierType.MainDiscArt
+                    .MainDiscArt = MValue
+                Case Enums.ModifierType.MainExtrafanarts
+                    .MainExtrafanarts = MValue
+                Case Enums.ModifierType.MainExtrathumbs
+                    .MainExtrathumbs = MValue
+                Case Enums.ModifierType.MainFanart
+                    .MainFanart = MValue
+                Case Enums.ModifierType.MainLandscape
+                    .MainLandscape = MValue
+                Case Enums.ModifierType.MainMeta
+                    .MainMeta = MValue
+                Case Enums.ModifierType.MainNFO
+                    .MainNFO = MValue
+                Case Enums.ModifierType.MainPoster
+                    .MainPoster = MValue
+                Case Enums.ModifierType.MainSubtitle
+                    .MainSubtitles = MValue
+                Case Enums.ModifierType.MainTheme
+                    .MainTheme = MValue
+                Case Enums.ModifierType.MainTrailer
+                    .MainTrailer = MValue
+                Case Enums.ModifierType.MainWatchedFile
+                    .MainWatchedFile = MValue
+                Case Enums.ModifierType.SeasonBanner
+                    .SeasonBanner = MValue
+                Case Enums.ModifierType.SeasonFanart
+                    .SeasonFanart = MValue
+                Case Enums.ModifierType.SeasonLandscape
+                    .SeasonLandscape = MValue
+                Case Enums.ModifierType.SeasonNFO
+                    .SeasonNFO = MValue
+                Case Enums.ModifierType.SeasonPoster
+                    .SeasonPoster = MValue
+                Case Enums.ModifierType.withEpisodes
+                    .withEpisodes = MValue
+                Case Enums.ModifierType.withSeasons
+                    .withSeasons = MValue
             End Select
-
         End With
     End Sub
-
-
     ''' <summary>
     ''' This method launches the user's default web browser to the supplied destination
     ''' </summary>
@@ -1472,20 +1717,30 @@ Public Class Functions
     ''' This is to prevent malformed URIs from attacking the user's machine.</remarks>
     Public Shared Function Launch(ByRef Destination As String, Optional ByRef AllowLocalFiles As Boolean = False) As Boolean
         If String.IsNullOrEmpty(Destination) Then
-            logger.Error( "Blank destination")
+            logger.Error("Blank destination")
             Return False
         End If
         Try
             Dim uriDestination As New Uri(Destination)
             If uriDestination.IsFile() Then
                 If (Not AllowLocalFiles) Then
-                    logger.Error( "Destination is a file, which is not permitted for security reasons <{0}>", Destination)
+                    logger.Error("Destination is a file, which is not permitted for security reasons <{0}>", Destination)
                     Return False
                 Else
-                    Dim localFileName = uriDestination.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped)
-                    If (Not File.Exists(localFileName)) Then
-                        logger.Error( "Destination is a file, but it does not exist <{0}>", Destination)
+                    If (Not File.Exists(uriDestination.LocalPath)) Then
+                        logger.Error("Destination is a file, but it does not exist <{0}>", Destination)
                         Return False
+                    Else
+                        If Master.isWindows Then
+                            Process.Start(uriDestination.LocalPath)
+                        Else
+                            Using Explorer As New Process
+                                Explorer.StartInfo.FileName = "xdg-open"
+                                Explorer.StartInfo.Arguments = uriDestination.LocalPath
+                                Explorer.Start()
+                            End Using
+                        End If
+                        Return True
                     End If
                 End If
             End If
@@ -1501,7 +1756,7 @@ Public Class Functions
                 End Using
             End If
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name & vbTab & "Could not launch <" & Destination & ">", ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "Could not launch <" & Destination & ">")
             Return False
         End Try
         'If you got here, everything went fine
@@ -1532,7 +1787,7 @@ Public Class Functions
             'End If
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name & vbTab & "Could not launch <" & dllPath & ">", ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "Could not launch <" & dllPath & ">")
         End Try
     End Sub
 
@@ -1579,7 +1834,7 @@ Public Class Functions
                 My_Process.Close()
             End Using
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name & vbTab & "Could not launch <" & Process_Name & ">", ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "Could not launch <" & Process_Name & ">")
         End Try
 
         Return OutputString
@@ -1591,274 +1846,142 @@ End Class 'Functions
 Public Class Structures
 
 #Region "Nested Types"
-    ''' <summary>
-    ''' Structure representing poster/image metadata
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Structure v3Size
-        Dim size As String
-        Dim description As String
-        Dim index As Integer
-        Dim width As Integer
-    End Structure
 
     Public Structure CustomUpdaterStruct
         Dim Canceled As Boolean
-        Dim Options As ScrapeOptions
+        Dim ScrapeOptions As ScrapeOptions
+        Dim ScrapeModifiers As ScrapeModifiers
         Dim ScrapeType As Enums.ScrapeType
     End Structure
     ''' <summary>
-    ''' Structure representing a movie source path and its metadata
+    ''' Structure representing a tag in the database
     ''' </summary>
     ''' <remarks></remarks>
-    Public Structure MovieSource
-        Dim id As String
-        Dim Name As String
-        Dim Path As String
-        Dim Recursive As Boolean
-        Dim UseFolderName As Boolean
-        Dim IsSingle As Boolean
-    End Structure
-    ''' <summary>
-    ''' Structure representing a TV source path and its metadata
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Structure TVSource
-        Dim id As String
-        Dim Name As String
-        Dim Path As String
-    End Structure
-    ''' <summary>
-    ''' Structure representing a movie in the database
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Structure DBMovie
-        Dim BannerPath As String
-        Dim ClearArtPath As String
-        Dim ClearLogoPath As String
-        Dim ClearBanner As Boolean
-        Dim ClearClearArt As Boolean
-        Dim ClearClearLogo As Boolean
-        Dim ClearDiscArt As Boolean
-        Dim ClearEThumbs As Boolean
-        Dim ClearEFanarts As Boolean
-        Dim ClearFanart As Boolean
-        Dim ClearLandscape As Boolean
-        Dim ClearPoster As Boolean
-        Dim ClearTheme As Boolean
-        Dim ClearTrailer As Boolean
-        Dim DateAdd As Long
-        Dim DiscArtPath As String
-        Dim EThumbsPath As String
-        Dim EFanartsPath As String
-        Dim FanartPath As String
-        Dim Filename As String
-        Dim FileSource As String
-        Dim ID As Long
-        Dim IsLock As Boolean
-        Dim IsMark As Boolean
-        Dim isSingle As Boolean
-        Dim OriginalTitle As String
-        Dim LandscapePath As String
-        Dim ListTitle As String
-        Dim Movie As MediaContainers.Movie
-        Dim NeedsSave As Boolean
-        Dim NfoPath As String
-        Dim OutOfTolerance As Boolean
-        Dim PosterPath As String
-        Dim Source As String
-        Dim SubPath As String
-        Dim ThemePath As String
-        Dim TrailerPath As String
-        Dim UseFolder As Boolean
-        Dim efList As List(Of String)
-        Dim etList As List(Of String)
-        Dim DVDProfilerCaseType As String
-        Dim DVDProfilerLocation As String
-        Dim DVDProfilerSlot As String
-        Dim DVDProfilerTitle As String
-        Dim DVDProfilerMediaType As String
-        Dim OfflineHolderFoldername As String
-    End Structure
-    ''' <summary>
-    ''' Structure representing a movieset in the database
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Structure DBMovieSet
-        Dim BannerPath As String
-        Dim ClearArtPath As String
-        Dim ClearLogoPath As String
-        Dim ClearBanner As Boolean
-        Dim ClearClearArt As Boolean
-        Dim ClearClearLogo As Boolean
-        Dim ClearDiscArt As Boolean
-        Dim ClearFanart As Boolean
-        Dim ClearLandscape As Boolean
-        Dim ClearPoster As Boolean
-        Dim DiscArtPath As String
-        Dim FanartPath As String
-        Dim ID As Long
-        Dim SetName As String
-        Dim TMDBColID As String
-        Dim LandscapePath As String
-        Dim NfoPath As String
-        Dim PosterPath As String
-        Dim Movies As List(Of Structures.DBMovie)
-    End Structure
-    ''' <summary>
-    ''' Structure representing a TV show in the database
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Structure DBTV
-        Dim ClearShowEFanarts As Boolean
-        Dim efList As List(Of String)
-        Dim EpFanartPath As String
-        Dim EpID As Long
-        Dim EpNeedsSave As Boolean
-        Dim EpNfoPath As String
-        Dim EpPosterPath As String
-        Dim Filename As String
-        Dim IsLockEp As Boolean
-        Dim IsLockSeason As Boolean
-        Dim IsLockShow As Boolean
-        Dim IsMarkEp As Boolean
-        Dim IsMarkSeason As Boolean
-        Dim IsMarkShow As Boolean
-        Dim Ordering As Enums.Ordering
-        Dim SeasonBannerPath As String
-        Dim SeasonFanartPath As String
-        Dim SeasonLandscapePath As String
-        Dim SeasonPosterPath As String
-        Dim ShowBannerPath As String
-        Dim ShowCharacterArtPath As String
-        Dim ShowClearArtPath As String
-        Dim ShowClearLogoPath As String
-        Dim ShowEFanartsPath As String
-        Dim ShowFanartPath As String
-        Dim ShowID As Long
-        Dim ShowLandscapePath As String
-        Dim ShowLanguage As String
-        Dim ShowNeedsSave As Boolean
-        Dim ShowNfoPath As String
-        Dim ShowPath As String
-        Dim ShowPosterPath As String
-        Dim ShowThemePath As String
-        Dim Source As String
-        Dim TVEp As MediaContainers.EpisodeDetails
-        Dim TVShow As MediaContainers.TVShow
+    Public Structure DBMovieTag
+        Dim ID As Integer
+        Dim Movies As List(Of Database.DBElement)
+        Dim Title As String
     End Structure
 
-    Public Structure Scans
+    Public Structure ScanOrClean
         Dim Movies As Boolean
         Dim MovieSets As Boolean
+        Dim SpecificFolder As Boolean
         Dim TV As Boolean
     End Structure
 
-    Public Structure ScrapeInfo
-        Dim CurrentImage As Images
-        Dim Ordering As Enums.Ordering
-        Dim iEpisode As Integer
-        Dim ImageType As Enums.TVImageType
-        Dim iSeason As Integer
-        Dim Options As Structures.TVScrapeOptions
-        Dim SelectedLang As String
-        Dim ShowID As Integer
-        Dim ShowTitle As String
-        Dim TVDBID As String
-        Dim WithCurrent As Boolean
-        Dim ScrapeType As Enums.ScrapeType
-    End Structure
-
-    Public Structure ScrapeModifier
+    Public Structure ScrapeModifiers
+        Dim AllSeasonsBanner As Boolean
+        Dim AllSeasonsFanart As Boolean
+        Dim AllSeasonsLandscape As Boolean
+        Dim AllSeasonsPoster As Boolean
         Dim DoSearch As Boolean
-        Dim EThumbs As Boolean
-        Dim EFanarts As Boolean
-        Dim Fanart As Boolean
-        Dim Meta As Boolean
-        Dim NFO As Boolean
-        Dim Poster As Boolean
-        Dim Trailer As Boolean
-        Dim ActorThumbs As Boolean
-        Dim Banner As Boolean
-        Dim CharacterArt As Boolean
-        Dim ClearArt As Boolean
-        Dim ClearLogo As Boolean
-        Dim DiscArt As Boolean
-        Dim Landscape As Boolean
-        Dim Theme As Boolean
+        Dim EpisodeActorThumbs As Boolean
+        Dim EpisodeFanart As Boolean
+        Dim EpisodePoster As Boolean
+        Dim EpisodeMeta As Boolean
+        Dim EpisodeNFO As Boolean
+        Dim EpisodeSubtitles As Boolean
+        Dim EpisodeWatchedFile As Boolean
+        Dim MainActorthumbs As Boolean
+        Dim MainBanner As Boolean
+        Dim MainCharacterArt As Boolean
+        Dim MainClearArt As Boolean
+        Dim MainClearLogo As Boolean
+        Dim MainDiscArt As Boolean
+        Dim MainExtrafanarts As Boolean
+        Dim MainExtrathumbs As Boolean
+        Dim MainFanart As Boolean
+        Dim MainLandscape As Boolean
+        Dim MainMeta As Boolean
+        Dim MainNFO As Boolean
+        Dim MainPoster As Boolean
+        Dim MainSubtitles As Boolean
+        Dim MainTheme As Boolean
+        Dim MainTrailer As Boolean
+        Dim MainWatchedFile As Boolean
+        Dim SeasonBanner As Boolean
+        Dim SeasonFanart As Boolean
+        Dim SeasonLandscape As Boolean
+        Dim SeasonNFO As Boolean
+        Dim SeasonPoster As Boolean
+        Dim withEpisodes As Boolean
+        Dim withSeasons As Boolean
     End Structure
     ''' <summary>
-    ''' Structure representing posible scrape fields for movies
+    ''' Structure representing posible scrape fields
     ''' </summary>
     ''' <remarks></remarks>
+    <Serializable()> _
     Public Structure ScrapeOptions
-        Dim bCast As Boolean
-        Dim bCert As Boolean
-        Dim bCollection As Boolean
-        Dim bDirector As Boolean
-        Dim bFullCast As Boolean
-        Dim bFullCrew As Boolean
-        Dim bGenre As Boolean
-        Dim bMPAA As Boolean
-        Dim bMusicBy As Boolean
-        Dim bOtherCrew As Boolean
-        Dim bOutline As Boolean
-        Dim bPlot As Boolean
-        Dim bProducers As Boolean
-        Dim bRating As Boolean
-        Dim bLanguageV As Boolean
-        Dim bLanguageA As Boolean
-        Dim buseMPAAForFSK As Boolean
-        Dim bCleanPlotOutline As Boolean
-        Dim bRelease As Boolean
-        Dim bRuntime As Boolean
-        Dim bStatus As Boolean
-        Dim bStudio As Boolean
-        Dim bTagline As Boolean
-        Dim bTitle As Boolean
-        Dim bTop250 As Boolean
-        Dim bCountry As Boolean
-        Dim bTrailer As Boolean
-        Dim bVotes As Boolean
-        Dim bWriters As Boolean
-        Dim bYear As Boolean
+        Dim bEpisodeActors As Boolean
+        Dim bEpisodeAired As Boolean
+        Dim bEpisodeCredits As Boolean
+        Dim bEpisodeDirectors As Boolean
+        Dim bEpisodeGuestStars As Boolean
+        Dim bEpisodePlot As Boolean
+        Dim bEpisodeRating As Boolean
+        Dim bEpisodeRuntime As Boolean
+        Dim bEpisodeTitle As Boolean
+        Dim bMainActors As Boolean
+        Dim bMainCertifications As Boolean
+        Dim bMainCollectionID As Boolean
+        Dim bMainCreators As Boolean
+        Dim bMainDirectors As Boolean
+        Dim bMainEpisodeGuide As Boolean
+        Dim bMainGenres As Boolean
+        Dim bMainMPAA As Boolean
+        Dim bMainOriginalTitle As Boolean
+        Dim bMainOutline As Boolean
+        Dim bMainPlot As Boolean
+        Dim bMainPremiered As Boolean
+        Dim bMainRating As Boolean
+        Dim bMainRelease As Boolean
+        Dim bMainRuntime As Boolean
+        Dim bMainStatus As Boolean
+        Dim bMainStudios As Boolean
+        Dim bMainTagline As Boolean
+        Dim bMainTitle As Boolean
+        Dim bMainTop250 As Boolean
+        Dim bMainCountries As Boolean
+        Dim bMainTags As Boolean
+        Dim bMainTrailer As Boolean
+        Dim bMainWriters As Boolean
+        Dim bMainYear As Boolean
+        Dim bSeasonAired As Boolean
+        Dim bSeasonPlot As Boolean
+        Dim bSeasonTitle As Boolean
     End Structure
 
     Public Structure SettingsResult
         Dim DidCancel As Boolean
-        Dim NeedsRefresh As Boolean
-        Dim NeedsUpdate As Boolean
+        Dim NeedsDBClean_Movie As Boolean
+        Dim NeedsDBClean_TV As Boolean
+        Dim NeedsDBUpdate_Movie As Boolean
+        Dim NeedsDBUpdate_TV As Boolean
+        Dim NeedsReload_Movie As Boolean
+        Dim NeedsReload_MovieSet As Boolean
+        Dim NeedsReload_TVEpisode As Boolean
+        Dim NeedsReload_TVShow As Boolean
         Dim NeedsRestart As Boolean
-    End Structure
-    ''' <summary>
-    ''' Structure representing possible scrape options for TV shows
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Structure TVScrapeOptions
-        Dim bEpActors As Boolean
-        Dim bEpAired As Boolean
-        Dim bEpCredits As Boolean
-        Dim bEpDirector As Boolean
-        Dim bEpEpisode As Boolean
-        Dim bEpPlot As Boolean
-        Dim bEpRating As Boolean
-        Dim bEpSeason As Boolean
-        Dim bEpTitle As Boolean
-        Dim bShowActors As Boolean
-        Dim bShowEpisodeGuide As Boolean
-        Dim bShowGenre As Boolean
-        Dim bShowMPAA As Boolean
-        Dim bShowPlot As Boolean
-        Dim bShowPremiered As Boolean
-        Dim bShowRating As Boolean
-        Dim bShowStatus As Boolean
-        Dim bShowStudio As Boolean
-        Dim bShowTitle As Boolean
     End Structure
 
     Public Structure ModulesMenus
-        Dim IfNoMovies As Boolean
-        Dim IfNoTVShow As Boolean
+        Dim ForMovies As Boolean
+        Dim ForMovieSets As Boolean
+        Dim ForTVShows As Boolean
+        Dim IfTabMovies As Boolean      'Only if Movies Tab is selected
+        Dim IfTabMovieSets As Boolean   'Only if MovieSets Tab is selected
+        Dim IfTabTVShows As Boolean     'Only if TV Shows Tab is selected
+        Dim IfNoMovies As Boolean       'Show also if the Movies list is empty
+        Dim IfNoMovieSets As Boolean    'Show also if the MovieSets list is empty
+        Dim IfNoTVShows As Boolean      'Show also if the TV Shows list is empty
+    End Structure
+
+    Public Structure MainTabType
+        Dim ContentName As String
+        Dim ContentType As Enums.ContentType
+        Dim DefaultList As String
     End Structure
 
 #End Region 'Nested Types

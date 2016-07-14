@@ -19,21 +19,24 @@
 ' ################################################################################
 
 Imports System.IO
-Imports EmberAPI
 Imports NLog
 
 Public Class Themes
     Implements IDisposable
+
 #Region "Fields"
     Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
 
+    Private _ext As String
     Private _title As String
     Private _id As String
+    Private _isEdit As Boolean
     Private _url As String
     Private _weburl As String
     Private _description As String
-    Private _length As String
+    Private _duration As String
     Private _bitrate As String
+    Private _toRemove As Boolean
 
     Private _ms As MemoryStream
     Private Ret As Byte()
@@ -43,12 +46,26 @@ Public Class Themes
 #Region "Constructors"
 
     Public Sub New()
-        Me.Clear()
+        Clear()
     End Sub
 
 #End Region 'Constructors
 
 #Region "Properties"
+    ''' <summary>
+    ''' theme extention
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property Extention() As String
+        Get
+            Return _ext
+        End Get
+        Set(ByVal value As String)
+            _ext = value
+        End Set
+    End Property
 
     Public Property Title() As String
         Get
@@ -65,6 +82,15 @@ Public Class Themes
         End Get
         Set(ByVal value As String)
             _id = value
+        End Set
+    End Property
+
+    Public Property isEdit() As Boolean
+        Get
+            Return _isEdit
+        End Get
+        Set(ByVal value As Boolean)
+            _isEdit = value
         End Set
     End Property
 
@@ -86,12 +112,12 @@ Public Class Themes
         End Set
     End Property
 
-    Public Property Length() As String
+    Public Property Duration() As String
         Get
-            Return _length
+            Return _duration
         End Get
         Set(ByVal value As String)
-            _length = value
+            _duration = value
         End Set
     End Property
 
@@ -112,6 +138,20 @@ Public Class Themes
             _weburl = value
         End Set
     End Property
+    ''' <summary>
+    ''' trigger to remove theme
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property toRemove() As Boolean
+        Get
+            Return _toRemove
+        End Get
+        Set(ByVal value As Boolean)
+            _toRemove = value
+        End Set
+    End Property
 
 #End Region 'Properties
 
@@ -124,87 +164,194 @@ Public Class Themes
 #Region "Methods"
 
     Private Sub Clear()
-        If Not IsNothing(_ms) Then
-            Me.Dispose(True)
-            Me.disposedValue = False    'Since this is not a real Dispose call...
+        If _ms IsNot Nothing Then
+            Dispose(True)
+            disposedValue = False    'Since this is not a real Dispose call...
         End If
 
+        _ext = String.Empty
         _title = String.Empty
         _id = String.Empty
+        _isEdit = False
+        _toRemove = False
         _url = String.Empty
         _weburl = String.Empty
         _description = String.Empty
-        _length = String.Empty
+        _duration = String.Empty
         _bitrate = String.Empty
     End Sub
 
     Public Sub Cancel()
         'Me.WebPage.Cancel()
     End Sub
-
     ''' <summary>
-    ''' Remove existing trailers from the given path.
+    ''' Delete the given arbitrary file
     ''' </summary>
-    ''' <param name="sPath">Path to look for trailers</param>
-    ''' <param name="NewTheme"></param>
-    ''' <remarks>
-    ''' 2013/11/08 Dekker500 - Enclosed file accessors in Try block
-    ''' </remarks>
-    Public Shared Sub DeleteThemes(ByVal sPath As String, ByVal NewTheme As String)
-
+    ''' <param name="sPath"></param>
+    ''' <remarks>This version of Delete is wrapped in a try-catch block which 
+    ''' will log errors before safely returning.</remarks>
+    Public Shared Sub Delete(ByVal sPath As String)
+        If Not String.IsNullOrEmpty(sPath) Then
+            Try
+                File.Delete(sPath)
+            Catch ex As Exception
+                logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "Param: <" & sPath & ">")
+            End Try
+        End If
     End Sub
     ''' <summary>
-    ''' Downloads the theme found at the supplied <paramref name="sURL"/> and places
-    ''' it in the supplied <paramref name="sPath"/>. 
+    ''' Delete the movie themes
     ''' </summary>
-    ''' <param name="sPath">Path into which the theme should be saved</param>
-    ''' <param name="sTheme">theme container</param>
-    ''' <returns></returns>
+    ''' <param name="DBMovie"><c>DBMovie</c> structure representing the movie on which we should operate</param>
     ''' <remarks></remarks>
-    Public Function DownloadTheme(ByVal sPath As String, ByVal isSingle As Boolean, ByVal sTheme As Themes) As String
+    Public Shared Sub DeleteMovieTheme(ByVal DBMovie As Database.DBElement)
+        If String.IsNullOrEmpty(DBMovie.Filename) Then Return
+
+        Try
+            For Each a In FileUtils.GetFilenameList.Movie(DBMovie, Enums.ModifierType.MainTheme)
+                For Each t As String In Master.eSettings.FileSystemValidThemeExts
+                    If File.Exists(String.Concat(a, t)) Then
+                        Delete(String.Concat(a, t))
+                    End If
+                Next
+            Next
+        Catch ex As Exception
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "<" & DBMovie.Filename & ">")
+        End Try
+    End Sub
+    ''' <summary>
+    ''' Delete the tv show themes
+    ''' </summary>
+    ''' <param name="DBTVShow"><c>DBMovie</c> structure representing the movie on which we should operate</param>
+    ''' <remarks></remarks>
+    Public Shared Sub DeleteTVShowTheme(ByVal DBTVShow As Database.DBElement)
+        If String.IsNullOrEmpty(DBTVShow.ShowPath) Then Return
+
+        Try
+            For Each a In FileUtils.GetFilenameList.TVShow(DBTVShow, Enums.ModifierType.MainTheme)
+                For Each t As String In Master.eSettings.FileSystemValidThemeExts
+                    If File.Exists(String.Concat(a, t)) Then
+                        Delete(String.Concat(a, t))
+                    End If
+                Next
+            Next
+        Catch ex As Exception
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "<" & DBTVShow.Filename & ">")
+        End Try
+    End Sub
+    ''' <summary>
+    ''' Raises the ProgressUpdated event, passing the iPercent value to indicate percent completed.
+    ''' </summary>
+    ''' <param name="iPercent">Integer representing percentage completed</param>
+    ''' <remarks></remarks>
+    Public Shared Sub DownloadProgressUpdated(ByVal iPercent As Integer)
+        RaiseEvent ProgressUpdated(iPercent)
+    End Sub
+    ''' <summary>
+    ''' Loads this theme from the contents of the supplied file
+    ''' </summary>
+    ''' <param name="sPath">Path to the theme file</param>
+    ''' <remarks></remarks>
+    Public Sub FromFile(ByVal sPath As String)
+        If _ms IsNot Nothing Then
+            _ms.Dispose()
+        End If
+        If Not String.IsNullOrEmpty(sPath) AndAlso File.Exists(sPath) Then
+            Try
+                _ms = New MemoryStream()
+                Using fsImage As New FileStream(sPath, FileMode.Open, FileAccess.Read)
+                    Dim StreamBuffer(Convert.ToInt32(fsImage.Length - 1)) As Byte
+
+                    fsImage.Read(StreamBuffer, 0, StreamBuffer.Length)
+                    _ms.Write(StreamBuffer, 0, StreamBuffer.Length)
+
+                    StreamBuffer = Nothing
+                    _ms.Flush()
+
+                    _ext = Path.GetExtension(sPath)
+                    _url = sPath
+                End Using
+            Catch ex As Exception
+                logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "<" & sPath & ">")
+            End Try
+        End If
+    End Sub
+    ''' <summary>
+    ''' Loads this theme from the supplied URL
+    ''' </summary>
+    ''' <param name="sURL">URL to the theme file</param>
+    ''' <remarks></remarks>
+    Public Sub FromWeb(ByVal sURL As String, Optional ByVal webURL As String = "")
         Dim WebPage As New HTTP
         Dim tURL As String = String.Empty
-        Dim sURL As String = sTheme.URL
-        Dim sWebURL As String = sTheme.WebURL
         Dim tTheme As String = String.Empty
         AddHandler WebPage.ProgressUpdated, AddressOf DownloadProgressUpdated
 
-        tTheme = WebPage.DownloadFile(sURL, "", False, "theme", sWebURL)
-        If Not String.IsNullOrEmpty(tTheme) Then
-            If Not IsNothing(Me._ms) Then
-                Me._ms.Dispose()
+        Try
+            tTheme = WebPage.DownloadFile(sURL, String.Empty, True, "theme", webURL)
+            If Not String.IsNullOrEmpty(tTheme) Then
+
+                If _ms IsNot Nothing Then
+                    _ms.Dispose()
+                End If
+                _ms = New MemoryStream()
+
+                Dim retSave() As Byte
+                retSave = WebPage.ms.ToArray
+                _ms.Write(retSave, 0, retSave.Length)
+
+                _ext = Path.GetExtension(tTheme)
+                _url = sURL
+                logger.Debug("Theme downloaded: " & sURL)
+            Else
+                logger.Warn("Theme NOT downloaded: " & sURL)
             End If
-            Me._ms = New MemoryStream()
 
-            Dim retSave() As Byte
-            retSave = WebPage.ms.ToArray
-            Me._ms.Write(retSave, 0, retSave.Length)
+        Catch ex As Exception
+            logger.Error(ex, New StackFrame().GetMethod().Name & Convert.ToChar(Windows.Forms.Keys.Tab) & "<" & sURL & ">")
+        End Try
 
+        RemoveHandler WebPage.ProgressUpdated, AddressOf DownloadProgressUpdated
+    End Sub
 
-            Dim fExt As String = Path.GetExtension(tTheme)
-            For Each a In FileUtils.GetFilenameList.Movie(sPath, isSingle, Enums.MovieModType.Theme)
-                If Not File.Exists(a & fExt) OrElse Master.eSettings.MovieThemeOverwrite Then
-                    If File.Exists(a & fExt) Then
-                        File.Delete(a & fExt)
-                    End If
-                    Directory.CreateDirectory(Directory.GetParent(a & fExt).FullName)
-                    SaveAsTheme(a & fExt)
-                    tURL = a & fExt
+    Public Function SaveAsMovieTheme(ByVal mMovie As Database.DBElement) As String
+        Dim strReturn As String = String.Empty
+
+        Try
+            Try
+                Dim params As New List(Of Object)(New Object() {mMovie})
+                ModulesManager.Instance.RunGeneric(Enums.ModuleEventType.OnThemeSave_Movie, params, False)
+            Catch ex As Exception
+            End Try
+
+            Dim fExt As String = Path.GetExtension(_ext)
+            For Each a In FileUtils.GetFilenameList.Movie(mMovie, Enums.ModifierType.MainTheme)
+                If Not File.Exists(String.Concat(a, fExt)) OrElse (isEdit OrElse Master.eSettings.MovieThemeKeepExisting) Then
+                    Save(String.Concat(a, fExt))
+                    strReturn = (String.Concat(a, fExt))
                 End If
             Next
-            File.Delete(tTheme)
-        End If
-        RemoveHandler WebPage.ProgressUpdated, AddressOf DownloadProgressUpdated
-        Return tURL
+
+        Catch ex As Exception
+            logger.Error(ex, New StackFrame().GetMethod().Name)
+        End Try
+        Return strReturn
     End Function
 
-    Public Sub SaveAsTheme(filename As String)
+    Public Sub Save(ByVal sPath As String)
         Dim retSave() As Byte
-        retSave = Me._ms.ToArray
+        Try
+            retSave = _ms.ToArray
 
-        Using FileStream As Stream = File.OpenWrite(filename)
-            FileStream.Write(retSave, 0, retSave.Length) 'check if it works
-        End Using
+            'make sure directory exists
+            Directory.CreateDirectory(Directory.GetParent(sPath).FullName)
+            Using FileStream As Stream = File.OpenWrite(sPath)
+                FileStream.Write(retSave, 0, retSave.Length)
+            End Using
+
+        Catch ex As Exception
+            logger.Error(ex, New StackFrame().GetMethod().Name)
+        End Try
     End Sub
 
     ''' <summary>
@@ -216,52 +363,32 @@ Public Class Themes
     ''' <param name="mMovie">The intended path to save the theme</param>
     ''' <returns><c>True</c> if a download is allowed, <c>False</c> otherwise</returns>
     ''' <remarks></remarks>
-    Public Function IsAllowedToDownload(ByVal mMovie As Structures.DBMovie) As Boolean
+    Public Function IsAllowedToDownload(ByVal mMovie As Database.DBElement) As Boolean
         Try
             With Master.eSettings
-                If (String.IsNullOrEmpty(mMovie.ThemePath) OrElse .MovieThemeOverwrite) AndAlso .MovieXBMCThemeEnable AndAlso _
-                    (mMovie.isSingle AndAlso .MovieXBMCThemeMovie) OrElse _
-                    (mMovie.isSingle AndAlso .MovieXBMCThemeSub AndAlso Not String.IsNullOrEmpty(.MovieXBMCThemeSubDir)) OrElse _
-                    (.MovieXBMCThemeCustom AndAlso Not String.IsNullOrEmpty(.MovieXBMCThemeCustomPath)) Then
+                If (String.IsNullOrEmpty(mMovie.ThemePath) OrElse .MovieThemeKeepExisting) AndAlso .MovieThemeTvTunesEnable AndAlso
+                    (mMovie.IsSingle AndAlso .MovieThemeTvTunesMoviePath) OrElse
+                    (mMovie.IsSingle AndAlso .MovieThemeTvTunesSub AndAlso Not String.IsNullOrEmpty(.MovieThemeTvTunesSubDir)) OrElse
+                    (.MovieThemeTvTunesCustom AndAlso Not String.IsNullOrEmpty(.MovieThemeTvTunesCustomPath)) Then
                     Return True
                 Else
                     Return False
                 End If
             End With
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
             Return False
         End Try
     End Function
-    ''' <summary>
-    ''' Raises the ProgressUpdated event, passing the iPercent value to indicate percent completed.
-    ''' </summary>
-    ''' <param name="iPercent">Integer representing percentage completed</param>
-    ''' <remarks></remarks>
-    Public Shared Sub DownloadProgressUpdated(ByVal iPercent As Integer)
-        RaiseEvent ProgressUpdated(iPercent)
-    End Sub
 
 #End Region 'Methods
-
-#Region "Nested Types"
-
-    Structure sMySettings
-
-#Region "Fields"
-
-#End Region 'Fields
-
-    End Structure
-
-#End Region 'Nested Types
 
 #Region "IDisposable Support"
     Private disposedValue As Boolean ' To detect redundant calls
 
     ' IDisposable
     Protected Overridable Sub Dispose(disposing As Boolean)
-        If Not Me.disposedValue Then
+        If Not disposedValue Then
             If disposing Then
                 ' dispose managed state (managed objects).
                 If _ms IsNot Nothing Then
@@ -275,7 +402,7 @@ Public Class Themes
             ' set large fields to null.
             _ms = Nothing
         End If
-        Me.disposedValue = True
+        disposedValue = True
     End Sub
 
     ' TODO: override Finalize() only if Dispose(ByVal disposing As Boolean) above has code to free unmanaged resources.

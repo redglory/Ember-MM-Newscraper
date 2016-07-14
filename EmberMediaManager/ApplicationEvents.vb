@@ -20,14 +20,18 @@
 
 Imports EmberAPI
 Imports NLog
+Imports System.IO
 
 Namespace My
 
     Partial Friend Class MyApplication
 
 #Region "Fields"
+
         Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
-#End Region
+        Private frmEmber As frmMain
+
+#End Region 'Fields
 
 #Region "Methods"
 
@@ -35,21 +39,130 @@ Namespace My
         ''' Process/load information before beginning the main application.
         ''' </summary>
         Private Sub MyApplication_Startup(ByVal sender As Object, ByVal e As Microsoft.VisualBasic.ApplicationServices.StartupEventArgs) Handles Me.Startup
-            Try
-                Functions.TestMediaInfoDLL()
-            Catch ex As Exception
-                logger.Error(New StackFrame().GetMethod().Name,ex)
-            End Try
+            logger.Info("====Ember Media Manager starting up====")
+            logger.Info(String.Format("====Version {0}.{1}.{2}.{3}====", Application.Info.Version.Major, Application.Info.Version.Minor, Application.Info.Version.Build, Application.Info.Version.Revision))
+            Master.fLoading = New frmSplash
+            Master.is32Bit = (IntPtr.Size = 4)
+            Master.appArgs = e
+
+            ' #############################################
+            ' ###  Inserted by: redglory on 14.07.2013  ###
+            ' #############################################
+            ' #  Check If Ember Media Manager is called   #
+            ' #  from a service process or from a Web     # 
+            ' #  application                              #
+            ' #                                           #
+            ' #  UserInteractive property (True/False)    #
+            ' #############################################
+            Master.isUserInteractive = Environment.UserInteractive
+            If Master.isUserInteractive Then
+                '# Show UI
+                Master.fLoading.Show()
+            End If
+
+            Dim aBit As String = "x64"
+            If Master.is32Bit Then
+                aBit = "x86"
+            End If
+            Master.fLoading.SetVersionMesg("Version {0}.{1}.{2}.{3} {4}", aBit)
+
+            Application.DoEvents()
+
+            Functions.TestMediaInfoDLL()
+
+            If Master.appArgs.CommandLine.Count > 0 Then
+                Master.isCL = True
+                Master.fLoading.SetProgressBarSize(10)
+            End If
+            ' Run InstallTask to see if any pending file needs to install
+            ' Do this before loading modules/themes/etc
+            Dim configpath As String = Path.Combine(Functions.AppPath, "InstallTasks.xml")
+            If File.Exists(configpath) Then
+                FileUtils.Common.InstallNewFiles(configpath)
+            End If
+
+            Master.fLoading.SetLoadingMesg("Select Profile")
+
+            If Not Directory.Exists(Path.Combine(Functions.AppPath, "Profiles")) Then
+                Directory.CreateDirectory(Path.Combine(Functions.AppPath, "Profiles"))
+            End If
+
+            If Not Directory.Exists(Path.Combine(Functions.AppPath, String.Concat("Profiles\", "Default"))) Then
+                Directory.CreateDirectory(Path.Combine(Functions.AppPath, String.Concat("Profiles\", "Default")))
+            End If
+
+            If Master.isCL Then
+                If Master.appArgs.CommandLine.Contains("-profile") Then
+                    Dim bProfileHasLoaded As Boolean = False
+                    For i As Integer = 0 To Master.appArgs.CommandLine.Count - 1
+                        Select Case Master.appArgs.CommandLine(i).ToLower
+                            Case "-profile"
+                                If Not bProfileHasLoaded Then
+                                    If Master.appArgs.CommandLine.Count - 1 > i AndAlso Not Master.appArgs.CommandLine(i + 1).StartsWith("-") Then
+                                        If Directory.Exists(Path.Combine(Functions.AppPath, String.Concat("Profiles\", Master.appArgs.CommandLine(i + 1).Replace("""", String.Empty)))) Then
+                                            Master.SettingsPath = Path.Combine(Functions.AppPath, String.Concat("Profiles\", Master.appArgs.CommandLine(i + 1).Replace("""", String.Empty)))
+                                            bProfileHasLoaded = True
+                                            i += 1
+                                            If Master.appArgs.CommandLine.Count = 2 Then
+                                                'switch back to GUI mode
+                                                Master.isCL = False
+                                            End If
+                                        Else
+                                            logger.Warn(String.Format("[CommandLine] [Abort] Profile ""{0}"" not found. Abort to prevent library corruption.", Master.appArgs.CommandLine(i + 1).Replace("""", String.Empty)))
+                                            logger.Info("====Ember Media Manager exiting====")
+                                            Environment.Exit(0)
+                                        End If
+                                    Else
+                                        logger.Warn("[CommandLine] [Abort] Missing profile name for command ""-profile"". Abort to prevent library corruption.")
+                                        logger.Info("====Ember Media Manager exiting====")
+                                        Environment.Exit(0)
+                                    End If
+                                Else
+                                    logger.Warn(String.Format("[CommandLine] [Abort] More than one profile has been specified. Abort to prevent library corruption.", Master.appArgs.CommandLine(i + 1).Replace("""", String.Empty)))
+                                    logger.Info("====Ember Media Manager exiting====")
+                                    Environment.Exit(0)
+                                End If
+                        End Select
+                    Next
+                Else
+                    logger.Info("[CommandLine] Using profile ""Default"".")
+                    Master.SettingsPath = Path.Combine(Functions.AppPath, "Profiles\Default")
+                End If
+            Else
+                'show Profile Select dialog
+                Using dProfileSelect As New dlgProfileSelect
+                    If dProfileSelect.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(dProfileSelect.SelectedProfile) Then
+                        Master.SettingsPath = Path.Combine(Functions.AppPath, String.Concat("Profiles\", dProfileSelect.SelectedProfile))
+                    Else
+                        logger.Info("====Ember Media Manager exiting====")
+                        Environment.Exit(0)
+                    End If
+                End Using
+            End If
+
+            Master.eSettings.Load()
+
+            ' Force initialization of languages for main
+            Master.eLang.LoadAllLanguage(Master.eSettings.GeneralLanguage)
+
+            Master.fLoading.SetLoadingMesg(Master.eLang.GetString(484, "Loading settings..."))
+
+            Master.fLoading.SetLoadingMesg(Master.eLang.GetString(862, "Loading translations..."))
+            APIXML.CacheXMLs()
+
+            Master.fLoading.SetLoadingMesg(Master.eLang.GetString(1164, "Loading Main Form. Please wait..."))
+            frmEmber = New frmMain
         End Sub
 
         ''' <summary>
         ''' Check if Ember is already running, but only for GUI instances
         ''' </summary>
         Private Sub MyApplication_StartupNextInstance(ByVal sender As Object, ByVal e As Microsoft.VisualBasic.ApplicationServices.StartupNextInstanceEventArgs) Handles Me.StartupNextInstance
-            Dim Args() As String = Environment.GetCommandLineArgs
-            If Args.Count = 1 Then
-                MsgBox("Ember Media Manager is already running.", MsgBoxStyle.OkOnly, "Ember Media Manager")
-                End
+            If e.CommandLine.Count = 0 Then
+                e.BringToForeground = True
+            ElseIf e.CommandLine.Count > 0 Then
+                Dim Args() As String = e.CommandLine.ToArray
+                frmMain.fCommandLine.RunCommandLine(Args)
             End If
         End Sub
 
@@ -57,7 +170,8 @@ Namespace My
         ''' Basic wrapper for unhandled exceptions
         ''' </summary>
         Private Sub MyApplication_UnhandledException(ByVal sender As Object, ByVal e As Microsoft.VisualBasic.ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
-            MsgBox(e.Exception.Message, MsgBoxStyle.OkOnly, "Ember Media Manager")
+            logger.Error(e.Exception, e.Exception.Source)
+            MessageBox.Show(e.Exception.Message, "Ember Media Manager", MessageBoxButtons.OK, MessageBoxIcon.Error)
             My.Application.Log.WriteException(e.Exception, TraceEventType.Critical, "Unhandled Exception.")
         End Sub
 

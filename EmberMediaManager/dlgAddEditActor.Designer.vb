@@ -23,9 +23,9 @@ Partial Class dlgAddEditActor
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(dlgAddEditActor))
-        Me.tlpButtons = New System.Windows.Forms.TableLayoutPanel()
-        Me.OK_Button = New System.Windows.Forms.Button()
-        Me.Cancel_Button = New System.Windows.Forms.Button()
+        Me.tblBottom = New System.Windows.Forms.TableLayoutPanel()
+        Me.btnOK = New System.Windows.Forms.Button()
+        Me.btnCancel = New System.Windows.Forms.Button()
         Me.txtName = New System.Windows.Forms.TextBox()
         Me.txtRole = New System.Windows.Forms.TextBox()
         Me.txtThumb = New System.Windows.Forms.TextBox()
@@ -36,48 +36,53 @@ Partial Class dlgAddEditActor
         Me.pbActors = New System.Windows.Forms.PictureBox()
         Me.btnVerify = New System.Windows.Forms.Button()
         Me.bwDownloadPic = New System.ComponentModel.BackgroundWorker()
-        Me.pnlNewActor = New System.Windows.Forms.Panel()
-        Me.tlpButtons.SuspendLayout()
+        Me.pnlMain = New System.Windows.Forms.Panel()
+        Me.pnlBottom = New System.Windows.Forms.Panel()
+        Me.tblBottom.SuspendLayout()
         CType(Me.pbActLoad, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.pbActors, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.pnlNewActor.SuspendLayout()
+        Me.pnlMain.SuspendLayout()
+        Me.pnlBottom.SuspendLayout()
         Me.SuspendLayout()
         '
-        'tlpButtons
+        'tblBottom
         '
-        Me.tlpButtons.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tlpButtons.ColumnCount = 2
-        Me.tlpButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.tlpButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.tlpButtons.Controls.Add(Me.OK_Button, 0, 0)
-        Me.tlpButtons.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.tlpButtons.Location = New System.Drawing.Point(220, 217)
-        Me.tlpButtons.Name = "tlpButtons"
-        Me.tlpButtons.RowCount = 1
-        Me.tlpButtons.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.tlpButtons.Size = New System.Drawing.Size(146, 29)
-        Me.tlpButtons.TabIndex = 0
+        Me.tblBottom.AutoSize = True
+        Me.tblBottom.ColumnCount = 3
+        Me.tblBottom.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.tblBottom.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+        Me.tblBottom.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+        Me.tblBottom.Controls.Add(Me.btnOK, 1, 0)
+        Me.tblBottom.Controls.Add(Me.btnCancel, 2, 0)
+        Me.tblBottom.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tblBottom.Location = New System.Drawing.Point(0, 0)
+        Me.tblBottom.Name = "tblBottom"
+        Me.tblBottom.RowCount = 1
+        Me.tblBottom.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.tblBottom.Size = New System.Drawing.Size(394, 29)
+        Me.tblBottom.TabIndex = 0
         '
-        'OK_Button
+        'btnOK
         '
-        Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.OK_Button.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(238, Byte))
-        Me.OK_Button.Location = New System.Drawing.Point(3, 3)
-        Me.OK_Button.Name = "OK_Button"
-        Me.OK_Button.Size = New System.Drawing.Size(67, 23)
-        Me.OK_Button.TabIndex = 0
-        Me.OK_Button.Text = "OK"
+        Me.btnOK.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.btnOK.Enabled = False
+        Me.btnOK.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(238, Byte))
+        Me.btnOK.Location = New System.Drawing.Point(251, 3)
+        Me.btnOK.Name = "btnOK"
+        Me.btnOK.Size = New System.Drawing.Size(67, 23)
+        Me.btnOK.TabIndex = 0
+        Me.btnOK.Text = "OK"
         '
-        'Cancel_Button
+        'btnCancel
         '
-        Me.Cancel_Button.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Cancel_Button.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(238, Byte))
-        Me.Cancel_Button.Location = New System.Drawing.Point(76, 3)
-        Me.Cancel_Button.Name = "Cancel_Button"
-        Me.Cancel_Button.Size = New System.Drawing.Size(67, 23)
-        Me.Cancel_Button.TabIndex = 1
-        Me.Cancel_Button.Text = "Cancel"
+        Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(238, Byte))
+        Me.btnCancel.Location = New System.Drawing.Point(324, 3)
+        Me.btnCancel.Name = "btnCancel"
+        Me.btnCancel.Size = New System.Drawing.Size(67, 23)
+        Me.btnCancel.TabIndex = 1
+        Me.btnCancel.Text = "Cancel"
         '
         'txtName
         '
@@ -167,53 +172,67 @@ Partial Class dlgAddEditActor
         'bwDownloadPic
         '
         '
-        'pnlNewActor
+        'pnlMain
         '
-        Me.pnlNewActor.BackColor = System.Drawing.Color.White
-        Me.pnlNewActor.Controls.Add(Me.btnVerify)
-        Me.pnlNewActor.Controls.Add(Me.pbActLoad)
-        Me.pnlNewActor.Controls.Add(Me.pbActors)
-        Me.pnlNewActor.Controls.Add(Me.lblThumb)
-        Me.pnlNewActor.Controls.Add(Me.lblRole)
-        Me.pnlNewActor.Controls.Add(Me.lblName)
-        Me.pnlNewActor.Controls.Add(Me.txtThumb)
-        Me.pnlNewActor.Controls.Add(Me.txtRole)
-        Me.pnlNewActor.Controls.Add(Me.txtName)
-        Me.pnlNewActor.Location = New System.Drawing.Point(2, 2)
-        Me.pnlNewActor.Name = "pnlNewActor"
-        Me.pnlNewActor.Size = New System.Drawing.Size(374, 209)
-        Me.pnlNewActor.TabIndex = 1
+        Me.pnlMain.BackColor = System.Drawing.Color.White
+        Me.pnlMain.Controls.Add(Me.btnVerify)
+        Me.pnlMain.Controls.Add(Me.pbActLoad)
+        Me.pnlMain.Controls.Add(Me.pbActors)
+        Me.pnlMain.Controls.Add(Me.lblThumb)
+        Me.pnlMain.Controls.Add(Me.lblRole)
+        Me.pnlMain.Controls.Add(Me.lblName)
+        Me.pnlMain.Controls.Add(Me.txtThumb)
+        Me.pnlMain.Controls.Add(Me.txtRole)
+        Me.pnlMain.Controls.Add(Me.txtName)
+        Me.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.pnlMain.Location = New System.Drawing.Point(0, 0)
+        Me.pnlMain.Name = "pnlMain"
+        Me.pnlMain.Size = New System.Drawing.Size(394, 245)
+        Me.pnlMain.TabIndex = 1
+        '
+        'pnlBottom
+        '
+        Me.pnlBottom.AutoSize = True
+        Me.pnlBottom.Controls.Add(Me.tblBottom)
+        Me.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.pnlBottom.Location = New System.Drawing.Point(0, 245)
+        Me.pnlBottom.Name = "pnlBottom"
+        Me.pnlBottom.Size = New System.Drawing.Size(394, 29)
+        Me.pnlBottom.TabIndex = 2
         '
         'dlgAddEditActor
         '
-        Me.AcceptButton = Me.OK_Button
+        Me.AcceptButton = Me.btnOK
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(378, 250)
+        Me.CancelButton = Me.btnCancel
+        Me.ClientSize = New System.Drawing.Size(394, 274)
         Me.ControlBox = False
-        Me.Controls.Add(Me.pnlNewActor)
-        Me.Controls.Add(Me.tlpButtons)
+        Me.Controls.Add(Me.pnlMain)
+        Me.Controls.Add(Me.pnlBottom)
         Me.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
+        Me.MinimumSize = New System.Drawing.Size(400, 280)
         Me.Name = "dlgAddEditActor"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "New Actor"
-        Me.tlpButtons.ResumeLayout(False)
+        Me.tblBottom.ResumeLayout(False)
         CType(Me.pbActLoad, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.pbActors, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.pnlNewActor.ResumeLayout(False)
-        Me.pnlNewActor.PerformLayout()
+        Me.pnlMain.ResumeLayout(False)
+        Me.pnlMain.PerformLayout()
+        Me.pnlBottom.ResumeLayout(False)
+        Me.pnlBottom.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
-    Friend WithEvents tlpButtons As System.Windows.Forms.TableLayoutPanel
-    Friend WithEvents OK_Button As System.Windows.Forms.Button
-    Friend WithEvents Cancel_Button As System.Windows.Forms.Button
+    Friend WithEvents tblBottom As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents btnOK As System.Windows.Forms.Button
+    Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents txtName As System.Windows.Forms.TextBox
     Friend WithEvents txtRole As System.Windows.Forms.TextBox
     Friend WithEvents txtThumb As System.Windows.Forms.TextBox
@@ -224,6 +243,7 @@ Partial Class dlgAddEditActor
     Friend WithEvents pbActors As System.Windows.Forms.PictureBox
     Friend WithEvents btnVerify As System.Windows.Forms.Button
     Friend WithEvents bwDownloadPic As System.ComponentModel.BackgroundWorker
-    Friend WithEvents pnlNewActor As System.Windows.Forms.Panel
+    Friend WithEvents pnlMain As System.Windows.Forms.Panel
+    Friend WithEvents pnlBottom As System.Windows.Forms.Panel
 
 End Class

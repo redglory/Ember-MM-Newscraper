@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Die Werte der Assemblyattribute überprüfen
 
-<Assembly: AssemblyTitle("scraper.Apple.Trailer")> 
+<Assembly: AssemblyTitle("scraper.Trailer.Apple")> 
 <Assembly: AssemblyDescription("http://forum.xbmc.org/forumdisplay.php?fid=195")> 
 <Assembly: AssemblyCompany("Ember Media Manager")> 
-<Assembly: AssemblyProduct("scraper.Apple.Trailer")> 
+<Assembly: AssemblyProduct("scraper.Trailer.Apple")> 
 <Assembly: AssemblyCopyright("Copyright ©  2014")> 
 <Assembly: AssemblyTrademark("")> 
 
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' übernehmen, indem Sie "*" eingeben:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.4.0.0")> 
-<Assembly: AssemblyFileVersion("1.4.0.0")> 
+<Assembly: AssemblyVersion("1.4.3.0")> 
+<Assembly: AssemblyFileVersion("1.4.3.0")> 

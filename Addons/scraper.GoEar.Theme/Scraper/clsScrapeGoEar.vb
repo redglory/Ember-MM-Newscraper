@@ -26,124 +26,127 @@ Imports System.Text.RegularExpressions
 Imports EmberAPI
 Imports NLog
 
-Public Class GoEar
+Namespace GoEar
+
+    Public Class Scraper
 
 #Region "Fields"
-    Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
-    Private originaltitle As String
-    Private listtitle As String
-    Private _themelist As New List(Of Themes)
+        Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
+        Private originaltitle As String
+        Private listtitle As String
+        Private _themelist As New List(Of Themes)
 
 #End Region 'Fields
 
 #Region "Constructors"
 
-    Public Sub New(ByVal sOriginalTitle As String, ByVal sListTitle As String)
-        Clear()
-        originaltitle = sOriginalTitle
-        listtitle = sListTitle
-        GetMovieThemes()
-    End Sub
+        Public Sub New(ByVal sOriginalTitle As String, ByVal sListTitle As String)
+            Clear()
+            originaltitle = sOriginalTitle
+            listtitle = sListTitle
+            GetMovieThemes()
+        End Sub
 
 #End Region 'Constructors
 
 #Region "Properties"
 
-    Public Property ThemeList() As List(Of Themes)
-        Get
-            Return _themelist
-        End Get
-        Set(ByVal value As List(Of Themes))
-            _themelist = value
-        End Set
-    End Property
+        Public Property ThemeList() As List(Of Themes)
+            Get
+                Return _themelist
+            End Get
+            Set(ByVal value As List(Of Themes))
+                _themelist = value
+            End Set
+        End Property
 
 #End Region 'Properties
 
 #Region "Methods"
 
-    Private Sub Clear()
-        _themelist = New List(Of Themes)
-    End Sub
+        Private Sub Clear()
+            _themelist = New List(Of Themes)
+        End Sub
 
-    Private Sub GetMovieThemes()
-        Dim BaseURL As String = "http://www.goear.com/search/"
-        Dim DownloadURL As String = "http://www.goear.com/action/sound/get/"
-        Dim SearchTitle As String
-        Dim SearchURL As String
+        Private Sub GetMovieThemes()
+            Dim BaseURL As String = "http://www.goear.com/search/"
+            Dim DownloadURL As String = "http://www.goear.com/action/sound/get/"
+            Dim SearchTitle As String
+            Dim SearchURL As String
 
-        If Not String.IsNullOrEmpty(originaltitle) Then
-            SearchTitle = Web.HttpUtility.UrlEncode(originaltitle)
-            SearchURL = String.Concat(BaseURL, SearchTitle)
-        ElseIf Not String.IsNullOrEmpty(listtitle) Then
-            SearchTitle = Web.HttpUtility.UrlEncode(listtitle)
-            SearchURL = String.Concat(BaseURL, SearchTitle)
-        Else
-            SearchURL = String.Empty
-        End If
-
-        Try
-            If Not String.IsNullOrEmpty(SearchURL) Then
-                Dim tTitle As String = String.Empty
-                Dim tID As String = String.Empty
-                Dim tWebURL As String = String.Empty
-                Dim tURL As String = String.Empty
-                Dim tDescription As String = String.Empty
-                Dim tLength As String = String.Empty
-                Dim tBitrate As String = String.Empty
-
-                Dim sHTTP As New HTTP
-                Dim Html As String = sHTTP.DownloadData(SearchURL)
-                sHTTP = Nothing
-
-                Dim rPattern As String = "<ol id=""search_results"">(?<RESULTS>.*?)</ol>"
-                Dim sPattern As String = "<a title=""escuchar.*?href=""(?<URL>.*?)"".*?<span class=""song"">(?<TITLE>.*?)</span>.*?<li class=""length radius_3"">(?<LENGTH>.*?)</li>.*?<li class=""kbps radius_3"">(?<BITRATE>.*?)<abbr title=.*?<li class=""description"">(?<DESCRIPTION>.*?)</li>"
-
-                Dim rResult As MatchCollection = Regex.Matches(Html, rPattern, RegexOptions.Singleline)
-
-                If rResult.Count > 0 Then
-                    Dim sHTML As String = rResult.Item(0).Groups(1).Value
-
-                    Dim sResult As MatchCollection = Regex.Matches(sHTML, sPattern, RegexOptions.Singleline)
-
-                    For ctr As Integer = 0 To sResult.Count - 1
-                        tWebURL = Web.HttpUtility.HtmlDecode(sResult.Item(ctr).Groups(1).Value)
-                        tTitle = sResult.Item(ctr).Groups(2).Value
-                        tLength = sResult.Item(ctr).Groups(3).Value
-                        tBitrate = sResult.Item(ctr).Groups(4).Value
-                        tDescription = sResult.Item(ctr).Groups(5).Value
-                        tID = GetFileID(tWebURL)
-                        tURL = String.Concat(DownloadURL, tID)
-
-                        If Not String.IsNullOrEmpty(tID) Then
-                            _themelist.Add(New Themes With {.Title = tTitle, .ID = tID, .URL = tURL, .Description = tDescription, .Length = tLength, .Bitrate = tBitrate, .WebURL = tWebURL})
-                        End If
-                    Next
-                End If
+            If Not String.IsNullOrEmpty(originaltitle) Then
+                SearchTitle = HttpUtility.UrlEncode(originaltitle)
+                SearchURL = String.Concat(BaseURL, SearchTitle)
+            ElseIf Not String.IsNullOrEmpty(listtitle) Then
+                SearchTitle = HttpUtility.UrlEncode(listtitle)
+                SearchURL = String.Concat(BaseURL, SearchTitle)
+            Else
+                SearchURL = String.Empty
             End If
 
+            Try
+                If Not String.IsNullOrEmpty(SearchURL) Then
+                    Dim tTitle As String = String.Empty
+                    Dim tID As String = String.Empty
+                    Dim tWebURL As String = String.Empty
+                    Dim tURL As String = String.Empty
+                    Dim tDescription As String = String.Empty
+                    Dim tDuration As String = String.Empty
+                    Dim tBitrate As String = String.Empty
 
-        Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
-        End Try
+                    Dim sHTTP As New HTTP
+                    Dim Html As String = sHTTP.DownloadData(SearchURL)
+                    sHTTP = Nothing
 
-    End Sub
+                    Dim strPatternSearchResultsArea As String = "<div class=""board search_board"">(?<RESULTS>.*?)</ol>"
 
-    Private Function GetFileID(ByVal URL As String) As String
-        If Not String.IsNullOrEmpty(URL) Then
-            Dim fileID As String
-            Dim startID As Integer
-            Dim endID As Integer
-            startID = URL.IndexOf("listen/") + 7
-            endID = URL.IndexOf("/", startID)
-            fileID = URL.Substring(startID, endID - startID)
+                    Dim regResultResultsArea As MatchCollection = Regex.Matches(Html, strPatternSearchResultsArea, RegexOptions.Singleline)
 
-            Return fileID
-        End If
-        Return String.Empty
-    End Function
+                    If regResultResultsArea.Count > 0 Then
+                        Dim strPatternSearchResults As String = "<li class=""board_item sound_item group"">(.*?)<\/div>.*?<\/li>"
+
+                        Dim regSearchResults As MatchCollection = Regex.Matches(regResultResultsArea.Item(0).Groups("RESULTS").Value, strPatternSearchResults, RegexOptions.Singleline Or RegexOptions.IgnoreCase)
+                        For ctr As Integer = 0 To regSearchResults.Count - 1
+                            Dim strPatternDetails As String = "redir=""(?<URL>.*?)"">.*?soundid=""(?<ID>.*?)"" title=""(?<TITLE>.*?)"" artist=""(?<DESCRIPTION>.*?)"".*?length"" title="".*?>(?<DURATION>.*?)<.*?kbps"" title=""Kbps"".*?>(?<BITRATE>.*?)<"
+
+                            Dim regDetails As Match = Regex.Match(regSearchResults.Item(ctr).Value, strPatternDetails, RegexOptions.Singleline Or RegexOptions.IgnoreCase)
+                            tWebURL = HttpUtility.HtmlDecode(regDetails.Groups("URL").Value).Trim
+                            tTitle = regDetails.Groups("TITLE").Value.Trim
+                            tDescription = regDetails.Groups("DESCRIPTION").Value.Trim
+                            tDuration = regDetails.Groups("DURATION").Value.Trim
+                            tBitrate = regDetails.Groups("BITRATE").Value.Trim
+                            tID = regDetails.Groups("ID").Value.Trim
+                            tURL = String.Concat(DownloadURL, tID).Trim
+
+                            If Not String.IsNullOrEmpty(tID) Then
+                                _themelist.Add(New Themes With {.Title = tTitle, .ID = tID, .URL = tURL, .Description = tDescription, .Duration = tDuration, .Bitrate = tBitrate, .WebURL = tWebURL})
+                            End If
+                        Next
+                    End If
+                End If
+            Catch ex As Exception
+                logger.Error(ex, New StackFrame().GetMethod().Name)
+            End Try
+
+        End Sub
+
+        Private Function GetFileID(ByVal URL As String) As String
+            If Not String.IsNullOrEmpty(URL) Then
+                Dim fileID As String
+                Dim startID As Integer
+                Dim endID As Integer
+                startID = URL.IndexOf("listen/") + 7
+                endID = URL.IndexOf("/", startID)
+                fileID = URL.Substring(startID, endID - startID)
+
+                Return fileID
+            End If
+            Return String.Empty
+        End Function
 
 #End Region 'Methods
 
-End Class
+    End Class
+
+End Namespace
 

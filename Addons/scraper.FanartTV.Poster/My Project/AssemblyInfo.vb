@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("scraper.FanartTV.Poster")> 
+<Assembly: AssemblyTitle("scraper.Image.FanartTV")> 
 <Assembly: AssemblyDescription("http://forum.xbmc.org/forumdisplay.php?fid=195")> 
 <Assembly: AssemblyCompany("Ember Media Manager")>
-<Assembly: AssemblyProduct("scraper.FanartTV.Poster")> 
+<Assembly: AssemblyProduct("scraper.Image.FanartTV")> 
 <Assembly: AssemblyCopyright("Copyright © 2013")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("70624D2F-DE90-42CB-AC79-7471FE533D11")> 
+<Assembly: Guid("70624D2F-DE90-42CB-AC79-7471FE533D11")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.4.0.0")> 
-<Assembly: AssemblyFileVersion("1.4.0.0")> 
+<Assembly: AssemblyVersion("1.4.8.0")>
+<Assembly: AssemblyFileVersion("1.4.8.0")>

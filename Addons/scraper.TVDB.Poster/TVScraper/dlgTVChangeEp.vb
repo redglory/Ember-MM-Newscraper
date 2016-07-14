@@ -32,6 +32,14 @@ Public Class dlgTVChangeEp
 
 #Region "Methods"
 
+    Public Sub New()
+        ' This call is required by the designer.
+        InitializeComponent()
+        Me.Left = Master.AppPos.Left + (Master.AppPos.Width - Me.Width) \ 2
+        Me.Top = Master.AppPos.Top + (Master.AppPos.Height - Me.Height) \ 2
+        Me.StartPosition = FormStartPosition.Manual
+    End Sub
+
     Public Overloads Function ShowDialog(ByVal tEpisodes As List(Of MediaContainers.EpisodeDetails)) As MediaContainers.EpisodeDetails
         Me._tepisodes = tEpisodes
 
@@ -76,22 +84,22 @@ Public Class dlgTVChangeEp
 
     Private Sub lvEpisodes_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvEpisodes.SelectedIndexChanged
         Me.ClearInfo()
-        If lvEpisodes.SelectedItems.Count > 0 AndAlso Not IsNothing(lvEpisodes.SelectedItems(0).Tag) Then
+        If lvEpisodes.SelectedItems.Count > 0 AndAlso lvEpisodes.SelectedItems(0).Tag IsNot Nothing Then
             Me._episode = DirectCast(lvEpisodes.SelectedItems(0).Tag, MediaContainers.EpisodeDetails)
 
-            If Not IsNothing(Me._episode.Poster.Image) Then
-                Me.pbPreview.Image = Me._episode.Poster.Image
+            If Me._episode.Poster.WebImage.Image IsNot Nothing Then
+                Me.pbPreview.Image = Me._episode.Poster.WebImage.Image
             ElseIf Not String.IsNullOrEmpty(Me._episode.LocalFile) AndAlso File.Exists(Me._episode.LocalFile) Then
-                Me._episode.Poster.FromFile(Me._episode.LocalFile)
-                If Not IsNothing(Me._episode.Poster.Image) Then
-                    Me.pbPreview.Image = Me._episode.Poster.Image
+                Me._episode.Poster.WebImage.FromFile(Me._episode.LocalFile)
+                If Me._episode.Poster.WebImage.Image IsNot Nothing Then
+                    Me.pbPreview.Image = Me._episode.Poster.WebImage.Image
                 End If
             ElseIf Not String.IsNullOrEmpty(Me._episode.PosterURL) Then
-                Me._episode.Poster.FromWeb(Me._episode.PosterURL)
-                If Not IsNothing(Me._episode.Poster.Image) Then
+                Me._episode.Poster.WebImage.FromWeb(Me._episode.PosterURL)
+                If Me._episode.Poster.WebImage.Image IsNot Nothing Then
                     Directory.CreateDirectory(Directory.GetParent(Me._episode.LocalFile).FullName)
-                    Me._episode.Poster.Save(Me._episode.LocalFile)
-                    Me.pbPreview.Image = Me._episode.Poster.Image
+                    Me._episode.Poster.WebImage.Save(Me._episode.LocalFile)
+                    Me.pbPreview.Image = Me._episode.Poster.WebImage.Image
                 End If
             End If
 

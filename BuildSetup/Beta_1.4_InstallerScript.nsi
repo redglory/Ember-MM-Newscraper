@@ -59,8 +59,8 @@
   !define MUI_COMPONENTSPAGE_SMALLDESC
   !define MUI_FINISHPAGE_LINK "Please visit http://embermediamanager.org for more information."
   !define MUI_FINISHPAGE_LINK_LOCATION "http://embermediamanager.org"
-  !define MUI_FINISHPAGE_RUN "$INSTDIR\${emm_filename}"
-  !define MUI_FINISHPAGE_RUN_NOTCHECKED
+  ;!define MUI_FINISHPAGE_RUN "$INSTDIR\${emm_filename}"
+  ;!define MUI_FINISHPAGE_RUN_NOTCHECKED
   !define MUI_ABORTWARNING
 ;--------------------------------
 ;Pages
@@ -105,6 +105,16 @@ Section "Ember Media Manager" SecEmberMediaManager
   SetShellVarContext current
   SectionIn RO
   SectionIn 1 2 3 #section is in install type Portable/UserFolder/Minimal
+  
+  ;Cleanup old defaults folder
+  RMDir /r "$INSTDIR\Defaults"
+  
+  ;Cleanup old modules folder
+  RMDir /r "$INSTDIR\Modules"
+  
+  ;Cleanup old files
+  Delete "$INSTDIR\*.*"
+  
   ;ADD YOUR OWN FILES HERE...
   SetOutPath "$INSTDIR"
   File "${emm_root}\${emm_folder}\${emm_filename}"
@@ -113,8 +123,13 @@ Section "Ember Media Manager" SecEmberMediaManager
   File "${emm_root}\${emm_folder}\NLog.config"
   File "${emm_root}\${emm_folder}\*.xml"
   File "${emm_root}\${emm_folder}\*.dll"
+  
   SetOutPath "$INSTDIR\Bin"
   File /r /x *.so "${emm_root}\${emm_folder}\Bin\*.*"
+  SetOutPath "$INSTDIR\DB"
+  File /r /x *.so "${emm_root}\${emm_folder}\DB\*.*"
+  SetOutPath "$INSTDIR\Defaults"
+  File /r /x *.so "${emm_root}\${emm_folder}\Defaults\*.*"
   SetOutPath "$INSTDIR\Images"
   File /r /x *.so "${emm_root}\${emm_folder}\Images\*.*"
   SetOutPath "$INSTDIR\Langs"
@@ -304,6 +319,8 @@ Section "Uninstall"
   Delete "$INSTDIR\*.xml"
   Delete "$INSTDIR\*.config"
   RMDir /r "$INSTDIR\Bin"
+  RMDir /r "$INSTDIR\DB"
+  RMDir /r "$INSTDIR\Defaults"
   RMDir /r "$INSTDIR\Images"
   RMDir /r "$INSTDIR\Langs"
   RMDir /r "$INSTDIR\Log"
@@ -339,7 +356,10 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\$StartMenuFolder\Visit ${emm_appname} Online.url"
   RMDir "$SMPROGRAMS\$StartMenuFolder"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${emm_appname}"
-
+  DeleteRegKey HKCU "Software\Classes\Directory\shell\EmberMediaManager"
+  DeleteRegKey HKCU "Software\Classes\Directory\shell\EmberMediaManager.AddMovieSource"
+  DeleteRegKey HKCU "Software\Classes\Directory\shell\EmberMediaManager.AddTVShowSource"
+  DeleteRegKey HKCU "Software\Classes\Directory\shell\EmberMediaManager.ScanFolder"
 SectionEnd
 
 ;--------------------------------

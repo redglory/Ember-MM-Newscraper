@@ -1,0 +1,695 @@
+Changelog 1.4.7.2 (2015-06-11)
+
+[Main]
+fixed: TMDB ID will be saved as thumb URL in actors table
+
+
+Changelog 1.4.7.1 (2015-06-11)
+
+[Main]
+fixed: error while loading Settings.xml if SeasonPosterPrefSize was set to HD1000
+fixed: some language errors
+
+
+Changelog 1.4.7.0 (2015-06-10)
+
+[Main]
+added: Windows shell context menu entries (check Settings -> Misc)
+added: mapping for hevc/h265 (reset the video codec mapping to default)
+added: LastPlayed for movies and episodes (read and write to/from NFO)
+added: more IDs (IMDB/TMDB/TVDB) for actors, movies, seasons, tv shows and episodes (not all are in use atm)
+added: more preferred image sizes
+added: error loging to all NFO readers
+fixed: some language issues
+fixed: removing movie/tv show sources takes a lot of time
+fixed: AllSeasons image flags be removed if new episodes has been added
+fixed: some issues with dialogs (missing in Taskbar, Icons)
+fixed: default settings
+fixed: main screen images start positions
+changed: all language settings for images are move to global "Scraper - Images" settings
+changed: image scrapers handling (massive API calls reducing)
+changed: CommandLine handling (for informations see http://forum.kodi.tv/showthread.php?tid=228652)
+
+[TMDB]
+added: scrape images for tv shows/seasons (episodes are not yet implemented)
+fixed: request limit handling
+fixed: crash if more than 40 search results was found (request limit issue)
+changed: new API wrapper
+
+[TVDB]
+fixed: crash on every second (re-)scrape
+fixed: Select Image dialog does not shown images they are specified as AllSeasons
+
+[Trakt.tv]
+added: Sync of lastplayed date for episodes and movies in trakt.tv manager
+added: comment support in trakt.tv manager to post new comments/reviews for movies on trakt.tv‏
+
+[IMPA]
+removed: scraper is broken and out-of-date
+
+[MPDB]
+removed: scraper is broken and out-of-date
+
+
+Changelog 1.4.6.0 (2015-05-21)
+
+[Main]
+added: MoviesSet Sorting (sort movie by year or by name)
+fixed: GetPrefered AllSeasons banner/poster
+fixed: season/episode recognizing (with files like "simpsons_s01e01_s01e02.mkv")
+fixed: Danish language file name
+fixed: does not play movies wich are stored in folders with umlauts
+changed: TVDB and Fanart.tv tv show image scraper has the same functions like movie image scrapers (sorting, enable/disable)
+
+[TVDB]
+added: new image scraper
+fixed: overlapping OK button in search results dialog
+
+[Renamer]
+fixed: some issues with tv show renaming
+changed: better default pattern for season and episode
+
+[Media File Manager]
+added: tv show compatibility
+fixed: some issues
+
+
+Changelog 1.4.5.0 (2015-05-07)
+
+[Main]
+added: TV Show Expert settings
+added: Denmark ratings
+added: MovieSet filter "Multiple Movies"
+added: SortTitle for TV Shows
+fixed: CommandLine scraping
+fixed: error with split-episodes (the "value is not integer" bug)
+fixed: YAMJ MovieSet NFO node
+fixed: DisplaySeason/DisplayEpisode is removed after edit episode
+fixed: many language and label issues
+fixed: save/load season images for seasons without local episode files
+fixed: season images are not recognized at first import
+fixed: Movie Studio scraping and splitting after edit
+improved: "Plot for Plot Outline" function
+improved: image class handling, image settings and image select dialogs
+
+[Renamer]
+fixed: works only after main tab has changed one time
+fixed: file name is not trimmed in Manual Renamer
+fixed: ToolStrip handling
+fixed: missing episode VCodec and wrong AChannel pattern
+
+
+Changelog 1.4.4.0 (2015-04-12)
+
+[Main]
+fixed: dialogs are displayed outside of screen if Ember is minimized
+fixed: tv show image preview
+fixed: "Reset Movie Filters"
+fixed: "Reset Valid Video Ext"
+fixed: read IMDB ID from folder or file name
+fixed: Split-Episode support
+fixed: episode subtitles scanning
+fixed: Watched checmarks do not update in real time
+fixed: sort movie list by "Sort Title"
+fixed: Studio and Director labels does not display ampersand
+fixed: German Forum URL
+added: "Lock Audio / Video Language" for episodes
+improved: startup process
+improved: media list response
+improved: search box is no longer blocked while loading media infos
+removed: button "Get Online" tv show matching regex
+
+[Media List Editor]
+added: first release
+
+[IMDB]
+added: Short Titles option (thx to Avi Buerno)
+
+[Renamer]
+fixed: does not respect lock if use "Lock all"
+fixed: do not use custom lists
+fixed: Rating if decimal separator is comma
+
+
+Changelog 1.4.3.1 (2015-03-25)
+
+[Renamer]
+fixed: episodes can not be renamed
+
+[TMDB]
+fixed: bug while search movies on TMDB
+
+[MovieExporter]
+fixed: no tv show list in exports
+
+
+Changelog 1.4.3.0 (2015-03-25)
+
+[Main]
+fixed: CodecMapping is always converted to lowercase
+fixed: ComboBox settings will not be saved after settings panel has changed
+fixed: "Edit Actor" dialog size
+fixed: bug with movie rating scraping
+fixed: "Remove Movie from Disk"
+fixed: confusing description of tv show reloading/refreshing
+fixed: error with episode subtitles recognition/saving
+fixed: "Clear All Cache" in tools menu (works now)
+fixed: SQL error in "Movie Source" dialog
+fixed: movie InfoPanel state after closing settings dialog
+fixed: "Custom Scraper" New/Marked movies
+fixed: movie/movieset/tvshow ID are not always trimmed after reading from NFOs
+fixed: missing linktable cleaning in database
+fixed: "Clean DB" does not remove all orphaned entries
+fixed: "Clean DB" and "Clear All Cache" is not enabled if all lists are empty
+added: option to disable "Image Select" dialog while single movie scraping
+added: some checks to block editing/scraping if a movie/tv show/episode file/path is offline
+added: option "Get Year from folder/file name" for movie sources
+added: preferred tv show/season poster size "1000x1426"
+added: more options for theming
+added: a dark infopanel theme
+added: "TMDB ID" to movie InfoPanel
+added: new tv show regex system (based on Kodi regex system)
+added: ability to add a custom rating string for not rated movies/tv shows
+added: option "Use digit grouping symbol for Votes count" (based on Windows region settings)
+added: field "Collection ID" to "Scrape Single Field" menu
+added: DiscArt for MovieSets (as expert settings, MSAA does not support DiscArts)
+added: new setting to add episode "Guest Stars" to actors list with role "Guest Star"
+added: "Clear Cache" to tv show context menu
+changed: replaced "Pref Movie(-Set) Banner Type" with "Banner Size"
+removed: "Tags" from global movie scraper settings (we do not want support that)
+
+[Renamer]
+fixed: renamer does not rename new movies/episodes
+fixed: some issues in preview
+fixed: $D and $F support for season/episode renamer
+fixed: episode actor thumbs folder handling
+added: "Reset" button for all pattern fields
+
+[Apple Trailers]
+fixed: no download possible if preferred quality is set to "All"
+
+[Trakt.tv]
+fixed: episode playcount synchronization
+fixed: database traffic while syncing
+added: option to disable "Progress" status (get information faster from Trakt.tv)
+
+[TMDB]
+added: "Year" textbox to "Movie Search Results" dialog
+
+[TVDB]
+added: option to scrape episode "Guest Stars"
+
+[MovieExporter]
+fixed: some issues with new database
+
+
+Changelog 1.4.2.0 (2015-03-05)
+
+[Main]
+fixed: dialogs/windows size
+fixed: DTS-MA and DTS-HRA identification
+fixed: refresh tv show does not refresh seasons
+added: <tag> manager
+
+[TVDB]
+fixed: image downloading on new tv show
+
+[Tag Manager]
+added: first release
+
+[Moviepilot]
+fixed: plot and outline scraping
+
+[Renamer]
+fixed: files will not be renamed while scraping if not NFO scraping is active in the current scraping process
+added: patter to control season/episode number padding
+
+
+Changelog 1.4.1.0 (2015-03-03)
+
+[Main]
+fixed: dialogs/windows are displayed in the wrong screen
+
+[Renamer]
+fixed: BulkRenamer does not load movies
+fixed: BulkRenamerdoes not use media list filters
+
+
+Changelog 1.4.0.9 (2015-03-02)
+
+[Main]
+fixed: episode file names with "720p" will be recognize as s7e20
+fixed: episode regex issues (partially fixed)
+fixed: seasons are partially lost after scraping
+fixed: loading movies from DB in "Edit MovieSet" window is not possible
+added: Video/Audio informations to Movie Export CVS
+
+[Moviepilot]
+fixed: plot and outline scraping
+
+[Renamer]
+fixed: renamer does not work
+fixed: manual episode rename dialog
+added: $2 tag for Aired date (episode only)
+
+
+Changelog 1.4.0.8 Beta (2015-02-25)
+
+[Main]
+added: possibility to scrape additional images for tv shows/seasons (CharacterArt, ClearArt, ClearLogo, Landscape)
+added: possibility to reorder/hide all list columns in main window
+added: possibility to hide language flags in main window
+added: VideoSource for episodes
+added: subtitle recognizing for episodes
+added: filter "_[->] " to default movie filter list (to replace _ with space)
+added: all HD formats can be downloaded from YouTube (also 1080p and 4K)
+added: new episode regex to recognize files like "ep_102.ext" (same rules like Kodi)
+added: new episode regex to recognize files by aired date like "ep_2015-02-25.ext" and "ep_25-02-2015.ext" (same rules like Kodi)
+added: new episode ordering "Day-Of-Year" (very special solution for Pr.Sinister ;-), 2015-01-01 = Season 2015 EP 1, 2015-12-31 = Season 2015 EP 365)
+added: display episodes by season/episode number or aired date (displays "Aired Date" instead of season/episode #)
+added: "* All Seasons" display season and episode # in episode list
+added: scrape MovieSets by current filters
+added: new filter "New Episode" to filter tv show list to tv shows with new episodes after DB update
+added: more options to filter year to main movie filter
+added: missing entries in "Update Single Data Field" (Actors, Genres, Original Title, Runtime)
+added: missing image type in main window (Banner, CharacterArt, ClearLogo, DiscArt)
+added: change Watched state for hole tv show/season
+added: buttons to reset Movie/MovieSet/TV sort tokens
+added: german articles to default sort tokens lists
+added: display number of episodes in tv show and seasons lists
+fixed: can't read tvshow.nfo's with new Kodi <episodeguide> node
+fixed: Outline shorting (now Outline is always cutted on the end of a sentence)
+fixed: missing episode handling
+fixed: rating is rounded if no vaotes are available
+fixed: displaying wrong rating and votes in main window
+fixed: NFO will not be writen after "MetaData Only" scraping
+fixed: episodes with same episode number (now it's possible to add more than one episode with same episode number)
+fixed: get year from directory/file name (the year does not have to be in brackets)
+fixed: "Display Year" in movie list does not work for inital listing
+fixed: "Use Plot for Outline"
+fixed: Movie/MovieSet count flickering in main window
+fixed: "Refresh Movie/MovieSet/TV Show/Season/Episode" handling
+fixed: prefered trailer handling
+fixed: image size labels in "Edit TV Show" dialog
+fixed: displaying wrong MPAA flag in main window
+fixed: new dialogs are displayed on wrong monitor
+fixed: YouTube trailer downloading
+fixed: theme downloading
+fixed: select theme dialog
+fixed: actors ordering numbers in NFO
+fixed: empty NFO nodes will be written to NFO
+fixed: TVDB info file downloading
+fixed: tv show image caching
+fixed: MovieSets MissingItem scraping
+fixed: MovieSets can't be marked
+fixed: Movie/MovieSet/TV Show lists and info reloading after DB update/cleaning
+fixed: image preview resizing
+fixed: refresh movie/episode does not remove no longer available movies/episodes
+fixed: "Change Movie (Auto)" does not remove old images/theme/trailer
+changed: optimized DB
+changed: Audio/Video Codec Mapping from regex to string comparison
+changed: Ember tries to load local actor thumb images instead of fetching URLs
+changed: moved "Missing Items" settings to filter panels
+changed: removed VLC from main code (VLC is now available as separate module and can be enabled or disabled)
+changed: set TelevisionTunes as new default theme scraper for movies
+changed: default Extrafanarts Limit to 4
+changed: display tv show path in main window instead of tv show name
+removed: "Overwrite English Plot/Outline"
+
+[Fanart.tv]
+added: image scraper for tv shows
+
+[GoEar]
+fixed: theme scraping
+
+[TelevisionTunes]
+added: first release
+
+[VLC]
+added: first release
+
+[TVDB]
+fixed: "Guest Stars" are listed as "Credits(Writer)"
+changed: reduced the time to scrape tv shows
+
+[IMDB]
+fixed: scraper does ignore the movie year while searching
+fixed: scraper does not display search result if only "Videos" where be found
+removed: image scraper (only crappy images without the possibility to filter them)
+
+[TMDB]
+fixed: Credits(Writer) scraping (now same results like in Kodi)
+fixed: Landscape size information
+fixed: issue while searching movie if "Year" is empty
+
+[HDTrailers.net]
+changed: improved match rate
+
+[MoviePilot]
+fixed: MoviePilot scraping
+
+[Trakt.tv]
+changed: upgraded to trakt.tv v2API
+added: sync  watchlist tab for syncing trakt.tv watchlist with watched movies in Ember
+added: userlist explorer
+fixed: movie/episode watched state syncing
+added: send rating of movies to trakt.tv account
+added: sync trakt.tv lists
+
+[Renamer]
+added: episode renamer (beta)
+added: "Rename after edit movie/episode"
+added: "Rename episodes after DB update"
+added: preview in module settings
+fixed: some issues in Bulk Renamer dialog
+
+
+Changelog 1.4.0.7 Beta (2014-11-27)
+
+[Main]
+added: MovieList custom sorting (beta)
+added: TV Show Extrafanarts settings
+added: backgroundworker for movie posters in moviesets
+added: expert settings for moviesets
+added: "Change Movie (Auto)" (scrapes all images images automatically after movie change)
+added: "Exclude TV Source from library update"
+added: votes count for tv shows and episodes
+added: filenames in Edit Movie and Episode dialog
+added: Audio and Subtitle languages flags with full stream informations in main window
+added: "Part of a MovieSet" column in main window
+added: "Rewrite all Movie Content"
+added: change Episode watched state by clicking watched column
+added: "Detailed Scraper preview" support while single field scraping
+added: MovieSet NFO support (not yet supportet by MovieSetArtworkAutomator)
+added: English and German Forum links to Help menu
+fixed: image resizing
+fixed: some data scraper issues
+fixed: MPAA/Certification handling
+fixed: error while closing "Edit TV Show" dialog
+fixed: TV Show MPAA can't set to empty
+fixed: season text if used year as season number
+fixed: titles in YouTube trailer search results
+fixed: Fanart Backdrops settings
+fixed: Bitrate "0" issue
+fixed: crash after deleting images in tv image select dialog
+fixed: icon shifting in settings dialog
+fixed: FileSorter do not use setted filenames
+fixed: Settings dialog size on small displays
+fixed: Title/OriginalTitle handling in main windows
+fixed: Playcount/Watched state is not writen to NFO after change with context menu
+fixed: Ratings in main window are not rounded
+fixed: "Missing Episodes" are gone after rescraping a single season (partially fixed, still does not work with "*All Seasons" entry
+fixed: Genre settings are not saved
+changed: completely revised Setting dialog for better sizing, scrolling and prevent label overlapping 
+changed: "Excluded" sources now are gray in update database submenu
+changed: temporarily disabled "New Movie" and "New Episode" notifications to prevent crash
+changed: Tools menu items handling
+changed: display best audio of selected language in main window (if this option is enabled in settings)
+changed: revised all main filter panels
+removed: all fixed audio and video codec conversion
+removed: quality settings for images
+removed: option "Use Outline for Plot if Plot is empty"
+
+[MediaFileManager]
+added: TeraCopy support to copy and move movies (beta)
+
+[Renamer]
+fixed: VideoSource bug
+fixed: Subtitles paths are not updated after renaming
+fixed: Renamer fills OriginalTitle even if it the same like title
+fixed: BulkRenamer adds too many "tt" to IMDB-ID
+changed: BulkRenamer use MovieList filter
+
+[MoviePilot]
+fixed: some issues
+changed: completely revised for faster scraping
+
+[IMDB]
+added: more "Force Title Languages"
+
+[OFDB]
+fixed: some issues
+changed: completely revised for faster scraping
+
+
+Changelog 1.4.0.6 Beta (2014-10-26)
+
+[Main]
+added: "Original Title" field to custom scraper
+added: "Data Field" to movie list filter
+added: "Movies in Set" poster list (need a little bit longer to load, we add a background worker later)
+added: UK and Germany tv show rating list (not possible to scrape, but you can set the rating manually in "Edit Show" dialog) (delete .\Ember Media Manager\Settings\Ratings.xml to get the new list)
+fixed: "Video Source/File Source" confusion (Video Source = dvd, bluray... / File Source = Source)
+fixed: MediaInfo codec mapping (mpeg4 bug) (reload codec mapping in settings to get a proper info)
+fixed: movie list data field refreshing after scraping/editing
+fixed: "Missing" filter checkbox control
+fixed: tv show rating in "Edit Show" dialog
+
+[TMDB]
+fixed: trailer scraper
+
+[IMDB]
+changed: IMDB ID manually input is blocked while searching
+
+
+Changelog 1.4.0.5 Beta (2014-10-21)
+
+[Main]
+fixed: clean <id> node in NFOs for YAMJ
+fixed: DB error with episodes embedded subtitles
+fixed: crash on ThemeSelect
+fixed: missing "PlaycountSpecified" and "TMDBSpecified" (if empty, the nodes will no longer writed to NFO)
+fixed: missing "Not Watched" text in episode context menu
+changed: disabled "Watched" for tv show and season context menu (does not work atm)
+updated: MediaInfo.dll to latest version 0.7.70
+
+[Renamer]
+fixed: error if field isNothing 
+
+[TMDB]
+fixed: SearchResult does not always show a poster
+
+
+Changelog 1.4.0.4 Beta (2014-10-18)
+
+[IMDB]
+fixed: fixed data scraper while change/search movie
+
+
+Changelog 1.4.0.3 Beta (2014-10-18)
+
+[Main]
+fixed: bug with MovieSet (reload all movies to fix existing and wrong sets)
+fixed: error while "Reload all MovieSets"
+fixed: missing movie list sorting after first start
+fixed: movie/movieset list does not refresh title for search bar
+fixed: FileInfo and StreamEditor
+added: external Subtitles preview in Edit Movie dialog
+added: filter "Only one Movie" to MovieSet filter
+
+
+Changelog 1.4.0.2 Beta (2014-10-17)
+
+[Main]
+fixed: issue with episode recognising
+
+
+Changelog 1.4.x Beta (2014-10-17)
+
+[Main]
+added: MovieSet title renamer (auto rename titles like "Hangover Reihe" to "Hangover Collection")
+added: missing icons for sd video sources
+added: more video sources
+added: clean MovieSet DB on update
+added: delete images with MovieSets
+added: filters for MovieSets
+added: filters for TV Shows (beta)
+added: search bar for MovieSets
+added: search bar for TV Shows
+added: exclude directories (you can add directories who will be completely ignored by Ember)
+added: search bar in Edit MovieSet dialog
+added: key sensitive movie list in Edit MovieSet dialog
+added: setting to set the release date in US format (yyyy-mm-dd)
+added: more settings for MovieSets
+added: missing locks
+added: scrape global episode runtime for tv shows from TVDB
+added: runtime in tv show and episode NFO
+added: use Show Runtime for Episodes if no Episode Runtime can be found
+added: a Movie source can set as "exclude from DB update" like in XBMC
+added: filter "Country" to Movie filters
+added: [none] to genre filter to find movies/tv shows without genre
+added: ListTile and sort tokens for tv shows
+added: "Cleanup disabled fields" for movie scraper
+added: HD-Trailers.net and Davestrailerpage.com as additional trailer scrapers
+added: "* All Seasons" to season list
+added: "Display Image Names" for main window (like "ClearArt", "Landscape")
+added: XBMC <StereoMode> tag in NFO
+added: full MKV 3D support
+added: better external subtitles support (in movie folder and "subs" subfolder)
+added: "Original Title" as separate data scraper option
+added: MovieSet images renaming if movieset title has changed
+fixed: MovieSet info panel height
+fixed: Ember wants restart while DB update after cloding settings dialog
+fixed: rating stars color for disabled stars
+fixed: MPAA/Certification handling
+fixed: Settings dialog is not sizable
+fixed: "Remove MovieSet images with MovieSet" to cleanup images from deleted MovieSets
+fixed: theme scraper in Edit Movie dialog
+fixed: delete existing trailers/themes
+fixed: some issues in main menu
+fixed: extrathumbs, extrafanarts and actorthumbs handling in Edit Movie dialog
+fixed: all missing/wrong "Expert Settings" for movie
+changed: Movie data scraper handling (now the first scraper in settings has the highest priority)
+changed: list sorting in movie list or filter will be saved and restored while DB-update, changed settings or Ember restart
+changed: Country and Studio are now saved in multiple NFO tags for each entry
+changed: trailer preview buttons logic in Edit Movie dialog
+changed: trailer logic
+removed: old MovieSets manager
+removed: Czech language (broken)
+
+[Renamer]
+added: MovieSet name tag
+fixed: bugs with special characters
+fixed: many other bugs
+
+[TMDB]
+fixed: MovieSet scraper get random images if no TMDBCOlID is available
+changed: API logic (now it's possible to change settings without restart)
+
+[Fanart.tv]
+added: private API key handling
+changed: API logic (now it's possible to change settings without restart)
+
+[IMDB]
+fixed: wrong runtime scraping
+fixed: wrong votes scraping
+
+[GoEar]
+fixed: theme scraping
+
+
+Changelog 1.4.x Beta (2014-09-05)
+
+[Main]
+fixed: a part of extrathumbs/extrafanarts in expert settings (not really finished)
+added: custom markers to filter
+
+[Renamer]
+fixed: issues with folders
+
+
+Changelog 1.4.x Beta (2014-08-26)
+
+[Main]
+fixed: VideoSource handling in NFO
+fixed: some MovieSet issues
+fixed: key pressing in lists will be stopped by Sub LoadMovie/MovieSet/Show/Season/Episode (now timer is 2sec after each key you press)
+
+
+Changelog 1.4.x Beta (2014-08-25)
+
+[Main]
+fixed: some issues with AdvancedSettings.xml
+fixed: MovieSources, Audio Video Codec Mapping
+added: "Reload Default" buttons for Audio Video Codec Mapping
+
+
+Changelog 1.4.x Beta (2014-08-24)
+
+[Main]
+fixed: language issue
+fixed: Default xml are moved instead of copied
+added: MovieSet settings to InstallWizard
+changed: no notification on new movie/episode
+
+
+Changelog 1.4.x Beta(2014-08-23)
+
+[Main]
+added: -tvupdate to command line starting
+added: new movieset management with extra tab
+added: auto scraper for moviesets
+added: new "DateAdded" options (same like in XBMC: now, ctime, mtime, from NFO)
+added: "DateAdded" field for movie and episode NFO
+added: 4 additional custom markers for movie list with adjustable colors and names
+added: "Collection" (TMDB collection ID's) for NFO
+added: option to activate "Scrape image on right mouse double click" in main window
+added: more fields to "Update Single Field"
+added: language and ordering can now be set individually for each tv show source
+added: default search parameter for search on Youtube (search field is auto filled with "moviename {parameter}" like "Avatar trailer german")
+added: new fields and image types to custom scraper
+added: "None" buttons in custom scraper
+added: export movies/tv shows list to XML
+added: new fields for furturer 3D support
+added: more image previews in main window (we need a better concept for more/all image previews)
+fixed: not all content is recognize on DB update
+fixed: command line starting
+fixed: trailer downloading
+fixed: tariler download process bar
+fixed: prefered and minimun trailer quality
+fixed: XBMC YouTube addon trailer link compatibility
+fixed: movie certification languages (now in "MovieCertLanguages.xml", you can add own languages)
+fixed: image tabs in "Edit Movie/MovieSet" are no longer displayed if a image type is not activated in settings
+fixed: image scrolling in image select dialog (now it's smooth and without jumping anymore)
+fixed: search on YouTube (trailers)
+fixed: tv rating region
+fixed: some tv languages issues
+fixed: episode poster prefered size
+fixed: some MediaInfo issues
+fixed: list size while first start
+fixed: some "Movie Expert Settings" issues
+fixed: Boxee tv show ID
+changed: TVDB scraper downloads new informations automatically if no info is precached for a new episode
+changed: removed Adobe Flash plugin (now we use VLC for trailer and theme previews)
+changed: new trailer preview dialog
+changed: rating from 5 to 10 stars
+changed: new internal modules handling
+changed: new internal XML serialization
+removed: NMT and MediaBrower modules (we will rework this later)
+removed: YAMJ module (now fully supported in Ember)
+removed: Boxee module (now fully supported in Ember)
+
+[Renamer]
+fixed: works now on auto and manually scraping
+fixed: errors with rating
+added: new parameters (audio & video codec, channels and more...)
+
+[TMDB data scraper]
+added: different settings for movies and moviesets
+added: get "Collection" ID of a movie
+added: data scraper for moviesets
+fixed: genre limit
+
+[IMDB data scraper]
+fixed: genre limit
+fixed: release date
+
+[OFDB data scraper]
+added: FSK scraping
+
+[TMDB image scraper]
+added: different settings for movies and moviesets
+added: display only preferend language images
+added: also display english images
+added: also blank english images
+added: image scraper for moviesets
+
+[IMDB image scraper]
+added: different settings for movies and moviesets
+
+[Fanart.tv image scraper]
+fixed: URL's for image preview
+added: different settings for movies and moviesets
+added: display only preferend language images
+added: also display english images
+added: also blank english images
+added: image scraper for moviesets
+
+[IMDB trailer scraper]
+fixed: works again
+
+[Apple trailer scraper]
+added: new Apple trailer scraper
+
+[TVDB data scraper]
+fixed: DisplayEpisode and DisplaySeason #

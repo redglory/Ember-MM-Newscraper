@@ -18,10 +18,7 @@
 ' # along with Ember Media Manager.  If not, see <http://www.gnu.org/licenses/>. #
 ' ################################################################################
 
-Imports System.IO
-Imports System.IO.Compression
 Imports System.Net
-Imports System.Text
 Imports System.Text.RegularExpressions
 Imports NLog
 Imports EmberAPI
@@ -41,8 +38,8 @@ Namespace IMPA
 
 #Region "Methods"
 
-        Public Function GetIMPAPosters(ByVal imdbID As String) As List(Of MediaContainers.Image)
-            Dim alPoster As New List(Of MediaContainers.Image)
+        Public Function GetIMPAPosters(ByVal imdbID As String) As MediaContainers.SearchResultsContainer
+            Dim alContainer As New MediaContainers.SearchResultsContainer
             Dim ParentID As String
             Dim oV As String = String.Empty
 
@@ -64,32 +61,25 @@ Namespace IMPA
 
                     Dim mcPoster As MatchCollection = Regex.Matches(HTML, "(thumbs/imp_([^>]*ver[^>]*.jpg))|(thumbs/imp_([^>]*.jpg))")
 
-                    Dim PosterURL As String
+                    Dim ThumbURL As String
 
                     For Each mPoster As Match In mcPoster
 
-                        PosterURL = String.Format("{0}/{1}", sURL.Substring(0, sURL.LastIndexOf("/")), mPoster.Value.ToString())
+                        ThumbURL = String.Format("{0}/{1}", sURL.Substring(0, sURL.LastIndexOf("/")), mPoster.Value.ToString())
                         ParentID = mPoster.Value
                         If Not ParentID = oV Then
-                            alPoster.Add(New MediaContainers.Image With {.Description = Master.eSize.poster_names(0).description, .URL = PosterURL, .Height = "100", .Width = "68", .ParentID = ParentID})
 
-                            PosterURL = Strings.Replace(String.Format("{0}/{1}", sURL.Substring(0, sURL.LastIndexOf("/")), mPoster.Value.ToString()).Replace("thumbs", "posters"), "imp_", String.Empty)
-
-                            alPoster.Add(New MediaContainers.Image With {.Description = Master.eSize.poster_names(5).description, .URL = PosterURL, .Height = "n/a", .Width = "n/a", .ParentID = ParentID})
-
-                            'Most posters are not available as extra large. Therefore, for now disabled.
-                            'PosterURL = PosterURL.Insert(PosterURL.LastIndexOf("."), "_xlg")
-                            'alPoster.Add(New MediaContainers.Image With {.Description = Master.eSize.poster_names(5).description, .URL = PosterURL, .Height = "n/a", .Width = "n/a", .ParentID = ParentID})
-
+                            Dim PosterURL = String.Format("{0}/{1}", sURL.Substring(0, sURL.LastIndexOf("/")), mPoster.Value.ToString()).Replace("thumbs", "posters").Replace("imp_", String.Empty)
+                            alContainer.MainPosters.Add(New MediaContainers.Image With {.URLOriginal = PosterURL, .URLThumb = ThumbURL, .Height = "n/a", .Width = "n/a", .Scraper = "IMPA"})
                             oV = ParentID
                         End If
                     Next
                 End If
             Catch ex As Exception
-                logger.Error("GetIMPAPosters", ex)
+                logger.Error(ex, "GetIMPAPosters")
             End Try
 
-            Return alPoster
+            Return alContainer
         End Function
 
         Private Function GetLink(ByVal IMDBID As String) As String
@@ -115,7 +105,7 @@ Namespace IMPA
                     Return String.Empty
                 End If
             Catch ex As Exception
-                logger.Error(New StackFrame().GetMethod().Name,ex)
+                logger.Error(ex, New StackFrame().GetMethod().Name)
                 Return String.Empty
             End Try
         End Function

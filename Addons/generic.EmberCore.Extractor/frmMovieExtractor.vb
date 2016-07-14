@@ -1,4 +1,24 @@
-﻿Imports System.Windows.Forms
+﻿' ################################################################################
+' #                             EMBER MEDIA MANAGER                              #
+' ################################################################################
+' ################################################################################
+' # This file is part of Ember Media Manager.                                    #
+' #                                                                              #
+' # Ember Media Manager is free software: you can redistribute it and/or modify  #
+' # it under the terms of the GNU General Public License as published by         #
+' # the Free Software Foundation, either version 3 of the License, or            #
+' # (at your option) any later version.                                          #
+' #                                                                              #
+' # Ember Media Manager is distributed in the hope that it will be useful,       #
+' # but WITHOUT ANY WARRANTY; without even the implied warranty of               #
+' # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                #
+' # GNU General Public License for more details.                                 #
+' #                                                                              #
+' # You should have received a copy of the GNU General Public License            #
+' # along with Ember Media Manager.  If not, see <http://www.gnu.org/licenses/>. #
+' ################################################################################
+
+Imports System.Windows.Forms
 Imports System
 Imports System.IO
 Imports System.Text.RegularExpressions
@@ -7,23 +27,38 @@ Imports NLog
 
 
 Public Class frmMovieExtractor
+
 #Region "Fields"
+
     Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
     Private PreviousFrameValue As Integer
-#End Region
+    Private _strFilename As String
+
+#End Region 'Fields
 
 #Region "Events"
+
     Event GenericEvent(ByVal mType As EmberAPI.Enums.ModuleEventType, ByRef _params As System.Collections.Generic.List(Of Object))
-#End Region
+
+#End Region 'Events
 
 #Region "Methods"
+
+    Public Sub New(ByVal strFilename As String)
+        ' This call is required by the designer.
+        InitializeComponent()
+        Me.Left = Master.AppPos.Left + (Master.AppPos.Width - Me.Width) \ 2
+        Me.Top = Master.AppPos.Top + (Master.AppPos.Height - Me.Height) \ 2
+        Me.StartPosition = FormStartPosition.Manual
+        _strFilename = strFilename
+    End Sub
 
     Private Sub btnFrameLoad_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFrameLoad.Click
         Try
             Using ffmpeg As New Process()
 
                 ffmpeg.StartInfo.FileName = Functions.GetFFMpeg
-                ffmpeg.StartInfo.Arguments = String.Format("-ss 0 -i ""{0}"" -an -f rawvideo -vframes 1 -s 1280x720 -vcodec mjpeg -y ""{1}""", Master.currMovie.Filename, Path.Combine(Master.TempPath, "frame.jpg"))
+                ffmpeg.StartInfo.Arguments = String.Format("-ss 0 -i ""{0}"" -an -f rawvideo -vframes 1 -s 1280x720 -vcodec mjpeg -y ""{1}""", _strFilename, Path.Combine(Master.TempPath, "frame.jpg"))
                 ffmpeg.EnableRaisingEvents = False
                 ffmpeg.StartInfo.UseShellExecute = False
                 ffmpeg.StartInfo.CreateNoWindow = True
@@ -57,8 +92,8 @@ Public Class frmMovieExtractor
                     pbFrame.Image = Image.FromStream(fsFImage)
                 End Using
                 btnFrameLoad.Enabled = False
-                btnFrameSaveAsEFanart.Enabled = True
-                btnFrameSaveAsEThumb.Enabled = True
+                btnFrameSaveAsExtrafanart.Enabled = True
+                btnFrameSaveAsExtrathumb.Enabled = True
                 btnFrameSaveAsFanart.Enabled = True
             Else
                 tbFrame.Maximum = 0
@@ -69,13 +104,14 @@ Public Class frmMovieExtractor
             PreviousFrameValue = 0
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
             tbFrame.Maximum = 0
             tbFrame.Value = 0
             tbFrame.Enabled = False
             pbFrame.Image = Nothing
         End Try
     End Sub
+
     Private Sub tbFrame_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tbFrame.KeyUp
         If tbFrame.Value <> PreviousFrameValue Then
             GrabTheFrame()
@@ -87,13 +123,14 @@ Public Class frmMovieExtractor
             GrabTheFrame()
         End If
     End Sub
+
     Private Sub tbFrame_Scroll(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbFrame.Scroll
         Try
             Dim sec2Time As New TimeSpan(0, 0, tbFrame.Value)
             lblTime.Text = String.Format("{0}:{1:00}:{2:00}", sec2Time.Hours, sec2Time.Minutes, sec2Time.Seconds)
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
     End Sub
 
@@ -105,7 +142,7 @@ Public Class frmMovieExtractor
 
             ffmpeg.StartInfo.FileName = Functions.GetFFMpeg
             'ffmpeg.StartInfo.Arguments = String.Format("-ss {0} -i ""{1}"" -an -f rawvideo -vframes 1 -vcodec mjpeg -y -pix_fmt ""yuvj420p"" ""{2}""", tbFrame.Value, Master.currMovie.Filename, Path.Combine(Master.TempPath, "frame.jpg"))
-            ffmpeg.StartInfo.Arguments = String.Format("-ss {0} -i ""{1}"" -vframes 1 -y ""{2}""", tbFrame.Value, Master.currMovie.Filename, Path.Combine(Master.TempPath, "frame.jpg"))
+            ffmpeg.StartInfo.Arguments = String.Format("-ss {0} -i ""{1}"" -vframes 1 -y ""{2}""", tbFrame.Value, _strFilename, Path.Combine(Master.TempPath, "frame.jpg"))
             ffmpeg.EnableRaisingEvents = False
             ffmpeg.StartInfo.UseShellExecute = False
             ffmpeg.StartInfo.CreateNoWindow = True
@@ -113,8 +150,8 @@ Public Class frmMovieExtractor
             ffmpeg.StartInfo.RedirectStandardError = False
 
             pnlFrameProgress.Visible = True
-            btnFrameSaveAsEFanart.Enabled = False
-            btnFrameSaveAsEThumb.Enabled = False
+            btnFrameSaveAsExtrafanart.Enabled = False
+            btnFrameSaveAsExtrathumb.Enabled = False
             btnFrameSaveAsFanart.Enabled = False
 
             ffmpeg.Start()
@@ -127,8 +164,8 @@ Public Class frmMovieExtractor
                     pbFrame.Image = Image.FromStream(fsFImage)
                 End Using
                 tbFrame.Enabled = True
-                btnFrameSaveAsEFanart.Enabled = True
-                btnFrameSaveAsEThumb.Enabled = True
+                btnFrameSaveAsExtrafanart.Enabled = True
+                btnFrameSaveAsExtrathumb.Enabled = True
                 btnFrameSaveAsFanart.Enabled = True
                 pnlFrameProgress.Visible = False
                 PreviousFrameValue = tbFrame.Value
@@ -137,8 +174,8 @@ Public Class frmMovieExtractor
                 tbFrame.Maximum = 0
                 tbFrame.Value = 0
                 tbFrame.Enabled = False
-                btnFrameSaveAsEFanart.Enabled = False
-                btnFrameSaveAsEThumb.Enabled = False
+                btnFrameSaveAsExtrafanart.Enabled = False
+                btnFrameSaveAsExtrathumb.Enabled = False
                 btnFrameSaveAsFanart.Enabled = False
                 btnFrameLoad.Enabled = True
                 pbFrame.Image = Nothing
@@ -147,21 +184,21 @@ Public Class frmMovieExtractor
             End If
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
             PreviousFrameValue = 0
             lblTime.Text = String.Empty
             tbFrame.Maximum = 0
             tbFrame.Value = 0
             tbFrame.Enabled = False
-            btnFrameSaveAsEFanart.Enabled = False
-            btnFrameSaveAsEThumb.Enabled = False
+            btnFrameSaveAsExtrafanart.Enabled = False
+            btnFrameSaveAsExtrathumb.Enabled = False
             btnFrameSaveAsFanart.Enabled = False
             btnFrameLoad.Enabled = True
             pbFrame.Image = Nothing
         End Try
     End Sub
 
-    Private Sub btnFrameSaveAsEFanart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFrameSaveAsEFanart.Click
+    Private Sub btnFrameSaveAsExtrafanart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFrameSaveAsExtrafanart.Click
         Try
             Dim tPath As String = Path.Combine(Master.TempPath, "extrafanarts")
 
@@ -169,24 +206,23 @@ Public Class frmMovieExtractor
                 Directory.CreateDirectory(tPath)
             End If
 
-            Dim iMod As Integer = Functions.GetExtraModifier(tPath)
+            Dim iMod As Integer = Functions.GetExtrathumbsModifier(tPath)
 
             Dim exImage As New Images
             Dim sPath As String = Path.Combine(tPath, String.Concat("thumb", (iMod + 1), ".jpg"))
             exImage.ResizeExtraFanart(Path.Combine(Master.TempPath, "frame.jpg"), sPath)
-            exImage.Dispose()
-            exImage = Nothing
+            exImage.Clear()
 
-            RaiseEvent GenericEvent(Enums.ModuleEventType.MovieFrameExtrator, New List(Of Object)(New Object() {"EFanartToSave", sPath}))
+            RaiseEvent GenericEvent(Enums.ModuleEventType.FrameExtrator_Movie, New List(Of Object)(New Object() {"ExtrafanartToSave", sPath}))
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
 
-        btnFrameSaveAsEFanart.Enabled = False
+        btnFrameSaveAsExtrafanart.Enabled = False
     End Sub
 
-    Private Sub btnFrameSaveAsEThumb_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFrameSaveAsEThumb.Click
+    Private Sub btnFrameSaveAsExtrathumb_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFrameSaveAsExtrathumb.Click
         Try
             Dim tPath As String = Path.Combine(Master.TempPath, "extrathumbs")
 
@@ -194,30 +230,29 @@ Public Class frmMovieExtractor
                 Directory.CreateDirectory(tPath)
             End If
 
-            Dim iMod As Integer = Functions.GetExtraModifier(tPath)
+            Dim iMod As Integer = Functions.GetExtrathumbsModifier(tPath)
 
             Dim exImage As New Images
             Dim sPath As String = Path.Combine(tPath, String.Concat("thumb", (iMod + 1), ".jpg"))
             exImage.ResizeExtraThumb(Path.Combine(Master.TempPath, "frame.jpg"), sPath)
-            exImage.Dispose()
-            exImage = Nothing
+            exImage.Clear()
 
-            RaiseEvent GenericEvent(Enums.ModuleEventType.MovieFrameExtrator, New List(Of Object)(New Object() {"EThumbToSave", sPath}))
+            RaiseEvent GenericEvent(Enums.ModuleEventType.FrameExtrator_Movie, New List(Of Object)(New Object() {"ExtrathumbToSave", sPath}))
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
 
-        btnFrameSaveAsEThumb.Enabled = False
+        btnFrameSaveAsExtrathumb.Enabled = False
     End Sub
 
     Private Sub btnFrameSaveAsFanart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFrameSaveAsFanart.Click
         Try
-            If Not IsNothing(pbFrame.Image) Then
-                RaiseEvent GenericEvent(Enums.ModuleEventType.MovieFrameExtrator, New List(Of Object)(New Object() {"FanartToSave"}))
+            If pbFrame.Image IsNot Nothing Then
+                RaiseEvent GenericEvent(Enums.ModuleEventType.FrameExtrator_Movie, New List(Of Object)(New Object() {"FanartToSave"}))
             End If
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
 
         btnFrameSaveAsFanart.Enabled = False
@@ -237,19 +272,19 @@ Public Class frmMovieExtractor
             '    pnlFrameProgress.Visible = False
             '    RaiseEvent GenericEvent(Enums.ModuleEventType.MovieFrameExtrator, Nothing)
             'End If
-            MsgBox("This feature is currently unavailable", MsgBoxStyle.OkOnly, "No Beta Feature") 'TODO: re-add autothumbs
+            MessageBox.Show("This feature is currently unavailable", "No Beta Feature", MessageBoxButtons.OK, MessageBoxIcon.Information) 'TODO: re-add autothumbs
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
     End Sub
 
     Private Sub txtThumbCount_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtThumbCount.GotFocus
         Me.AcceptButton = Me.btnAutoGen
     End Sub
+
     Private Sub txtThumbCount_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtThumbCount.TextChanged
         btnAutoGen.Enabled = Not String.IsNullOrEmpty(txtThumbCount.Text)
     End Sub
-
 
     Private Sub frmMovieExtrator_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         'If Master.eSettings.AutoThumbs > 0 Then
@@ -262,22 +297,14 @@ Public Class frmMovieExtractor
         Me.gbAutoGenerate.Text = Master.eLang.GetString(296, "Auto-Generate")
         Me.lblToCreate.Text = Master.eLang.GetString(303, "# to Create:")
         Me.btnAutoGen.Text = Master.eLang.GetString(304, "Auto-Gen")
-        Me.btnFrameSaveAsEFanart.Text = Master.eLang.GetString(1050, "Save as Extrafanart")
-        Me.btnFrameSaveAsEThumb.Text = Master.eLang.GetString(305, "Save as Extrathumb")
+        Me.btnFrameSaveAsExtrafanart.Text = Master.eLang.GetString(1050, "Save as Extrafanart")
+        Me.btnFrameSaveAsExtrathumb.Text = Master.eLang.GetString(305, "Save as Extrathumb")
         Me.btnFrameSaveAsFanart.Text = Master.eLang.GetString(1049, "Save as Fanart")
         Me.lblExtractingFrame.Text = Master.eLang.GetString(306, "Extracting Frame...")
         Me.btnFrameLoad.Text = Master.eLang.GetString(307, "Load Movie")
 
     End Sub
 
-    Public Sub New()
-
-        ' This call is required by the designer.
-        InitializeComponent()
-        Me.SetUp()
-        ' Add any initialization after the InitializeComponent() call.
-
-    End Sub
-#End Region
+#End Region 'Methods
 
 End Class

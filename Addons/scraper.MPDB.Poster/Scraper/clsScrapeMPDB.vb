@@ -40,8 +40,8 @@ Namespace MPDB
 
 #Region "Methods"
 
-        Public Function GetMPDBPosters(ByVal imdbID As String) As List(Of MediaContainers.Image)
-            Dim alPosters As New List(Of MediaContainers.Image)
+        Public Function GetMPDBPosters(ByVal imdbID As String) As MediaContainers.SearchResultsContainer
+            Dim alContainer As New MediaContainers.SearchResultsContainer
 
             Try
                 Dim sHTTP As New HTTP
@@ -52,32 +52,29 @@ Namespace MPDB
                     Dim mcPoster As MatchCollection = Regex.Matches(HTML, "http://www.movieposterdb.com/posters/[0-9_](.*?)/[0-9](.*?)/[0-9](.*?)/[a-z0-9_](.*?).jpg")
 
                     Dim PosterURL As String = String.Empty
-                    Dim ParentID As String = String.Empty
+                    Dim ThumbURL As String = String.Empty
                     For Each mPoster As Match In mcPoster
-                        ParentID = mPoster.Value.Substring(mPoster.Value.LastIndexOf("/") + 3, mPoster.Value.LastIndexOf(".jpg") - (mPoster.Value.LastIndexOf("/") + 3))
                         ' there are a lot of duplicates in the page.
-                        Dim x = From MI As MediaContainers.Image In alPosters Where (MI.ParentID = ParentID)
+                        Dim x = From MI As MediaContainers.Image In alContainer.MainPosters
                         If x.Count > 0 Then
                             logger.Trace("Duplicate {0} ", PosterURL)
                         Else
+                            ThumbURL = mPoster.Value
                             PosterURL = mPoster.Value.Remove(mPoster.Value.LastIndexOf("/") + 1, 1)
                             PosterURL = PosterURL.Insert(mPoster.Value.LastIndexOf("/") + 1, "l")
                             ' url are like> http://www.movieposterdb.com/posters/10_08/2009/499549/l_499549_43475538.jpg
                             'the parent id is the part AFTER the l_
                             ' all poster have the same size
-                            alPosters.Add(New MediaContainers.Image With {.Description = Master.eSize.poster_names(5).description, .URL = PosterURL, .Width = "n/a", .Height = "n/a", .ParentID = ParentID})
-                            PosterURL = mPoster.Value.Remove(mPoster.Value.LastIndexOf("/") + 1, 1)
-                            PosterURL = PosterURL.Insert(mPoster.Value.LastIndexOf("/") + 1, "t")
-                            alPosters.Add(New MediaContainers.Image With {.Description = Master.eSize.poster_names(0).description, .URL = PosterURL, .Width = "100", .Height = "148", .ParentID = ParentID})
+                            alContainer.MainPosters.Add(New MediaContainers.Image With {.URLOriginal = PosterURL, .URLThumb = ThumbURL, .Width = "n/a", .Height = "n/a", .Scraper = "MPDB"})
                         End If
                     Next
                 End If
 
             Catch ex As Exception
-                logger.Error(New StackFrame().GetMethod().Name,ex)
+                logger.Error(ex, New StackFrame().GetMethod().Name)
             End Try
 
-            Return alPosters
+            Return alContainer
         End Function
 
 #End Region 'Methods

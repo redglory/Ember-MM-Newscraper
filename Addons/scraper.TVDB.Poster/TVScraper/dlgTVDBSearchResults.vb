@@ -38,9 +38,18 @@ Public Class dlgTVDBSearchResults
 
 #Region "Methods"
 
+    Public Sub New()
+        ' This call is required by the designer.
+        InitializeComponent()
+        Me.Left = Master.AppPos.Left + (Master.AppPos.Width - Me.Width) \ 2
+        Me.Top = Master.AppPos.Top + (Master.AppPos.Height - Me.Height) \ 2
+        Me.StartPosition = FormStartPosition.Manual
+    End Sub
+
     Public Overloads Function ShowDialog(ByVal _sInfo As Structures.ScrapeInfo) As Windows.Forms.DialogResult
         Me.sInfo = _sInfo
         Me.Text = String.Concat(Master.eLang.GetString(948, "TV Search Results"), " - ", sInfo.ShowTitle)
+        Me.txtSearch.Text = sInfo.ShowTitle
         Scraper.sObject.GetSearchResultsAsync(Me.sInfo)
 
         Return MyBase.ShowDialog()
@@ -51,6 +60,7 @@ Public Class dlgTVDBSearchResults
         Me._skipdownload = SkipDownload
 
         Me.Text = String.Concat(Master.eLang.GetString(948, "TV Search Results"), " - ", sInfo.ShowTitle)
+        Me.txtSearch.Text = sInfo.ShowTitle
         Scraper.sObject.GetSearchResultsAsync(Me.sInfo)
 
         If MyBase.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -70,20 +80,22 @@ Public Class dlgTVDBSearchResults
             Me.txtSearch.Text = String.Empty
             Me.btnVerify.Enabled = False
             Scraper.sObject.GetSearchResultsAsync(Me.sInfo)
-            Me.pnlLoading.Visible = True
+            Me.lblSearching.Visible = True
+            Me.ProgressBar.Visible = True
         End If
     End Sub
 
     Private Sub btnVerify_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerify.Click
-        If IsNumeric(Me.txtTVDBID.Text) AndAlso Me.txtTVDBID.Text.Length >= 5 Then
+        If Integer.TryParse(Me.txtTVDBID.Text, 0) AndAlso Me.txtTVDBID.Text.Length >= 5 Then
             Dim tmpXML As XDocument = Nothing
             Dim sLang As String = String.Empty
 
             Me.ClearInfo()
-            Me.pnlLoading.Visible = True
+            Me.lblSearching.Visible = True
+            Me.ProgressBar.Visible = True
             Application.DoEvents()
 
-            Dim forceXML As String = sHTTP.DownloadData(String.Format("http://{0}/api/{1}/series/{2}/{3}.xml", AdvancedSettings.GetSetting("TVDBMirror", "thetvdb.com"), Scraper.APIKey, Me.txtTVDBID.Text, AdvancedSettings.GetSetting("TVDBLanguage", "en")))
+            Dim forceXML As String = sHTTP.DownloadData(String.Format("http://{0}/api/{1}/series/{2}/{3}.xml", clsAdvancedSettings.GetSetting("TVDBMirror", "thetvdb.com"), Scraper.APIKey, Me.txtTVDBID.Text, clsAdvancedSettings.GetSetting("TVDBLanguage", "en")))
 
             If Not String.IsNullOrEmpty(forceXML) Then
                 Try
@@ -91,23 +103,23 @@ Public Class dlgTVDBSearchResults
                 Catch
                 End Try
 
-                If Not IsNothing(tmpXML) Then
+                If tmpXML IsNot Nothing Then
                     Dim tSer As XElement = tmpXML.Descendants("Series").FirstOrDefault(Function(s) s.HasElements)
 
-                    If Not IsNothing(tSer) Then
+                    If tSer IsNot Nothing Then
                         Me._manualresult = New Scraper.TVSearchResults
                         Me._manualresult.ID = Convert.ToInt32(tSer.Element("id").Value)
-                        Me._manualresult.Name = If(Not IsNothing(tSer.Element("SeriesName")), tSer.Element("SeriesName").Value, String.Empty)
-                        If Not IsNothing(tSer.Element("Language")) AndAlso Master.eSettings.TVGeneralLanguages.Count > 0 Then
+                        Me._manualresult.Name = If(tSer.Element("SeriesName") IsNot Nothing, tSer.Element("SeriesName").Value, String.Empty)
+                        If tSer.Element("Language") IsNot Nothing AndAlso Master.eSettings.TVGeneralLanguages.Language.Count > 0 Then
                             sLang = tSer.Element("Language").Value
-                            Me._manualresult.Language = Master.eSettings.TVGeneralLanguages.FirstOrDefault(Function(s) s.ShortLang = sLang)
-                        ElseIf Not IsNothing(tSer.Element("Language")) Then
+                            Me._manualresult.Language = Master.eSettings.TVGeneralLanguages.Language.FirstOrDefault(Function(s) s.abbreviation = sLang)
+                        ElseIf tSer.Element("Language") IsNot Nothing Then
                             sLang = tSer.Element("Language").Value
-                            Me._manualresult.Language = New Containers.TVLanguage With {.LongLang = String.Format("Unknown ({0})", sLang), .ShortLang = sLang}
+                            Me._manualresult.Language = New TVDBLanguagesLanguage With {.name = String.Format("Unknown ({0})", sLang), .abbreviation = sLang, .id = 0}
                         End If
-                        Me._manualresult.Aired = If(Not IsNothing(tSer.Element("FirstAired")), tSer.Element("FirstAired").Value, String.Empty)
-                        Me._manualresult.Overview = If(Not IsNothing(tSer.Element("Overview")), tSer.Element("Overview").Value, String.Empty)
-                        Me._manualresult.Banner = If(Not IsNothing(tSer.Element("banner")), tSer.Element("banner").Value, String.Empty)
+                        Me._manualresult.Aired = If(tSer.Element("FirstAired") IsNot Nothing, tSer.Element("FirstAired").Value, String.Empty)
+                        Me._manualresult.Overview = If(tSer.Element("Overview") IsNot Nothing, tSer.Element("Overview").Value, String.Empty)
+                        Me._manualresult.Banner = If(tSer.Element("banner") IsNot Nothing, tSer.Element("banner").Value, String.Empty)
                         If Not String.IsNullOrEmpty(Me._manualresult.Name) AndAlso Not String.IsNullOrEmpty(sLang) Then
                             If Not String.IsNullOrEmpty(Me._manualresult.Banner) Then
                                 If Me.bwDownloadPic.IsBusy Then
@@ -124,29 +136,34 @@ Public Class dlgTVDBSearchResults
                             Me.txtOutline.Text = Me._manualresult.Overview
                             Me.lblAired.Text = Me._manualresult.Aired
                             Me.OK_Button.Enabled = True
-                            Me.pnlLoading.Visible = False
+                            Me.lblSearching.Visible = False
+                            Me.ProgressBar.Visible = False
                             Me.ControlsVisible(True)
                         Else
-                            Me.pnlLoading.Visible = False
+                            Me.lblSearching.Visible = False
+                            Me.ProgressBar.Visible = False
                         End If
                     Else
-                        Me.pnlLoading.Visible = False
+                        Me.lblSearching.Visible = False
+                        Me.ProgressBar.Visible = False
                     End If
                 Else
-                    Me.pnlLoading.Visible = False
+                    Me.lblSearching.Visible = False
+                    Me.ProgressBar.Visible = False
                 End If
             Else
-                Me.pnlLoading.Visible = False
+                Me.lblSearching.Visible = False
+                Me.ProgressBar.Visible = False
             End If
 
         Else
-            MsgBox(Master.eLang.GetString(949, "The ID you entered is not a valid TVDB ID."), MsgBoxStyle.Exclamation, Master.eLang.GetString(292, "Invalid Entry"))
+            MessageBox.Show(Master.eLang.GetString(949, "The ID you entered is not a valid TVDB ID."), Master.eLang.GetString(292, "Invalid Entry"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End If
     End Sub
 
     Private Sub bwDownloadPic_DoWork(ByVal sender As Object, ByVal e As System.ComponentModel.DoWorkEventArgs) Handles bwDownloadPic.DoWork
         Dim Args As Arguments = DirectCast(e.Argument, Arguments)
-        sHTTP.StartDownloadImage(String.Format("http://{0}/banners/_cache/{1}", AdvancedSettings.GetSetting("TVDBMirror", "thetvdb.com"), Args.pURL))
+        sHTTP.StartDownloadImage(String.Format("http://{0}/banners/_cache/{1}", clsAdvancedSettings.GetSetting("TVDBMirror", "thetvdb.com"), Args.pURL))
 
         While sHTTP.IsDownloading
             Application.DoEvents()
@@ -162,7 +179,7 @@ Public Class dlgTVDBSearchResults
         Try
             Me.pbBanner.Image = Res.Result
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(New StackFrame().GetMethod().Name, ex)
         End Try
     End Sub
 
@@ -190,21 +207,21 @@ Public Class dlgTVDBSearchResults
         Me.lblTitle.Text = String.Empty
         Me.lblAired.Text = String.Empty
         Me.pbBanner.Image = Nothing
+        Me.txtOutline.Text = String.Empty
         Scraper.sObject.CancelAsync()
     End Sub
 
     Private Sub ControlsVisible(ByVal areVisible As Boolean)
-        Me.pbBanner.Visible = areVisible
-        Me.lblTitle.Visible = areVisible
-        Me.lblAiredHeader.Visible = areVisible
-        Me.lblAired.Visible = areVisible
-        Me.lblPlotHeader.Visible = areVisible
-        Me.txtOutline.Visible = areVisible
+        Me.pbBanner.Enabled = areVisible
+        Me.lblTitle.Enabled = areVisible
+        Me.lblAiredHeader.Enabled = areVisible
+        Me.lblAired.Enabled = areVisible
+        Me.lblPlotHeader.Enabled = areVisible
+        Me.txtOutline.Enabled = areVisible
     End Sub
 
     Private Sub dlgTVDBSearchResults_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
-            AddHandler ModulesManager.Instance.TVScraperEvent, AddressOf TVScraperEvent
             Dim iBackground As New Bitmap(Me.pnlTop.Width, Me.pnlTop.Height)
             Using g As Graphics = Graphics.FromImage(iBackground)
                 g.FillRectangle(New Drawing2D.LinearGradientBrush(Me.pnlTop.ClientRectangle, Color.SteelBlue, Color.LightSteelBlue, Drawing2D.LinearGradientMode.Horizontal), pnlTop.ClientRectangle)
@@ -215,7 +232,7 @@ Public Class dlgTVDBSearchResults
 
             Me.SetUp()
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(New StackFrame().GetMethod().Name, ex)
         End Try
     End Sub
 
@@ -239,7 +256,7 @@ Public Class dlgTVDBSearchResults
             ' Perform the sort with these new sort options.
             Me.lvSearchResults.Sort()
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(New StackFrame().GetMethod().Name, ex)
         End Try
     End Sub
 
@@ -248,8 +265,8 @@ Public Class dlgTVDBSearchResults
     End Sub
 
     Private Sub lvSearchResults_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lvSearchResults.SelectedIndexChanged
-        Me.ClearInfo()
         If Me.lvSearchResults.SelectedItems.Count > 0 AndAlso Not Me.chkManual.Checked Then
+            Me.ClearInfo()
             Dim SelectedShow As Scraper.TVSearchResults = DirectCast(Me.lvSearchResults.SelectedItems(0).Tag, Scraper.TVSearchResults)
             If Not String.IsNullOrEmpty(SelectedShow.Banner) Then
                 If Me.bwDownloadPic.IsBusy Then
@@ -272,25 +289,29 @@ Public Class dlgTVDBSearchResults
 
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
         If Me.lvSearchResults.SelectedItems.Count > 0 Then
+            OK_Button.Enabled = False
             Dim sResults As Scraper.TVSearchResults = DirectCast(Me.lvSearchResults.SelectedItems(0).Tag, Scraper.TVSearchResults)
             Me.sInfo.TVDBID = sResults.ID.ToString
-            Me.sInfo.SelectedLang = sResults.Language.ShortLang
+            Me.sInfo.ShowLang = sResults.Language.abbreviation
 
             If Not _skipdownload Then
-                Me.Label3.Text = Master.eLang.GetString(950, "Downloading show info...")
-                Me.pnlLoading.Visible = True
+                Me.lblSearching.Text = Master.eLang.GetString(950, "Downloading show info...")
+                Me.lblSearching.Visible = True
+                Me.ProgressBar.Visible = True
                 Scraper.sObject.DownloadSeriesAsync(sInfo)
             Else
                 Me.DialogResult = System.Windows.Forms.DialogResult.OK
                 Me.Close()
             End If
-        ElseIf Me.chkManual.Checked AndAlso Not IsNothing(Me._manualresult) Then
+        ElseIf Me.chkManual.Checked AndAlso Me._manualresult IsNot Nothing Then
+            OK_Button.Enabled = False
             Me.sInfo.TVDBID = Me._manualresult.ID.ToString
-            Me.sInfo.SelectedLang = Me._manualresult.Language.ShortLang
+            Me.sInfo.ShowLang = Me._manualresult.Language.abbreviation
 
             If Not _skipdownload Then
-                Me.Label3.Text = Master.eLang.GetString(950, "Downloading show info...")
-                Me.pnlLoading.Visible = True
+                Me.lblSearching.Text = Master.eLang.GetString(950, "Downloading show info...")
+                Me.lblSearching.Visible = True
+                Me.ProgressBar.Visible = True
                 Scraper.sObject.DownloadSeriesAsync(sInfo)
             Else
                 Me.DialogResult = System.Windows.Forms.DialogResult.OK
@@ -300,9 +321,9 @@ Public Class dlgTVDBSearchResults
     End Sub
 
     Private Sub SetUp()
-        Me.Label1.Text = Master.eLang.GetString(948, "TV Search Results")
-        Me.Label2.Text = Master.eLang.GetString(951, "View details of each result to find the proper TV show.")
-        Me.lblAiredHeader.Text = Master.eLang.GetString(658, "Aired:")
+        Me.lblTopTitle.Text = Master.eLang.GetString(948, "TV Search Results")
+        Me.lblTopInfo.Text = Master.eLang.GetString(951, "View details of each result to find the proper TV show.")
+        Me.lblAiredHeader.Text = String.Concat(Master.eLang.GetString(728, "Aired"), ":")
         Me.lblPlotHeader.Text = Master.eLang.GetString(783, "Plot Summary:")
 
         Me.lvSearchResults.Columns(0).Text = Master.eLang.GetString(21, "Title")
@@ -312,33 +333,34 @@ Public Class dlgTVDBSearchResults
         Me.Cancel_Button.Text = Master.eLang.GetString(167, "Cancel")
     End Sub
 
-    Private Sub TVScraperEvent(ByVal eType As Enums.TVScraperEventType, ByVal iProgress As Integer, ByVal Parameter As Object)
+    Private Sub TVScraperEvent(ByVal eType As Enums.ScraperEventType_TV, ByVal iProgress As Integer, ByVal Parameter As Object)
         Select Case eType
-            Case Enums.TVScraperEventType.SearchResultsDownloaded
+            Case Enums.ScraperEventType_TV.SearchResultsDownloaded
                 Dim lItem As ListViewItem
                 Dim sResults As List(Of Scraper.TVSearchResults) = DirectCast(Parameter, List(Of Scraper.TVSearchResults))
 
                 Me.lvSearchResults.Items.Clear()
 
-                If Not IsNothing(sResults) AndAlso sResults.Count > 0 Then
+                If sResults IsNot Nothing AndAlso sResults.Count > 0 Then
                     For Each sRes As Scraper.TVSearchResults In sResults.OrderBy(Function(r) r.Lev)
                         lItem = New ListViewItem(sRes.Name)
-                        lItem.SubItems.Add(sRes.Language.LongLang)
+                        lItem.SubItems.Add(sRes.Language.name)
                         lItem.SubItems.Add(sRes.Lev.ToString)
                         lItem.SubItems.Add(sRes.ID.ToString)
-                        lItem.SubItems.Add(sRes.Language.ShortLang)
+                        lItem.SubItems.Add(sRes.Language.abbreviation)
                         lItem.Tag = sRes
                         Me.lvSearchResults.Items.Add(lItem)
                     Next
                 End If
 
-                Me.pnlLoading.Visible = False
+                Me.lblSearching.Visible = False
+                Me.ProgressBar.Visible = False
 
                 If Me.lvSearchResults.Items.Count > 0 Then
                     If sResults.Select(Function(s) s.ID).Distinct.Count = 1 Then
                         'they're all for the same show... try to find one with the preferred language
                         For Each fItem As ListViewItem In Me.lvSearchResults.Items
-                            If fItem.SubItems(4).Text = AdvancedSettings.GetSetting("TVDBLanguage", "en") Then
+                            If fItem.SubItems(4).Text = clsAdvancedSettings.GetSetting("TVDBLanguage", "en") Then
                                 fItem.Selected = True
                                 fItem.EnsureVisible()
                                 Exit For
@@ -348,7 +370,7 @@ Public Class dlgTVDBSearchResults
                         'we've got a bunch of different shows... try to find a "best match" title with the preferred language
                         If sResults.Where(Function(s) s.Lev <= 5).Count > 0 Then
                             For Each fItem As ListViewItem In Me.lvSearchResults.Items
-                                If Convert.ToInt32(fItem.SubItems(2).Text) <= 5 AndAlso fItem.SubItems(4).Text = AdvancedSettings.GetSetting("TVDBLanguage", "en") Then
+                                If Convert.ToInt32(fItem.SubItems(2).Text) <= 5 AndAlso fItem.SubItems(4).Text = clsAdvancedSettings.GetSetting("TVDBLanguage", "en") Then
                                     fItem.Selected = True
                                     fItem.EnsureVisible()
                                     Exit For
@@ -357,10 +379,10 @@ Public Class dlgTVDBSearchResults
 
                             If Me.lvSearchResults.SelectedItems.Count = 0 Then
                                 'get the id for the best english match and see if we have one for the preferred language with same id
-                                Dim tID As Integer = sResults.OrderBy(Function(s) s.Lev).FirstOrDefault(Function(s) s.Language.ShortLang = "en").ID
+                                Dim tID As Integer = sResults.OrderBy(Function(s) s.Lev).FirstOrDefault(Function(s) s.Language.abbreviation = "en").ID
                                 If tID > 0 Then
                                     For Each fItem As ListViewItem In Me.lvSearchResults.Items
-                                        If Convert.ToInt32(fItem.SubItems(3).Text) = tID AndAlso fItem.SubItems(4).Text = AdvancedSettings.GetSetting("TVDBLang", "en") Then
+                                        If Convert.ToInt32(fItem.SubItems(3).Text) = tID AndAlso fItem.SubItems(4).Text = clsAdvancedSettings.GetSetting("TVDBLang", "en") Then
                                             fItem.Selected = True
                                             fItem.EnsureVisible()
                                             Exit For
@@ -380,7 +402,7 @@ Public Class dlgTVDBSearchResults
                 Me.chkManual.Enabled = True
                 If Not Me.chkManual.Checked Then Me.lvSearchResults.Enabled = True
 
-            Case Enums.TVScraperEventType.ShowDownloaded
+            Case Enums.ScraperEventType_TV.ShowDownloaded
                 Me.DialogResult = System.Windows.Forms.DialogResult.OK
                 Me.Close()
         End Select

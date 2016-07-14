@@ -19,9 +19,10 @@
 ' ################################################################################
 
 Imports EmberAPI
+Imports System.IO
 
 Public Class MovieExporterModule
-    Implements Interfaces.EmberExternalModule
+    Implements Interfaces.GenericModule
 
 #Region "Delegates"
     Public Delegate Sub Delegate_AddToolsStripItem(control As System.Windows.Forms.ToolStripMenuItem, value As System.Windows.Forms.ToolStripItem)
@@ -31,11 +32,11 @@ Public Class MovieExporterModule
 
 #Region "Fields"
 
-    Private WithEvents MyMenu As New System.Windows.Forms.ToolStripMenuItem
-    Private WithEvents MyTrayMenu As New System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents mnuMainToolsExporter As New System.Windows.Forms.ToolStripMenuItem
+    Private WithEvents cmnuTrayToolsExporter As New System.Windows.Forms.ToolStripMenuItem
     Private _AssemblyName As String = String.Empty
     Private _enabled As Boolean = False
-    Private _Name As String = "Movie List Exporter"
+    Private _Name As String = "MovieListExporter"
     Private _setup As frmSettingsHolder
     Private MySettings As New _MySettings
 
@@ -43,23 +44,22 @@ Public Class MovieExporterModule
 
 #Region "Events"
 
-    Public Event GenericEvent(ByVal mType As Enums.ModuleEventType, ByRef _params As List(Of Object)) Implements Interfaces.EmberExternalModule.GenericEvent
-
-    Public Event ModuleEnabledChanged(ByVal Name As String, ByVal State As Boolean, ByVal diffOrder As Integer) Implements Interfaces.EmberExternalModule.ModuleSetupChanged
-
-    Public Event ModuleSettingsChanged() Implements Interfaces.EmberExternalModule.ModuleSettingsChanged
+    Public Event GenericEvent(ByVal mType As Enums.ModuleEventType, ByRef _params As List(Of Object)) Implements Interfaces.GenericModule.GenericEvent
+    Public Event ModuleEnabledChanged(ByVal Name As String, ByVal State As Boolean, ByVal diffOrder As Integer) Implements Interfaces.GenericModule.ModuleSetupChanged
+    Public Event ModuleSettingsChanged() Implements Interfaces.GenericModule.ModuleSettingsChanged
+    Public Event SetupNeedsRestart() Implements EmberAPI.Interfaces.GenericModule.SetupNeedsRestart
 
 #End Region 'Events
 
 #Region "Properties"
 
-    Public ReadOnly Property ModuleType() As List(Of Enums.ModuleEventType) Implements Interfaces.EmberExternalModule.ModuleType
+    Public ReadOnly Property ModuleType() As List(Of Enums.ModuleEventType) Implements Interfaces.GenericModule.ModuleType
         Get
             Return New List(Of Enums.ModuleEventType)(New Enums.ModuleEventType() {Enums.ModuleEventType.Generic, Enums.ModuleEventType.CommandLine})
         End Get
     End Property
 
-    Property Enabled() As Boolean Implements Interfaces.EmberExternalModule.Enabled
+    Property Enabled() As Boolean Implements Interfaces.GenericModule.Enabled
         Get
             Return _enabled
         End Get
@@ -74,13 +74,19 @@ Public Class MovieExporterModule
         End Set
     End Property
 
-    ReadOnly Property ModuleName() As String Implements Interfaces.EmberExternalModule.ModuleName
+    ReadOnly Property IsBusy() As Boolean Implements Interfaces.GenericModule.IsBusy
+        Get
+            Return False
+        End Get
+    End Property
+
+    ReadOnly Property ModuleName() As String Implements Interfaces.GenericModule.ModuleName
         Get
             Return _Name
         End Get
     End Property
 
-    ReadOnly Property ModuleVersion() As String Implements Interfaces.EmberExternalModule.ModuleVersion
+    ReadOnly Property ModuleVersion() As String Implements Interfaces.GenericModule.ModuleVersion
         Get
             Return FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly.Location).FileVersion.ToString
         End Get
@@ -90,50 +96,102 @@ Public Class MovieExporterModule
 
 #Region "Methods"
 
-    Public Function RunGeneric(ByVal mType As Enums.ModuleEventType, ByRef _params As List(Of Object), ByRef _refparam As Object) As Interfaces.ModuleResult Implements Interfaces.EmberExternalModule.RunGeneric
-        Try
-            dlgExportMovies.CLExport(DirectCast(_params(0), String), DirectCast(_params(1), String), DirectCast(_params(2), Int32))
+    Public Function RunGeneric(ByVal mType As Enums.ModuleEventType, ByRef _params As List(Of Object), ByRef _singleobjekt As Object, ByRef _dbelement As Database.DBElement) As Interfaces.ModuleResult Implements Interfaces.GenericModule.RunGeneric
+        Select Case mType
+            Case Enums.ModuleEventType.CommandLine
+                Dim TemplateName As String = String.Empty
+                Dim BuildPath As String = String.Empty
 
-        Catch ex As Exception
-        End Try
+                If _params IsNot Nothing Then
+                    For Each tParameter In _params
+                        'check if tParameter is a path or template name
+                        If Not String.IsNullOrEmpty(Path.GetPathRoot(tParameter.ToString)) Then
+                            BuildPath = tParameter.ToString
+                        Else
+                            TemplateName = tParameter.ToString
+                        End If
+                    Next
+                End If
+
+                If String.IsNullOrEmpty(BuildPath) Then
+                    BuildPath = MySettings.ExportPath
+                End If
+
+                If String.IsNullOrEmpty(TemplateName) Then
+                    TemplateName = MySettings.DefaultTemplate
+                End If
+
+                Dim MovieList As New List(Of Database.DBElement)
+                ' Load nfo movies using path from DB
+                Using SQLNewcommand As SQLite.SQLiteCommand = Master.DB.MyVideosDBConn.CreateCommand()
+                    SQLNewcommand.CommandText = String.Concat("SELECT idMovie FROM movielist ORDER BY SortedTitle COLLATE NOCASE;")
+                    Using SQLreader As SQLite.SQLiteDataReader = SQLNewcommand.ExecuteReader()
+                        While SQLreader.Read()
+                            MovieList.Add(Master.DB.Load_Movie(Convert.ToInt32(SQLreader("idMovie"))))
+                        End While
+                    End Using
+                End Using
+
+                Dim TVShowList As New List(Of Database.DBElement)
+                ' Load nfo tv shows using path from DB
+                Using SQLNewcommand As SQLite.SQLiteCommand = Master.DB.MyVideosDBConn.CreateCommand()
+                    SQLNewcommand.CommandText = String.Concat("SELECT idShow FROM tvshowlist ORDER BY SortedTitle COLLATE NOCASE;")
+                    Using SQLreader As SQLite.SQLiteDataReader = SQLNewcommand.ExecuteReader()
+                        While SQLreader.Read()
+                            TVShowList.Add(Master.DB.Load_TVShow(Convert.ToInt32(SQLreader("idShow")), True, True, MySettings.ExportMissingEpisodes))
+                        End While
+                    End Using
+                End Using
+
+                Dim MExporter As New MediaExporter
+                MExporter.CreateTemplate(TemplateName, MovieList, TVShowList, BuildPath, Nothing)
+        End Select
 
         Return New Interfaces.ModuleResult With {.breakChain = False}
     End Function
 
     Sub Disable()
         Dim tsi As New ToolStripMenuItem
-        tsi = DirectCast(ModulesManager.Instance.RuntimeObjects.TopMenu.Items("mnuMainTools"), ToolStripMenuItem)
-        RemoveToolsStripItem(tsi, MyMenu)
-        tsi = DirectCast(ModulesManager.Instance.RuntimeObjects.TopMenu.Items("cmnuTrayTools"), ToolStripMenuItem)
-        RemoveToolsStripItem(tsi, MyTrayMenu)
+
+        'mnuMainTools
+        tsi = DirectCast(ModulesManager.Instance.RuntimeObjects.MainMenu.Items("mnuMainTools"), ToolStripMenuItem)
+        RemoveToolsStripItem(tsi, mnuMainToolsExporter)
+
+        'cmnuTrayTools
+        tsi = DirectCast(ModulesManager.Instance.RuntimeObjects.TrayMenu.Items("cmnuTrayTools"), ToolStripMenuItem)
+        RemoveToolsStripItem(tsi, cmnuTrayToolsExporter)
     End Sub
 
     Public Sub RemoveToolsStripItem(control As System.Windows.Forms.ToolStripMenuItem, value As System.Windows.Forms.ToolStripItem)
-        If (control.Owner.InvokeRequired) Then
+        If control.Owner.InvokeRequired Then
             control.Owner.Invoke(New Delegate_RemoveToolsStripItem(AddressOf RemoveToolsStripItem), New Object() {control, value})
-            Exit Sub
+        Else
+            control.DropDownItems.Remove(value)
         End If
-        control.DropDownItems.Remove(value)
     End Sub
 
     Sub Enable()
         Dim tsi As New ToolStripMenuItem
-        MyMenu.Image = New Bitmap(My.Resources.icon)
-        MyMenu.Text = Master.eLang.GetString(336, "Export Movie List")
-        tsi = DirectCast(ModulesManager.Instance.RuntimeObjects.TopMenu.Items("mnuMainTools"), ToolStripMenuItem)
-        AddToolsStripItem(tsi, MyMenu)
-        MyTrayMenu.Image = New Bitmap(My.Resources.icon)
-        MyTrayMenu.Text = Master.eLang.GetString(336, "Export Movie List")
+
+        'mnuMainTools
+        mnuMainToolsExporter.Image = New Bitmap(My.Resources.icon)
+        mnuMainToolsExporter.Text = Master.eLang.GetString(336, "Export Movie List")
+        tsi = DirectCast(ModulesManager.Instance.RuntimeObjects.MainMenu.Items("mnuMainTools"), ToolStripMenuItem)
+        AddToolsStripItem(tsi, mnuMainToolsExporter)
+
+        'cmnuTrayTools
+        cmnuTrayToolsExporter.Image = New Bitmap(My.Resources.icon)
+        cmnuTrayToolsExporter.Text = Master.eLang.GetString(336, "Export Movie List")
         tsi = DirectCast(ModulesManager.Instance.RuntimeObjects.TrayMenu.Items("cmnuTrayTools"), ToolStripMenuItem)
-        AddToolsStripItem(tsi, MyTrayMenu)
+        AddToolsStripItem(tsi, cmnuTrayToolsExporter)
     End Sub
 
     Public Sub AddToolsStripItem(control As System.Windows.Forms.ToolStripMenuItem, value As System.Windows.Forms.ToolStripItem)
-        If (control.Owner.InvokeRequired) Then
-            control.Owner.Invoke(New Delegate_AddToolsStripItem(AddressOf RemoveToolsStripItem), New Object() {control, value})
-            Exit Sub
+        If control.Owner.InvokeRequired Then
+            control.Owner.Invoke(New Delegate_AddToolsStripItem(AddressOf AddToolsStripItem), New Object() {control, value})
+        Else
+            control.DropDownItems.Add(value)
         End If
-        control.DropDownItems.Add(value)
     End Sub
 
     Private Sub Handle_ModuleEnabledChanged(ByVal State As Boolean)
@@ -144,27 +202,18 @@ Public Class MovieExporterModule
         RaiseEvent ModuleSettingsChanged()
     End Sub
 
-    Sub Init(ByVal sAssemblyName As String, ByVal sExecutable As String) Implements Interfaces.EmberExternalModule.Init
+    Sub Init(ByVal sAssemblyName As String, ByVal sExecutable As String) Implements Interfaces.GenericModule.Init
         _AssemblyName = sAssemblyName
-        'Master.eLang.LoadLanguage(Master.eSettings.Language, sExecutable)
         LoadSettings()
     End Sub
 
-    Function InjectSetup() As Containers.SettingsPanel Implements Interfaces.EmberExternalModule.InjectSetup
+    Function InjectSetup() As Containers.SettingsPanel Implements Interfaces.GenericModule.InjectSetup
         Me._setup = New frmSettingsHolder
         Me._setup.cbEnabled.Checked = Me._enabled
         Dim SPanel As New Containers.SettingsPanel
 
-
-        _setup.txt_exportmoviepath.Text = MySettings.ExportPath
-        _setup.chkExportTVShows.Checked = MySettings.ExportTVShows
-        _setup.cbo_exportmovieposter.Text = CStr(MySettings.ExportPosterHeight)
-        _setup.cbo_exportmoviefanart.Text = CStr(MySettings.ExportFanartWidth)
-        _setup.cbo_exportmoviequality.Text = CStr(MySettings.ExportImageQuality)
-        _setup.lbl_exportmoviefilter1saved.Text = MySettings.ExportFilter1
-        _setup.lbl_exportmoviefilter2saved.Text = MySettings.ExportFilter2
-        _setup.lbl_exportmoviefilter3saved.Text = MySettings.ExportFilter3
-
+        _setup.txtExportPath.Text = MySettings.ExportPath
+        _setup.chkExportMissingEpisodes.Checked = MySettings.ExportMissingEpisodes
 
         SPanel.Name = Me._Name
         SPanel.Text = Master.eLang.GetString(335, "Movie List Exporter")
@@ -178,7 +227,7 @@ Public Class MovieExporterModule
         Return SPanel
     End Function
 
-    Private Sub MyMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyMenu.Click, MyTrayMenu.Click
+    Private Sub MyMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuMainToolsExporter.Click, cmnuTrayToolsExporter.Click
         RaiseEvent GenericEvent(Enums.ModuleEventType.Generic, New List(Of Object)(New Object() {"controlsenabled", False}))
 
         Using dExportMovies As New dlgExportMovies
@@ -189,62 +238,48 @@ Public Class MovieExporterModule
     End Sub
 
     Sub LoadSettings()
-        MySettings.ExportPath = AdvancedSettings.GetSetting("ExportPath", "")
-        MySettings.ExportTVShows = AdvancedSettings.GetBooleanSetting("ExportTVShows", False)
-        MySettings.ExportPosterHeight = CInt(AdvancedSettings.GetSetting("ExportPosterHeight", "300"))
-        MySettings.ExportFanartWidth = CInt(AdvancedSettings.GetSetting("ExportFanartWidth", "800"))
-        MySettings.ExportFilter1 = AdvancedSettings.GetSetting("ExportFilter1", "-")
-        MySettings.ExportFilter2 = AdvancedSettings.GetSetting("ExportFilter2", "-")
-        MySettings.ExportFilter3 = AdvancedSettings.GetSetting("ExportFilter3", "-")
-        MySettings.ExportImageQuality = CInt(AdvancedSettings.GetSetting("ExportImageQuality", "70"))
+        MySettings.DefaultTemplate = AdvancedSettings.GetSetting("DefaultTemplate", "template")
+        MySettings.ExportPath = AdvancedSettings.GetSetting("ExportPath", String.Empty)
+        MySettings.ExportMissingEpisodes = AdvancedSettings.GetBooleanSetting("ExportMissingEpisodes", False)
     End Sub
 
-    Sub SaveSetup(ByVal DoDispose As Boolean) Implements Interfaces.EmberExternalModule.SaveSetup
+    Sub SaveSetup(ByVal DoDispose As Boolean) Implements Interfaces.GenericModule.SaveSetup
         Me.Enabled = Me._setup.cbEnabled.Checked
-        MySettings.ExportPath = _setup.txt_exportmoviepath.Text
-        MySettings.ExportTVShows = _setup.chkExportTVShows.Checked
-        MySettings.ExportPosterHeight = CInt(_setup.cbo_exportmovieposter.Text)
-        MySettings.ExportFanartWidth = CInt(_setup.cbo_exportmoviefanart.Text)
-        MySettings.ExportFilter1 = _setup.lbl_exportmoviefilter1saved.Text
-        MySettings.ExportFilter2 = _setup.lbl_exportmoviefilter2saved.Text
-        MySettings.ExportFilter3 = _setup.lbl_exportmoviefilter3saved.Text
-        MySettings.ExportImageQuality = CInt(_setup.cbo_exportmoviequality.Text)
+        MySettings.ExportPath = _setup.txtExportPath.Text
+        MySettings.ExportMissingEpisodes = _setup.chkExportMissingEpisodes.Checked
         SaveSettings()
+        If DoDispose Then
+            RemoveHandler Me._setup.ModuleEnabledChanged, AddressOf Handle_ModuleEnabledChanged
+            RemoveHandler Me._setup.ModuleSettingsChanged, AddressOf Handle_ModuleSettingsChanged
+            _setup.Dispose()
+        End If
     End Sub
 
     Sub SaveSettings()
         Using settings = New AdvancedSettings()
+            settings.SetSetting("DefaultTemplate", MySettings.DefaultTemplate)
             settings.SetSetting("ExportPath", MySettings.ExportPath)
-            settings.SetBooleanSetting("ExportTVShows", MySettings.ExportTVShows)
-            settings.SetSetting("ExportPosterHeight", CStr(MySettings.ExportPosterHeight))
-            settings.SetSetting("ExportFanartWidth", CStr(MySettings.ExportFanartWidth))
-            settings.SetSetting("ExportFilter1", MySettings.ExportFilter1)
-            settings.SetSetting("ExportFilter2", MySettings.ExportFilter2)
-            settings.SetSetting("ExportFilter3", MySettings.ExportFilter3)
-            settings.SetSetting("ExportImageQuality", CStr(MySettings.ExportImageQuality))
+            settings.SetBooleanSetting("ExportMissingEpisodes", MySettings.ExportMissingEpisodes)
         End Using
-
     End Sub
 
 
 #End Region 'Methods
+
 #Region "Nested Types"
 
     Structure _MySettings
 
 #Region "Fields"
 
+        Dim DefaultTemplate As String
         Dim ExportPath As String
-        Dim ExportFanartWidth As Integer
-        Dim ExportPosterHeight As Integer
-        Dim ExportFilter1 As String
-        Dim ExportFilter2 As String
-        Dim ExportFilter3 As String
-        Dim ExportTVShows As Boolean
-        Dim ExportImageQuality As Integer
+        Dim ExportMissingEpisodes As Boolean
+
 #End Region 'Fields
 
     End Structure
 
 #End Region 'Nested Types
+
 End Class

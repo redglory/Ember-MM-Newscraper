@@ -6889,8 +6889,9 @@
       <Name>Elkei</Name>
     </Language>
     <Language>
+      <Alpha2>el</Alpha2>
       <Alpha3>ell</Alpha3>
-      <Name>Modern Greek</Name>
+      <Name>Greek</Name>
     </Language>
     <Language>
       <Alpha3>elm</Alpha3>
@@ -18045,6 +18046,7 @@
       <Name>Ngete</Name>
     </Language>
     <Language>
+      <Alpha2>nn</Alpha2>
       <Alpha3>nno</Alpha3>
       <Name>Norwegian Nynorsk</Name>
     </Language>

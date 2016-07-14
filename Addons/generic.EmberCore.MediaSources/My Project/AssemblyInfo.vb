@@ -6,10 +6,10 @@ Imports System.Runtime.InteropServices
 ' set of attributes. Change these attribute values to modify the information
 ' associated with an assembly.
 ' Review the values of the assembly attributes
-<Assembly: AssemblyTitle("generic.Embercore.MediaSources")> 
+<Assembly: AssemblyTitle("generic.EmberCore.MediaSources")> 
 <Assembly: AssemblyDescription("http://forum.xbmc.org/forumdisplay.php?fid=195")> 
 <Assembly: AssemblyCompany("Ember Media Manager")> 
-<Assembly: AssemblyProduct("generic.Embercore.MediaSources")> 
+<Assembly: AssemblyProduct("generic.EmberCore.MediaSources")> 
 <Assembly: AssemblyCopyright("Copyright © 2013")> 
 <Assembly: AssemblyTrademark("")> 
 <Assembly: ComVisible(False)> 
@@ -27,5 +27,5 @@ Imports System.Runtime.InteropServices
 ' You can specify all the values or you can default the Build and Revision Numbers
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")>
-<Assembly: AssemblyVersion("1.4.0.0")> 
-<Assembly: AssemblyFileVersion("1.4.0.0")> 
+<Assembly: AssemblyVersion("1.4.3.0")> 
+<Assembly: AssemblyFileVersion("1.4.3.0")> 

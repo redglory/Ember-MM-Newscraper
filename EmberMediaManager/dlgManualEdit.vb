@@ -25,7 +25,6 @@ Imports System.Xml.Schema
 Imports System.Text
 Imports EmberAPI
 Imports NLog
-Imports System.Diagnostics
 
 Public Class dlgManualEdit
 
@@ -45,10 +44,18 @@ Public Class dlgManualEdit
 
 #Region "Methods"
 
-    Public Overloads Function ShowDialog(ByVal nfoPath As String) As Windows.Forms.DialogResult
-        Me.currFile = nfoPath
+    Public Sub New()
+        ' This call is required by the designer.
+        InitializeComponent()
+        Left = Master.AppPos.Left + (Master.AppPos.Width - Width) \ 2
+        Top = Master.AppPos.Top + (Master.AppPos.Height - Height) \ 2
+        StartPosition = FormStartPosition.Manual
+    End Sub
 
-        Return MyBase.ShowDialog()
+    Public Overloads Function ShowDialog(ByVal nfoPath As String) As Windows.Forms.DialogResult
+        currFile = nfoPath
+
+        Return ShowDialog()
     End Function
 
     Private Function ConstructTag(ByVal ElementNameParam As String) As String
@@ -78,7 +85,7 @@ Public Class dlgManualEdit
             ElementName += ">"
 
         Catch ex As Exception
-            Logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
 
         Return ElementName
@@ -90,32 +97,24 @@ Public Class dlgManualEdit
 
     Private Sub Editor_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
         If Changed = True Then
-            Dim DResult As MsgBoxResult
-            DResult = MsgBox(Master.eLang.GetString(196, "Do you want to save changes?"), MsgBoxStyle.YesNoCancel, Master.eLang.GetString(197, "Save?"))
-            If DResult = MsgBoxResult.Yes Then
+            If MessageBox.Show(Master.eLang.GetString(196, "Do you want to save changes?"), Master.eLang.GetString(197, "Save?"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then
                 File.WriteAllText(currFile, XmlViewer.Text, Encoding.UTF8)
                 'RichTextBox1.SaveFile(currFile, RichTextBoxStreamType.PlainText)
-                Me.DialogResult = Windows.Forms.DialogResult.OK
-
-            ElseIf DResult = MsgBoxResult.Cancel Then
-
+                DialogResult = Windows.Forms.DialogResult.OK
+            Else
                 e.Cancel = True
-
             End If
-
         Else
-
-            If ReturnOK Then Me.DialogResult = Windows.Forms.DialogResult.OK
-
+            If ReturnOK Then DialogResult = Windows.Forms.DialogResult.OK
         End If
     End Sub
 
     Private Sub Editor_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        Me.SetUp()
+        SetUp()
 
         If Not String.IsNullOrEmpty(currFile) Then
             If File.Exists(currFile) Then
-                Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+                Cursor = System.Windows.Forms.Cursors.WaitCursor
                 XmlViewer.Text = File.ReadAllText(currFile, Encoding.UTF8)
                 'RichTextBox1.LoadFile(currFile, RichTextBoxStreamType.PlainText)
                 Try
@@ -130,18 +129,18 @@ Public Class dlgManualEdit
                     End If
                     XmlViewer.Process(True)
                 Catch ex As Exception
-                    Logger.Error(New StackFrame().GetMethod().Name,ex)
+                    logger.Error(ex, New StackFrame().GetMethod().Name)
                 End Try
                 ParseFile(True)
-                Me.Cursor = System.Windows.Forms.Cursors.Default
+                Cursor = System.Windows.Forms.Cursors.Default
             End If
 
-            Me.Text = String.Concat(Master.eLang.GetString(190, "Manual NFO Editor | "), currFile.Substring(currFile.LastIndexOf(Path.DirectorySeparatorChar) + 1))
+            Text = String.Concat(Master.eLang.GetString(190, "Manual NFO Editor | "), currFile.Substring(currFile.LastIndexOf(Path.DirectorySeparatorChar) + 1))
         End If
 
         Changed = False
 
-        Me.Activate()
+        Activate()
     End Sub
 
     'Private Sub IndentFormat()
@@ -162,7 +161,7 @@ Public Class dlgManualEdit
 
     '        'Converting entire file to a single line
 
-    '        AllData = AllData.Replace(vbNewLine, String.Empty)
+    '        AllData = AllData.Replace(Environment.NewLine, String.Empty)
     '        AllData = AllData.Replace(vbCrLf, String.Empty)
     '        AllData = AllData.Replace(vbLf, String.Empty)
     '        AllData = AllData.Replace(vbCr, String.Empty)
@@ -318,16 +317,16 @@ Public Class dlgManualEdit
     End Sub
 
     Private Sub mnuExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuExit.Click
-        Me.Close()
+        Close()
     End Sub
 
     Private Sub mnuFormat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFormat.Click
         Try
-            Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+            Cursor = System.Windows.Forms.Cursors.WaitCursor
             XmlViewer.Process(True)
-            Me.Cursor = System.Windows.Forms.Cursors.Default
+            Cursor = System.Windows.Forms.Cursors.Default
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
     End Sub
 
@@ -347,7 +346,7 @@ Public Class dlgManualEdit
             Exit Sub
         End If
 
-        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        Cursor = System.Windows.Forms.Cursors.WaitCursor
 
         Dim tempFile As String = Path.GetTempPath + "nfo.tmp"
         File.WriteAllText(tempFile, XmlViewer.Text, Encoding.UTF8)
@@ -389,7 +388,7 @@ Public Class dlgManualEdit
                     ListBox1.Items.Add(ErrStr)
 
                 Catch ex As Exception
-                    Logger.Error(New StackFrame().GetMethod().Name,ex)
+                    logger.Error(ex, New StackFrame().GetMethod().Name)
                     Exit Do
                 End Try
 
@@ -400,12 +399,12 @@ Public Class dlgManualEdit
         xmlV.Close()
         xmlP.Close()
 
-        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Cursor = System.Windows.Forms.Cursors.Default
         If OnLoad Then
             If IsValid = False Then
-                MsgBox(Master.eLang.GetString(192, "File is not valid."), MsgBoxStyle.Exclamation, Master.eLang.GetString(194, "Not Valid"))
+                MessageBox.Show(Master.eLang.GetString(192, "File is not valid."), Master.eLang.GetString(194, "Not Valid"), MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Else
-                MsgBox(Master.eLang.GetString(193, "File is valid."), MsgBoxStyle.Information, Master.eLang.GetString(195, "Valid"))
+                MessageBox.Show(Master.eLang.GetString(193, "File is valid."), Master.eLang.GetString(195, "Valid"), MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
         End If
     End Sub
@@ -415,12 +414,12 @@ Public Class dlgManualEdit
     End Sub
 
     Private Sub SetUp()
-        Me.mnuFormat.Text = Master.eLang.GetString(187, "&Format / Indent")
-        Me.mnuParse.Text = Master.eLang.GetString(188, "&Parse")
-        Me.MenuItem19.Text = Master.eLang.GetString(8, "&Tools")
-        Me.mnuFile.Text = Master.eLang.GetString(1, "&File")
-        Me.mnuSave.Text = Master.eLang.GetString(189, "&Save")
-        Me.mnuExit.Text = Master.eLang.GetString(2, "E&xit")
+        mnuFormat.Text = Master.eLang.GetString(187, "&Format / Indent")
+        mnuParse.Text = Master.eLang.GetString(188, "&Parse")
+        MenuItem19.Text = Master.eLang.GetString(8, "&Tools")
+        mnuFile.Text = Master.eLang.GetString(1, "&File")
+        mnuSave.Text = Master.eLang.GetString(189, "&Save")
+        mnuExit.Text = Master.eLang.GetString(2, "E&xit")
     End Sub
 
     Private Sub WriteErrorLog(ByVal sender As Object, ByVal args As ValidationEventArgs)

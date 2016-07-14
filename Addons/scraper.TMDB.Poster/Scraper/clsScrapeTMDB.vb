@@ -19,7 +19,6 @@
 ' ################################################################################
 
 Imports EmberAPI
-Imports WatTmdb
 Imports NLog
 Imports System.Diagnostics
 
@@ -28,270 +27,304 @@ Namespace TMDB
 	Public Class Scraper
 
 #Region "Fields"
-        Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
-		Private _TMDBConf As V3.TmdbConfiguration
-		Private _TMDBConfE As V3.TmdbConfiguration
-		Private _TMDBApi As V3.Tmdb
-        Private _TMDBApiE As V3.Tmdb
-        Private _TMDBApiA As V3.Tmdb
-        Private _MySettings As TMDB_Poster.sMySettings
 
-        'Friend WithEvents bwTMDB As New System.ComponentModel.BackgroundWorker
+        Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
+
+        Private _TMDBApi As TMDbLib.Client.TMDbClient
+        Private _sPoster As String
+
+        Friend WithEvents bwTMDB As New System.ComponentModel.BackgroundWorker
 
 #End Region 'Fields
 
 #Region "Methods"
 
-        Public Sub New(ByRef tTMDBConf As V3.TmdbConfiguration, ByRef tTMDBConfE As V3.TmdbConfiguration, ByRef tTMDBApi As V3.Tmdb, ByRef tTMDBApiE As V3.Tmdb, ByRef tTMDBApiA As V3.Tmdb, ByRef tMySettings As TMDB_Poster.sMySettings)
-            _TMDBConf = tTMDBConf
-            _TMDBConfE = tTMDBConfE
-            _TMDBApi = tTMDBApi
-            _TMDBApiE = tTMDBApiE
-            _TMDBApiA = tTMDBApiA
-            _MySettings = tMySettings
-            ' v3 does not have description anymore
+        Public Sub New(ByVal SpecialSettings As TMDB_Image.SpecialSettings)
+            Try
+
+                _TMDBApi = New TMDbLib.Client.TMDbClient(SpecialSettings.APIKey)
+                _TMDBApi.GetConfig()
+
+            Catch ex As Exception
+                logger.Error(ex, New StackFrame().GetMethod().Name)
+            End Try
         End Sub
 
-        'Public Sub Cancel()
-        '	If bwTMDB.IsBusy Then bwTMDB.CancelAsync()
+        Public Function GetImages_Movie_MovieSet(ByVal TMDBID As String, ByVal FilteredModifiers As Structures.ScrapeModifiers, ByVal ContentType As Enums.ContentType) As MediaContainers.SearchResultsContainer
+            Dim alImagesContainer As New MediaContainers.SearchResultsContainer
 
-        '	While bwTMDB.IsBusy
-        '		Application.DoEvents()
-        '		Threading.Thread.Sleep(50)
-        '	End While
-        'End Sub
+            If bwTMDB.CancellationPending Then Return Nothing
 
-        'Public Sub GetImagesAsync(ByVal imdbID As String, ByVal Type As Enums.ScraperCapabilities)
-        '    Try
-        '        If Not bwTMDB.IsBusy Then
-        '            bwTMDB.WorkerSupportsCancellation = True
-        '            bwTMDB.WorkerReportsProgress = True
-        '            bwTMDB.RunWorkerAsync(New Arguments With {.Parameter = imdbID, .Type = Type})
-        '        End If
-        '    Catch ex As Exception
-        '        logger.Error(New StackFrame().GetMethod().Name,ex)
-        '    End Try
-        'End Sub
-
-        Public Function GetTMDBImages(ByVal TMDBID As String, ByVal Type As Enums.ScraperCapabilities) As List(Of MediaContainers.Image)
-            Dim alPosters As New List(Of MediaContainers.Image) 'main poster list
-            Dim alPostersP As New List(Of MediaContainers.Image) 'preferred language poster list
-            Dim alPostersE As New List(Of MediaContainers.Image) 'english poster list
-            Dim alPostersO As New List(Of MediaContainers.Image) 'all others poster list
-            Dim alPostersOs As New List(Of MediaContainers.Image) 'all others sorted poster list
-            Dim alPostersN As New List(Of MediaContainers.Image) 'neutral/none language poster list
-
-            Dim images As V3.TmdbMovieImages
-            Dim aW, aH As Integer
-
-            ';If bwTMDB.CancellationPending Then Return Nothing
             Try
-                If Not String.IsNullOrEmpty(TMDBID) Then
-                    images = _TMDBApiA.GetMovieImages(CInt(TMDBID))
-                    If Type = Enums.ScraperCapabilities.Poster Then
-                        If IsNothing(images.posters) OrElse images.posters.Count = 0 Then
-                            images = _TMDBApiE.GetMovieImages(CInt(TMDBID))
-                            If IsNothing(images.posters) OrElse images.posters.Count = 0 Then
-                                Return alPosters
-                            End If
-                        End If
-                    Else
-                        If IsNothing(images.backdrops) OrElse images.backdrops.Count = 0 Then
-                            images = _TMDBApiE.GetMovieImages(CInt(TMDBID))
-                            If IsNothing(images.backdrops) OrElse images.backdrops.Count = 0 Then
-                                Return alPosters
-                            End If
-                        End If
-                    End If
+                Dim Results As TMDbLib.Objects.General.Images = Nothing
+                Dim APIResult As Task(Of TMDbLib.Objects.General.ImagesWithId)
 
-                    'If bwTMDB.WorkerReportsProgress Then
-                    '    bwTMDB.ReportProgress(1)
-                    'End If
-
-                    'If bwTMDB.CancellationPending Then Return Nothing
-
-                    If Type = Enums.ScraperCapabilities.Poster Then
-                        For Each tmdbI As V3.Poster In images.posters
-                            'If bwTMDB.CancellationPending Then Return Nothing
-                            For Each aSize In Master.eSize.poster_names
-                                Select Case aSize.size
-                                    Case Master.eSize.poster_names(5).description
-                                        aW = tmdbI.width
-                                        aH = tmdbI.height
-                                    Case Else
-                                        aW = aSize.width
-                                        aH = CInt(aW / tmdbI.aspect_ratio)
-                                End Select
-                                Dim tmpPoster As New MediaContainers.Image With {.ShortLang = tmdbI.iso_639_1, .LongLang = If(String.IsNullOrEmpty(tmdbI.iso_639_1), "", Localization.ISOGetLangByCode2(tmdbI.iso_639_1)), .URL = _TMDBConf.images.base_url & aSize.size & tmdbI.file_path, .Description = aSize.description, .Width = CStr(aW), .Height = CStr(aH), .ParentID = tmdbI.file_path}
-                                If tmpPoster.ShortLang = _MySettings.TMDBLanguage Then
-                                    alPostersP.Add(tmpPoster)
-                                ElseIf tmpPoster.ShortLang = "en" Then
-                                    alPostersE.Add(tmpPoster)
-                                ElseIf tmpPoster.ShortLang = "xx" Then
-                                    alPostersN.Add(tmpPoster)
-                                ElseIf String.IsNullOrEmpty(tmpPoster.ShortLang) Then
-                                    alPostersN.Add(tmpPoster)
-                                Else
-                                    alPostersO.Add(tmpPoster)
-                                End If
-                            Next
-                        Next
-                        For Each xPoster As MediaContainers.Image In alPostersO.OrderBy(Function(p) (p.LongLang))
-                            alPostersOs.Add(xPoster)
-                        Next
-                        alPosters.AddRange(alPostersP)
-                        alPosters.AddRange(alPostersE)
-                        alPosters.AddRange(alPostersOs)
-                        alPosters.AddRange(alPostersN)
-                    ElseIf Type = Enums.ScraperCapabilities.Fanart Then
-                        For Each tmdbI As V3.Backdrop In images.backdrops
-                            'If bwTMDB.CancellationPending Then Return Nothing
-                            For Each aSize In Master.eSize.backdrop_names
-                                Select Case aSize.size
-                                    Case Master.eSize.backdrop_names(3).description
-                                        aW = tmdbI.width
-                                        aH = tmdbI.height
-                                    Case Else
-                                        aW = aSize.width
-                                        aH = CInt(aW / tmdbI.aspect_ratio)
-                                End Select
-                                Dim tmpPoster As New MediaContainers.Image With {.ShortLang = tmdbI.iso_639_1, .LongLang = If(String.IsNullOrEmpty(tmdbI.iso_639_1), "", Localization.ISOGetLangByCode2(tmdbI.iso_639_1)), .URL = _TMDBConf.images.base_url & aSize.size & tmdbI.file_path, .Description = aSize.description, .Width = CStr(aW), .Height = CStr(aH), .ParentID = tmdbI.file_path}
-                                alPosters.Add(tmpPoster)
-                            Next
-                        Next
-                    End If
+                If ContentType = Enums.ContentType.Movie Then
+                    APIResult = Task.Run(Function() _TMDBApi.GetMovieImagesAsync(CInt(TMDBID)))
+                    Results = APIResult.Result
+                ElseIf ContentType = Enums.ContentType.MovieSet Then
+                    APIResult = Task.Run(Function() _TMDBApi.GetCollectionImagesAsync(CInt(TMDBID)))
+                    Results = APIResult.Result
                 End If
-                'If bwTMDB.WorkerReportsProgress Then
-                '    bwTMDB.ReportProgress(3)
-                'End If
+
+                If Results Is Nothing Then
+                    Return Nothing
+                End If
+
+                'MainFanart
+                If (FilteredModifiers.MainExtrafanarts OrElse FilteredModifiers.MainExtrathumbs OrElse FilteredModifiers.MainFanart) AndAlso Results.Backdrops IsNot Nothing Then
+                    For Each tImage In Results.Backdrops
+                        Dim newImage As New MediaContainers.Image With {
+                            .Height = tImage.Height.ToString,
+                            .Likes = 0,
+                            .LongLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, Localization.ISOGetLangByCode2(tImage.Iso_639_1)),
+                            .Scraper = "TMDB",
+                            .ShortLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, tImage.Iso_639_1),
+                            .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tImage.FilePath,
+                            .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w300" & tImage.FilePath,
+                            .VoteAverage = tImage.VoteAverage.ToString,
+                            .VoteCount = tImage.VoteCount,
+                            .Width = tImage.Width.ToString}
+
+                        alImagesContainer.MainFanarts.Add(newImage)
+                    Next
+                End If
+
+                'MainPoster
+                If FilteredModifiers.MainPoster AndAlso Results.Posters IsNot Nothing Then
+                    For Each tImage In Results.Posters
+                        Dim newImage As New MediaContainers.Image With {
+                                .Height = tImage.Height.ToString,
+                                .Likes = 0,
+                                .LongLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, Localization.ISOGetLangByCode2(tImage.Iso_639_1)),
+                                .Scraper = "TMDB",
+                                .ShortLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, tImage.Iso_639_1),
+                                .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tImage.FilePath,
+                                .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w185" & tImage.FilePath,
+                                .VoteAverage = tImage.VoteAverage.ToString,
+                                .VoteCount = tImage.VoteCount,
+                                .Width = tImage.Width.ToString}
+
+                        alImagesContainer.MainPosters.Add(newImage)
+                    Next
+                End If
 
             Catch ex As Exception
-                logger.Error(New StackFrame().GetMethod().Name,ex)
+                logger.Error(ex, New StackFrame().GetMethod().Name)
             End Try
 
-            Return alPosters
+            Return alImagesContainer
         End Function
 
+        Public Function GetImages_TVShow(ByVal tmdbID As String, ByVal FilteredModifiers As Structures.ScrapeModifiers) As MediaContainers.SearchResultsContainer
+            Dim alContainer As New MediaContainers.SearchResultsContainer
 
-        Public Function GetTMDBCollectionImages(ByVal CollectionID As String, ByVal Type As Enums.ScraperCapabilities) As List(Of MediaContainers.Image)
-            Dim alPosters As New List(Of MediaContainers.Image) 'main poster list
-            Dim alPostersP As New List(Of MediaContainers.Image) 'preferred language poster list
-            Dim alPostersE As New List(Of MediaContainers.Image) 'english poster list
-            Dim alPostersO As New List(Of MediaContainers.Image) 'all others poster list
-            Dim alPostersOs As New List(Of MediaContainers.Image) 'all others sorted poster list
-            Dim alPostersN As New List(Of MediaContainers.Image) 'neutral/none language poster list
+            If bwTMDB.CancellationPending Then Return Nothing
 
-            Dim images As V3.TmdbCollectionImages
-            Dim aW, aH As Integer
-
-            ';If bwTMDB.CancellationPending Then Return Nothing
             Try
-                images = _TMDBApiA.GetCollectionImages(CInt(CollectionID))
-                If Type = Enums.ScraperCapabilities.Poster Then
-                    If IsNothing(images.posters) OrElse images.posters.Count = 0 Then
-                        images = _TMDBApiE.GetCollectionImages(CInt(CollectionID))
-                        If IsNothing(images.posters) OrElse images.posters.Count = 0 Then
-                            Return alPosters
-                        End If
-                    End If
-                Else
-                    If IsNothing(images.backdrops) OrElse images.backdrops.Count = 0 Then
-                        images = _TMDBApiE.GetCollectionImages(CInt(CollectionID))
-                        If IsNothing(images.backdrops) OrElse images.backdrops.Count = 0 Then
-                            Return alPosters
-                        End If
-                    End If
+
+                Dim APIResult As Task(Of TMDbLib.Objects.TvShows.TvShow)
+                APIResult = Task.Run(Function() _TMDBApi.GetTvShowAsync(CInt(tmdbID), TMDbLib.Objects.TvShows.TvShowMethods.Images))
+
+                If APIResult Is Nothing Then
+                    Return Nothing
                 End If
 
-                'If bwTMDB.WorkerReportsProgress Then
-                '    bwTMDB.ReportProgress(1)
-                'End If
+                Dim Result As TMDbLib.Objects.TvShows.TvShow = APIResult.Result
 
-                'If bwTMDB.CancellationPending Then Return Nothing
+                'MainFanart
+                If FilteredModifiers.MainFanart AndAlso Result.Images.Backdrops IsNot Nothing Then
+                    For Each tImage In Result.Images.Backdrops
+                        Dim newImage As New MediaContainers.Image With {
+                            .Height = tImage.Height.ToString,
+                            .Likes = 0,
+                            .LongLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, Localization.ISOGetLangByCode2(tImage.Iso_639_1)),
+                            .Scraper = "TMDB",
+                            .ShortLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, tImage.Iso_639_1),
+                            .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tImage.FilePath,
+                            .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w300" & tImage.FilePath,
+                            .VoteAverage = tImage.VoteAverage.ToString,
+                            .VoteCount = tImage.VoteCount,
+                            .Width = tImage.Width.ToString}
 
-                If Type = Enums.ScraperCapabilities.Poster Then
-                    For Each tmdbI As V3.CollectionPoster In images.posters
-                        'If bwTMDB.CancellationPending Then Return Nothing
-                        For Each aSize In Master.eSize.poster_names
-                            Select Case aSize.size
-                                Case Master.eSize.poster_names(5).description
-                                    aW = tmdbI.width
-                                    aH = tmdbI.height
-                                Case Else
-                                    aW = aSize.width
-                                    aH = CInt(aW / tmdbI.aspect_ratio)
-                            End Select
-                            Dim tmpPoster As New MediaContainers.Image With {.ShortLang = tmdbI.iso_639_1, .LongLang = If(String.IsNullOrEmpty(tmdbI.iso_639_1), "", Localization.ISOGetLangByCode2(tmdbI.iso_639_1)), .URL = _TMDBConf.images.base_url & aSize.size & tmdbI.file_path, .Description = aSize.description, .Width = CStr(aW), .Height = CStr(aH), .ParentID = tmdbI.file_path}
-                            If tmpPoster.ShortLang = _MySettings.TMDBLanguage Then
-                                alPostersP.Add(tmpPoster)
-                            ElseIf tmpPoster.ShortLang = "en" Then
-                                alPostersE.Add(tmpPoster)
-                            ElseIf tmpPoster.ShortLang = "xx" Then
-                                alPostersN.Add(tmpPoster)
-                            ElseIf String.IsNullOrEmpty(tmpPoster.ShortLang) Then
-                                alPostersN.Add(tmpPoster)
-                            Else
-                                alPostersO.Add(tmpPoster)
+                        alContainer.MainFanarts.Add(newImage)
+                    Next
+                End If
+
+                'MainPoster
+                If FilteredModifiers.MainPoster AndAlso Result.Images.Posters IsNot Nothing Then
+                    For Each tImage In Result.Images.Posters
+                        Dim newImage As New MediaContainers.Image With {
+                                .Height = tImage.Height.ToString,
+                                .Likes = 0,
+                                .LongLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, Localization.ISOGetLangByCode2(tImage.Iso_639_1)),
+                                .Scraper = "TMDB",
+                                .ShortLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, tImage.Iso_639_1),
+                                .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tImage.FilePath,
+                                .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w185" & tImage.FilePath,
+                                .VoteAverage = tImage.VoteAverage.ToString,
+                                .VoteCount = tImage.VoteCount,
+                                .Width = tImage.Width.ToString}
+
+                        alContainer.MainPosters.Add(newImage)
+                    Next
+                End If
+
+                'SeasonPoster
+                If (FilteredModifiers.SeasonPoster OrElse FilteredModifiers.EpisodePoster) AndAlso Result.Seasons IsNot Nothing Then
+                    For Each tSeason In Result.Seasons
+                        Dim APIResult_Season As Task(Of TMDbLib.Objects.TvShows.TvSeason)
+                        APIResult_Season = Task.Run(Function() _TMDBApi.GetTvSeasonAsync(CInt(tmdbID), tSeason.SeasonNumber, TMDbLib.Objects.TvShows.TvSeasonMethods.Images))
+
+                        If APIResult_Season IsNot Nothing Then
+                            Dim Result_Season As TMDbLib.Objects.TvShows.TvSeason = APIResult_Season.Result
+
+                            'SeasonPoster
+                            If FilteredModifiers.SeasonPoster AndAlso Result_Season.Images.Posters IsNot Nothing Then
+                                For Each tImage In Result_Season.Images.Posters
+                                    Dim newImage As New MediaContainers.Image With {
+                                        .Height = tImage.Height.ToString,
+                                        .Likes = 0,
+                                        .LongLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, Localization.ISOGetLangByCode2(tImage.Iso_639_1)),
+                                        .Scraper = "TMDB",
+                                        .Season = tSeason.SeasonNumber,
+                                        .ShortLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, tImage.Iso_639_1),
+                                        .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tImage.FilePath,
+                                        .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w185" & tImage.FilePath,
+                                        .VoteAverage = tImage.VoteAverage.ToString,
+                                        .VoteCount = tImage.VoteCount,
+                                        .Width = tImage.Width.ToString}
+
+                                    alContainer.SeasonPosters.Add(newImage)
+                                Next
                             End If
-                        Next
-                    Next
-                    For Each xPoster As MediaContainers.Image In alPostersO.OrderBy(Function(p) (p.LongLang))
-                        alPostersOs.Add(xPoster)
-                    Next
-                    alPosters.AddRange(alPostersP)
-                    alPosters.AddRange(alPostersE)
-                    alPosters.AddRange(alPostersOs)
-                    alPosters.AddRange(alPostersN)
-                ElseIf Type = Enums.ScraperCapabilities.Fanart Then
-                    For Each tmdbI As V3.CollectionBackdrop In images.backdrops
-                        'If bwTMDB.CancellationPending Then Return Nothing
-                        For Each aSize In Master.eSize.backdrop_names
-                            Select Case aSize.size
-                                Case Master.eSize.backdrop_names(3).description
-                                    aW = tmdbI.width
-                                    aH = tmdbI.height
-                                Case Else
-                                    aW = aSize.width
-                                    aH = CInt(aW / tmdbI.aspect_ratio)
-                            End Select
-                            Dim tmpPoster As New MediaContainers.Image With {.ShortLang = tmdbI.iso_639_1, .LongLang = If(String.IsNullOrEmpty(tmdbI.iso_639_1), "", Localization.ISOGetLangByCode2(tmdbI.iso_639_1)), .URL = _TMDBConf.images.base_url & aSize.size & tmdbI.file_path, .Description = aSize.description, .Width = CStr(aW), .Height = CStr(aH), .ParentID = tmdbI.file_path}
-                            alPosters.Add(tmpPoster)
-                        Next
+
+                            If FilteredModifiers.EpisodePoster AndAlso Result_Season.Episodes IsNot Nothing Then
+                                For Each tEpisode In Result_Season.Episodes
+
+                                    'EpisodePoster
+                                    If FilteredModifiers.EpisodePoster AndAlso tEpisode.StillPath IsNot Nothing Then
+
+                                        Dim newImage As New MediaContainers.Image With {
+                                            .Episode = tEpisode.EpisodeNumber,
+                                            .Scraper = "TMDB",
+                                            .Season = CInt(tEpisode.SeasonNumber),
+                                            .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tEpisode.StillPath,
+                                            .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w185" & tEpisode.StillPath}
+
+                                        alContainer.EpisodePosters.Add(newImage)
+
+                                        '    For Each tImage In tEpisode.Images.Stills
+                                        '        Dim newImage As New MediaContainers.Image With {
+                                        '            .Episode = tEpisode.EpisodeNumber,
+                                        '            .Height = tImage.Height.ToString,
+                                        '            .Likes = 0,
+                                        '            .LongLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, Localization.ISOGetLangByCode2(tImage.Iso_639_1)),
+                                        '            .Scraper = "TMDB",
+                                        '            .Season = CInt(tEpisode.SeasonNumber),
+                                        '            .ShortLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, tImage.Iso_639_1),
+                                        '            .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tImage.FilePath,
+                                        '            .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w185" & tImage.FilePath,
+                                        '            .VoteAverage = tImage.VoteAverage.ToString,
+                                        '            .VoteCount = tImage.VoteCount,
+                                        '            .Width = tImage.Width.ToString}
+
+                                        '        alContainer.EpisodePosters.Add(newImage)
+                                        '    Next
+                                    End If
+                                Next
+                            End If
+                        End If
                     Next
                 End If
-
-                'If bwTMDB.WorkerReportsProgress Then
-                '    bwTMDB.ReportProgress(3)
-                'End If
 
             Catch ex As Exception
-                logger.Error(New StackFrame().GetMethod().Name,ex)
+                logger.Error(ex, New StackFrame().GetMethod().Name)
             End Try
 
-            Return alPosters
+            Return alContainer
         End Function
 
-        '      Private Sub bwTMDB_DoWork(ByVal sender As Object, ByVal e As System.ComponentModel.DoWorkEventArgs) Handles bwTMDB.DoWork
-        '          Dim Args As Arguments = DirectCast(e.Argument, Arguments)
-        '          Try
-        '              e.Result = GetTMDBImages(Args.Parameter, Args.Type)
-        '          Catch ex As Exception
-        '              logger.Error(New StackFrame().GetMethod().Name,ex)
-        '              e.Result = Nothing
-        '          End Try
-        '      End Sub
+        Public Function GetImages_TVEpisode(ByVal tmdbID As String, ByVal iSeason As Integer, ByVal iEpisode As Integer, ByVal FilteredModifiers As Structures.ScrapeModifiers) As MediaContainers.SearchResultsContainer
+            Dim alContainer As New MediaContainers.SearchResultsContainer
 
-        'Private Sub bwTMDB_ProgressChanged(ByVal sender As Object, ByVal e As System.ComponentModel.ProgressChangedEventArgs) Handles bwTMDB.ProgressChanged
-        '	If Not bwTMDB.CancellationPending Then
-        '		RaiseEvent ProgressUpdated(e.ProgressPercentage)
-        '	End If
-        'End Sub
+            If bwTMDB.CancellationPending Then Return Nothing
 
-        'Private Sub bwTMDB_RunWorkerCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles bwTMDB.RunWorkerCompleted
-        '	If Not IsNothing(e.Result) Then
-        '		RaiseEvent PostersDownloaded(DirectCast(e.Result, List(Of MediaContainers.Image)))
-        '	End If
-        'End Sub
+            Try
+                Dim Results As TMDbLib.Objects.General.StillImages = Nothing
+                Dim APIResult As Task(Of TMDbLib.Objects.General.StillImages)
+                APIResult = Task.Run(Function() _TMDBApi.GetTvEpisodeImagesAsync(CInt(tmdbID), iSeason, iEpisode))
+                Results = APIResult.Result
+
+                If Results Is Nothing Then
+                    Return Nothing
+                End If
+
+                'EpisodePoster
+                If FilteredModifiers.EpisodePoster AndAlso Results.Stills IsNot Nothing Then
+                    For Each tImage In Results.Stills
+                        Dim newImage As New MediaContainers.Image With {
+                            .Episode = iEpisode,
+                            .Height = tImage.Height.ToString,
+                            .Likes = 0,
+                            .LongLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, Localization.ISOGetLangByCode2(tImage.Iso_639_1)),
+                            .Scraper = "TMDB",
+                            .Season = iSeason,
+                            .ShortLang = If(String.IsNullOrEmpty(tImage.Iso_639_1), String.Empty, tImage.Iso_639_1),
+                            .URLOriginal = _TMDBApi.Config.Images.BaseUrl & "original" & tImage.FilePath,
+                            .URLThumb = _TMDBApi.Config.Images.BaseUrl & "w185" & tImage.FilePath,
+                            .VoteAverage = tImage.VoteAverage.ToString,
+                            .VoteCount = tImage.VoteCount,
+                            .Width = tImage.Width.ToString}
+
+                        alContainer.EpisodePosters.Add(newImage)
+                    Next
+                End If
+
+            Catch ex As Exception
+                logger.Error(ex, New StackFrame().GetMethod().Name)
+            End Try
+
+            Return alContainer
+        End Function
+
+        Public Function GetTMDBbyIMDB(ByVal imdbID As String) As String
+            Dim tmdbID As String = String.Empty
+
+            Try
+                Dim APIResult As Task(Of TMDbLib.Objects.Find.FindContainer)
+                APIResult = Task.Run(Function() _TMDBApi.FindAsync(TMDbLib.Objects.Find.FindExternalSource.Imdb, imdbID))
+
+                If APIResult IsNot Nothing AndAlso APIResult.Result IsNot Nothing AndAlso
+                    APIResult.Result.TvResults IsNot Nothing AndAlso APIResult.Result.TvResults.Count > 0 Then
+                    tmdbID = APIResult.Result.TvResults.Item(0).Id.ToString
+                End If
+
+            Catch ex As Exception
+                logger.Error(ex, New StackFrame().GetMethod().Name)
+            End Try
+
+            Return tmdbID
+        End Function
+
+        Public Function GetTMDBbyTVDB(ByVal tvdbID As String) As String
+            Dim tmdbID As String = String.Empty
+
+            Try
+                Dim APIResult As Task(Of TMDbLib.Objects.Find.FindContainer)
+                APIResult = Task.Run(Function() _TMDBApi.FindAsync(TMDbLib.Objects.Find.FindExternalSource.TvDb, tvdbID))
+
+                If APIResult IsNot Nothing AndAlso APIResult.Result IsNot Nothing AndAlso _
+                    APIResult.Result.TvResults IsNot Nothing AndAlso APIResult.Result.TvResults.Count > 0 Then
+                    tmdbID = APIResult.Result.TvResults.Item(0).Id.ToString
+                End If
+
+            Catch ex As Exception
+                logger.Error(ex, New StackFrame().GetMethod().Name)
+            End Try
+
+            Return tmdbID
+        End Function
 
 #End Region 'Methods
 
@@ -302,7 +335,7 @@ Namespace TMDB
 #Region "Fields"
 
             Dim Parameter As String
-            Dim Type As Enums.ScraperCapabilities
+            Dim Type As Enums.ModifierType
 
 #End Region 'Fields
 

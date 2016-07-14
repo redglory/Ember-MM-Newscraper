@@ -25,16 +25,32 @@ Imports EmberAPI
 Imports NLog
 
 Public Class frmTVExtrator
+
 #Region "Fields"
+
     Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
     Private PreviousFrameValue As Integer
-#End Region
+    Private _strFilename As String
+
+#End Region 'Fields
 
 #Region "Events"
+
     Event GenericEvent(ByVal mType As EmberAPI.Enums.ModuleEventType, ByRef _params As System.Collections.Generic.List(Of Object))
-#End Region
+
+#End Region 'Events
 
 #Region "Methods"
+
+    Public Sub New(ByVal strFilename As String)
+        ' This call is required by the designer.
+        InitializeComponent()
+        Me.Left = Master.AppPos.Left + (Master.AppPos.Width - Me.Width) \ 2
+        Me.Top = Master.AppPos.Top + (Master.AppPos.Height - Me.Height) \ 2
+        Me.StartPosition = FormStartPosition.Manual
+        _strFilename = strFilename
+    End Sub
+
     Private Sub frmTVExtrator_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         SetUp()
     End Sub
@@ -57,13 +73,13 @@ Public Class frmTVExtrator
             lblTime.Text = String.Format("{0}:{1:00}:{2:00}", sec2Time.Hours, sec2Time.Minutes, sec2Time.Seconds)
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
     End Sub
 
     Private Sub btnFrameSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFrameSave.Click
-        If Not IsNothing(pbFrame.Image) Then
-            RaiseEvent GenericEvent(Enums.ModuleEventType.TVFrameExtrator, Nothing)
+        If pbFrame.Image IsNot Nothing Then
+            RaiseEvent GenericEvent(Enums.ModuleEventType.FrameExtrator_TVEpisode, Nothing)
         End If
     End Sub
 
@@ -72,7 +88,7 @@ Public Class frmTVExtrator
             Using ffmpeg As New Process()
 
                 ffmpeg.StartInfo.FileName = FrameExtrator.GetFFMpeg
-                ffmpeg.StartInfo.Arguments = String.Format("-ss 0 -i ""{0}"" -an -f rawvideo -vframes 1 -s 1280x720 -vcodec mjpeg -y ""{1}""", Master.currShow.Filename, Path.Combine(Master.TempPath, "frame.jpg"))
+                ffmpeg.StartInfo.Arguments = String.Format("-ss 0 -i ""{0}"" -an -f rawvideo -vframes 1 -s 1280x720 -vcodec mjpeg -y ""{1}""", _strFilename, Path.Combine(Master.TempPath, "frame.jpg"))
                 ffmpeg.EnableRaisingEvents = False
                 ffmpeg.StartInfo.UseShellExecute = False
                 ffmpeg.StartInfo.CreateNoWindow = True
@@ -116,13 +132,14 @@ Public Class frmTVExtrator
             PreviousFrameValue = 0
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
             tbFrame.Maximum = 0
             tbFrame.Value = 0
             tbFrame.Enabled = False
             pbFrame.Image = Nothing
         End Try
     End Sub
+
     Private Sub GrabTheFrame()
         Try
 
@@ -131,7 +148,7 @@ Public Class frmTVExtrator
 
             ffmpeg.StartInfo.FileName = Functions.GetFFMpeg
             'ffmpeg.StartInfo.Arguments = String.Format("-ss {0} -i ""{1}"" -an -f rawvideo -vframes 1 -vcodec mjpeg -y ""{2}""", tbFrame.Value, Master.currShow.Filename, Path.Combine(Master.TempPath, "frame.jpg"))
-            ffmpeg.StartInfo.Arguments = String.Format("-ss {0} -i ""{1}"" -vframes 1 -y ""{2}""", tbFrame.Value, Master.currShow.Filename, Path.Combine(Master.TempPath, "frame.jpg"))
+            ffmpeg.StartInfo.Arguments = String.Format("-ss {0} -i ""{1}"" -vframes 1 -y ""{2}""", tbFrame.Value, _strFilename, Path.Combine(Master.TempPath, "frame.jpg"))
             ffmpeg.EnableRaisingEvents = False
             ffmpeg.StartInfo.UseShellExecute = False
             ffmpeg.StartInfo.CreateNoWindow = True
@@ -167,7 +184,7 @@ Public Class frmTVExtrator
             End If
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name,ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
             PreviousFrameValue = 0
             lblTime.Text = String.Empty
             tbFrame.Maximum = 0
@@ -184,6 +201,7 @@ Public Class frmTVExtrator
         Me.btnFrameLoad.Text = Master.eLang.GetString(308, "Load Episode")
         Me.btnFrameSave.Text = Master.eLang.GetString(309, "Save as Poster")
     End Sub
-#End Region
+
+#End Region 'Methods
 
 End Class

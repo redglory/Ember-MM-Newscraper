@@ -19,33 +19,33 @@
 ' ################################################################################
 
 Imports System.IO
-Imports NLog
 
 Public Class Master
 
 #Region "Fields"
 
+    Public Shared fLoading As New frmSplash
+
+    Public Shared isUserInteractive As Boolean = True
+    Public Shared isCL As Boolean
+    Public Shared appArgs As ApplicationServices.StartupEventArgs
+
+    Public Shared AppPos As New Drawing.Rectangle
     Public Shared CanScanDiscImage As Boolean
     Public Shared DB As New Database
-    Public Shared currMovie As New Structures.DBMovie
-    Public Shared currMovieSet As New Structures.DBMovieSet
-    Public Shared currShow As New Structures.DBTV
-    Public Shared DefaultMovieOptions As New Structures.ScrapeOptions
-    Public Shared DefaultTVOptions As New Structures.TVScrapeOptions
-    'Public Shared eAdvancedSettings As New AdvancedSettings
-    Public Shared eLang As New Localization
-    'Public Shared logger As Logger = LogManager.GetCurrentClassLogger()
-    Public Shared eSettings As New Settings
-    Public Shared eSize As New Globals
-    Public Shared GlobalScrapeMod As New Structures.ScrapeModifier
-    Public Shared isWindows As Boolean = Functions.CheckIfWindows
-    Public Shared is32Bit As Boolean
-    'Public Shared MediaJobLog As New MediaLog
+    Public Shared DefaultOptions_Movie As New Structures.ScrapeOptions
+    Public Shared DefaultOptions_MovieSet As New Structures.ScrapeOptions
+    Public Shared DefaultOptions_TV As New Structures.ScrapeOptions
+    Public Shared ExcludeDirs As New List(Of String)
+    Public Shared MovieSources As New List(Of Database.DBSource)
+    Public Shared SettingsPath As String = Path.Combine(Functions.AppPath, "Profiles\Default")
     Public Shared SourcesList As New List(Of String)
+    Public Shared TVShowSources As New List(Of Database.DBSource)
     Public Shared TempPath As String = Path.Combine(Functions.AppPath, "Temp")
-    Public Shared tmpMovie As New MediaContainers.Movie
-    Public Shared MovieSources As New List(Of Structures.MovieSource)
-    Public Shared TVSources As New List(Of Structures.TVSource)
+    Public Shared eLang As New Localization
+    Public Shared eSettings As New Settings
+    Public Shared is32Bit As Boolean
+    Public Shared isWindows As Boolean = Functions.CheckIfWindows
 
 #End Region 'Fields
 

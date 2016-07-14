@@ -1,7 +1,13 @@
 <html>
-<$NEED_POSTERS>
-<$NEED_FANART>
-<$NEED_FLAGS>
+<exportsettings>
+    <flags>true</flags>
+    <mainfanarts>true</mainfanarts>
+    <mainfanarts_maxheight>300</mainfanarts_maxheight>
+    <mainfanarts_maxwidth>200</mainfanarts_maxwidth>
+    <mainposters>true</mainposters>
+    <mainposters_maxheight>120</mainposters_maxheight>
+    <mainposters_maxwidth>80</mainposters_maxwidth>
+</exportsettings>
 <head><script src="jquery.js" type="text/javascript" language="javascript"></script>
 <script src="prettyPhoto.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="prettyPhoto.css" type="text/css" media="screen" title="prettyPhoto main stylesheet" charset="utf-8" />
@@ -92,17 +98,17 @@ function hiddiv() {
 Movie List<br><br>
 
 <table style="font-size:13px;border-collapse: collapse;">
-<$MOVIE>
+<$$MOVIE>
   <tr class="boldrow">
    <td>
     <div class="top">
-      <div id="name<$COUNT>" class="header"><a onclick="ShowDetails2(det<$COUNT>)" href="javascript:"><b><$MOVIENAME></b></a>
+      <div id="name<$COUNT>" class="header"><a onclick="ShowDetails2(det<$COUNT>)" href="javascript:"><b><$TITLE></b></a>
               <div style="font-size:11px;position:absolute;top:0;right:0;text-align: right;"><b><$YEAR></b><br><div class="details-s" id="det<$COUNT>-s"><$VIDEO> - <$AUDIO></div/></div>
       </div><br>
     <div id="<$COUNT>" class="detail">Filename: <$FILENAME></div>
     </div>
     <div class="details" id="det<$COUNT>">
-<div style="float:right;clear:left;padding-left:10px;padding-top:5px;padding-bottom:5px;"> <a href="<$FANART_FILE>" rel="prettyPhoto"><div id="det<$COUNT>img" src="<$POSTER_FILE>"></div></a></div>
+<div style="float:right;clear:left;padding-left:10px;padding-top:5px;padding-bottom:5px;"> <a href="<$FANART>" rel="prettyPhoto"><div id="det<$COUNT>img" src="<$POSTER>"></div></a></div>
          <b>Genres:</b>&nbsp;<$GENRES><br>
          <b>Plot:</b><br><$PLOT><br>&nbsp;
 <div class="details-s" id="det<$COUNT>-s">
@@ -115,7 +121,7 @@ Movie List<br><br>
     </div>
    </td>
   </tr>
-<$/MOVIE>
+</$$MOVIE>
   <tr class="boldrow">
    <td style="text-align:center;">
 	<p><br>Created by: Ember Media Manager

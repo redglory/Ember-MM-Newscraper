@@ -17,7 +17,6 @@
 ' # You should have received a copy of the GNU General Public License            #
 ' # along with Ember Media Manager.  If not, see <http://www.gnu.org/licenses/>. #
 ' ################################################################################
-'Class originally developed by blackducksoftware and highly modified for Ember Media Manager
 
 Imports System.IO
 Imports NLog
@@ -39,7 +38,7 @@ Public Class DVD
 
 #End Region 'Fields
 
-    #Region "Constructors"
+#Region "Constructors"
 
     Public Sub New()
         MyBase.New()
@@ -57,7 +56,7 @@ Public Class DVD
         mVideoCodingMode.Add("1", "mpeg2")
     End Sub
 
-    #End Region 'Constructors
+#End Region 'Constructors
 
 #Region "Properties"
     ''' <summary>
@@ -82,7 +81,7 @@ Public Class DVD
                     ReturnArray(2) = ParsedIFOFile.AudioAtt_VTS_VOBS(bytAudioIndex).NumberOfChannels.ToString
                 End If
             Catch ex As Exception
-                logger.Error("GetIFOAudio", ex)
+                logger.Error(ex, "GetIFOAudio")
             End Try
             Return ReturnArray
         End Get
@@ -110,7 +109,7 @@ Public Class DVD
                     Return Localization.ISOGetLangByCode2(ParsedIFOFile.SubPictureAtt_VTS_VOBS(bytSubPicIndex).LanguageCode)
                 End If
             Catch ex As Exception
-                logger.Error("GetIFOSubPic", ex)
+                logger.Error(ex, "GetIFOSubPic")
             End Try
             Return String.Empty
         End Get
@@ -156,7 +155,7 @@ Public Class DVD
                     ReturnArray(2) = String.Empty
                 End If
             Catch ex As Exception
-                logger.Error("GetIFOVideo", ex)
+                logger.Error(ex, "GetIFOVideo")
             End Try
             Return ReturnArray
         End Get
@@ -187,7 +186,7 @@ Public Class DVD
                     Return fctPlayBackTimeToString(ParsedIFOFile.ProgramChainInformation(bytProChainIndex).PlayBackTime, MinsOnly)
                 End If
             Catch ex As Exception
-                logger.Error("GetProgramChainPlayBackTime", ex)
+                logger.Error(ex, "GetProgramChainPlayBackTime")
             End Try
             Return String.Empty
         End Get
@@ -219,7 +218,7 @@ Public Class DVD
             hexStr = hexStr.Insert(0, "0x")
 
         Catch ex As Exception
-            logger.Error("CovertByteToHex", ex)
+            logger.Error(ex, "CovertByteToHex")
         End Try
         Return hexStr
     End Function
@@ -272,7 +271,7 @@ Public Class DVD
                 Return True
             End If
         Catch ex As Exception
-            logger.Error("fctOpenIFOFile", ex)
+            logger.Error(ex, "fctOpenIFOFile")
         End Try
         Return False
     End Function
@@ -326,7 +325,7 @@ Public Class DVD
             If (byteInfo(1) And 4) = 4 Then bytTempValue = Convert.ToByte(bytTempValue + 4)
             tVTSM.NumberOfChannels = Convert.ToByte(bytTempValue + 1)
         Catch ex As Exception
-            logger.Error("fctAudioAttVTSM_VTS", ex)
+            logger.Error(ex, "fctAudioAttVTSM_VTS")
         End Try
         Return tVTSM
     End Function
@@ -337,7 +336,7 @@ Public Class DVD
     ''' <returns>Integer value of the input hexadecimal string</returns>
     ''' <remarks></remarks>
     Private Function fctHexOffset(ByVal strHexString As String) As Integer
-        Return Convert.ToInt32(Val(String.Concat("&H", (strHexString).ToUpper)))
+        Return Convert.ToInt32(Microsoft.VisualBasic.Val(String.Concat("&H", (strHexString).ToUpper))) 'TODO: remove old VB code
     End Function
     ''' <summary>
     ''' 
@@ -364,7 +363,7 @@ Public Class DVD
         Try
             'Read the IFO file into a temporary String
             Using _
-                objFS As FileStream = File.Open(strFileName, FileMode.Open, FileAccess.Read), _
+                objFS As FileStream = File.Open(strFileName, FileMode.Open, FileAccess.Read),
                 objBR As New BinaryReader(objFS)
 
                 strTmpIFOFileIn = System.Text.Encoding.Default.GetString(objBR.ReadBytes(Convert.ToInt32(objFS.Length)))
@@ -440,7 +439,7 @@ Public Class DVD
             End If
 
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
         Return tmpIFO
     End Function
@@ -448,7 +447,7 @@ Public Class DVD
     ''' Converts a DVD_Time_Type to a String
     ''' </summary>
     ''' <param name="PlayBack">Time structure to be converted</param>
-    ''' <param name="MinsOnly">If <c>True</c> only convert and return the minutes portion of the DVD time. So 1h33m would return 93. If <c>False</c> it would convert all elements, and return 01h33mn00s</param>
+    ''' <param name="MinsOnly">If <c>True</c> only convert and return the minutes portion of the DVD time. So 1h33m would return 93. If <c>False</c> it would convert all elements, and return 01h33min00s</param>
     ''' <returns>DVD Time converted to String.</returns>
     ''' <remarks></remarks>
     Private Function fctPlayBackTimeToString(ByRef PlayBack As DVD_Time_Type, Optional ByVal MinsOnly As Boolean = False) As String
@@ -457,10 +456,10 @@ Public Class DVD
             If MinsOnly Then
                 Return ((PlayBack.hours * 60) + PlayBack.minutes).ToString
             Else
-                Return String.Concat((PlayBack.hours).ToString("00"), "h ", (PlayBack.minutes).ToString("00"), "mn ", (PlayBack.seconds).ToString("00"), "s")
+                Return String.Concat((PlayBack.hours).ToString("00"), "h ", (PlayBack.minutes).ToString("00"), "min ", (PlayBack.seconds).ToString("00"), "s")
             End If
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
         Return String.Empty
     End Function
@@ -491,7 +490,7 @@ Public Class DVD
             PCT.PlayBackTime.minutes = fctHexTimeToDecTime(Convert.ToByte(((strIFOFileBuffer).Substring(ChainLoc + 5, 1)).Chars(0)))
             PCT.PlayBackTime.seconds = fctHexTimeToDecTime(Convert.ToByte(((strIFOFileBuffer).Substring(ChainLoc + 6, 1)).Chars(0)))
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
         Return PCT
     End Function
@@ -530,7 +529,7 @@ Public Class DVD
             If (byte2 And 8) = 8 Then bytTmpValue = Convert.ToByte(bytTmpValue + 2)
             tSRPT.Resolution = bytTmpValue
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
         Return tSRPT
     End Function
@@ -558,7 +557,7 @@ Public Class DVD
                 End If
             Next
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
         Return Convert.ToInt32(HexTotal)
     End Function
@@ -574,7 +573,7 @@ Public Class DVD
             SubPicATT.LanguageCode = (strSubPictureInfo).Substring(2, 1) & (strSubPictureInfo).Substring(3, 1)
             SubPicATT.CodeExtention = Convert.ToByte(oEnc.GetBytes((((strSubPictureInfo).Substring(5, 1)).Chars(0)))(0))
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
         Return SubPicATT
     End Function
@@ -616,7 +615,7 @@ Public Class DVD
             If (byte2 And 8) = 8 Then bytTmpValue = Convert.ToByte(bytTmpValue + 2)
             tVTSVOB.Resolution = bytTmpValue
         Catch ex As Exception
-            logger.Error(New StackFrame().GetMethod().Name, ex)
+            logger.Error(ex, New StackFrame().GetMethod().Name)
         End Try
         Return tVTSVOB
     End Function

@@ -18,9 +18,6 @@
 ' # along with Ember Media Manager.  If not, see <http://www.gnu.org/licenses/>. #
 ' ################################################################################
 
-Imports System.IO
-Imports System.Text
-Imports System.Text.RegularExpressions
 Imports NLog
 Imports EmberAPI
 
@@ -28,32 +25,31 @@ Imports EmberAPI
 ''' Native Scraper
 ''' </summary>
 ''' <remarks></remarks>
-Public Class IMDB_trailer
-    Implements Interfaces.EmberMovieScraperModule_Trailer
+Public Class IMDB_Trailer
+    Implements Interfaces.ScraperModule_Trailer_Movie
 
 
 #Region "Fields"
-    Shared logger As Logger = NLog.LogManager.GetCurrentClassLogger()
+    Shared logger As Logger = LogManager.GetCurrentClassLogger()
 
-    Public Shared ConfigOptions As New Structures.ScrapeOptions
-    Public Shared ConfigScrapeModifier As New Structures.ScrapeModifier
+    Public Shared ConfigScrapeModifiers As New Structures.ScrapeModifiers
     Public Shared _AssemblyName As String
 
     Private _Name As String = "IMDB_Trailer"
     Private _ScraperEnabled As Boolean = False
-    Private _setup As frmIMDBTrailerSettingsHolder
+    Private _setup As frmSettingsHolder
 
 #End Region 'Fields
 
 #Region "Events"
 
-    Public Event ModuleSettingsChanged() Implements Interfaces.EmberMovieScraperModule_Trailer.ModuleSettingsChanged
+    Public Event ModuleSettingsChanged() Implements Interfaces.ScraperModule_Trailer_Movie.ModuleSettingsChanged
 
-    Public Event MovieScraperEvent(ByVal eType As Enums.MovieScraperEventType, ByVal Parameter As Object) Implements Interfaces.EmberMovieScraperModule_Trailer.MovieScraperEvent
+    Public Event MovieScraperEvent(ByVal eType As Enums.ScraperEventType, ByVal Parameter As Object) Implements Interfaces.ScraperModule_Trailer_Movie.ScraperEvent
 
-    Public Event SetupScraperChanged(ByVal name As String, ByVal State As Boolean, ByVal difforder As Integer) Implements Interfaces.EmberMovieScraperModule_Trailer.ScraperSetupChanged
+    Public Event SetupScraperChanged(ByVal name As String, ByVal State As Boolean, ByVal difforder As Integer) Implements Interfaces.ScraperModule_Trailer_Movie.ScraperSetupChanged
 
-    Public Event SetupNeedsRestart() Implements Interfaces.EmberMovieScraperModule_Trailer.SetupNeedsRestart
+    Public Event SetupNeedsRestart() Implements Interfaces.ScraperModule_Trailer_Movie.SetupNeedsRestart
 
     'Public Event ProgressUpdated(ByVal iPercent As Integer) Implements Interfaces.EmberMovieScraperModule_Trailer.ProgressUpdated
 
@@ -61,19 +57,19 @@ Public Class IMDB_trailer
 
 #Region "Properties"
 
-    ReadOnly Property ModuleName() As String Implements Interfaces.EmberMovieScraperModule_Trailer.ModuleName
+    ReadOnly Property ModuleName() As String Implements Interfaces.ScraperModule_Trailer_Movie.ModuleName
         Get
             Return _Name
         End Get
     End Property
 
-    ReadOnly Property ModuleVersion() As String Implements Interfaces.EmberMovieScraperModule_Trailer.ModuleVersion
+    ReadOnly Property ModuleVersion() As String Implements Interfaces.ScraperModule_Trailer_Movie.ModuleVersion
         Get
             Return FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly.Location).FileVersion.ToString
         End Get
     End Property
 
-    Property ScraperEnabled() As Boolean Implements Interfaces.EmberMovieScraperModule_Trailer.ScraperEnabled
+    Property ScraperEnabled() As Boolean Implements Interfaces.ScraperModule_Trailer_Movie.ScraperEnabled
         Get
             Return _ScraperEnabled
         End Get
@@ -103,19 +99,19 @@ Public Class IMDB_trailer
         RaiseEvent SetupNeedsRestart()
     End Sub
 
-    Sub Init(ByVal sAssemblyName As String) Implements Interfaces.EmberMovieScraperModule_Trailer.Init
+    Sub Init(ByVal sAssemblyName As String) Implements Interfaces.ScraperModule_Trailer_Movie.Init
         _AssemblyName = sAssemblyName
         LoadSettings()
     End Sub
 
-    Function InjectSetupScraper() As Containers.SettingsPanel Implements Interfaces.EmberMovieScraperModule_Trailer.InjectSetupScraper
+    Function InjectSetupScraper() As Containers.SettingsPanel Implements Interfaces.ScraperModule_Trailer_Movie.InjectSetupScraper
         Dim SPanel As New Containers.SettingsPanel
-        _setup = New frmIMDBTrailerSettingsHolder
+        _setup = New frmSettingsHolder
         LoadSettings()
-        _setup.cbEnabled.Checked = _ScraperEnabled
+        _setup.chkEnabled.Checked = _ScraperEnabled
 
         SPanel.Name = String.Concat(Me._Name, "Scraper")
-        SPanel.Text = Master.eLang.GetString(885, "IMDB")
+        SPanel.Text = "IMDB"
         SPanel.Prefix = "IMDBTrailer_"
         SPanel.Order = 110
         SPanel.Parent = "pnlMovieTrailer"
@@ -129,16 +125,16 @@ Public Class IMDB_trailer
     End Function
 
     Sub LoadSettings()
-        ConfigScrapeModifier.Trailer = AdvancedSettings.GetBooleanSetting("DoTrailer", True)
+        ConfigScrapeModifiers.MainTrailer = AdvancedSettings.GetBooleanSetting("DoTrailer", True)
     End Sub
 
     Sub SaveSettings()
         Using settings = New AdvancedSettings()
-            settings.SetBooleanSetting("DoTrailer", ConfigScrapeModifier.Trailer)
+            settings.SetBooleanSetting("DoTrailer", ConfigScrapeModifiers.MainTrailer)
         End Using
     End Sub
 
-    Sub SaveSetupScraper(ByVal DoDispose As Boolean) Implements Interfaces.EmberMovieScraperModule_Trailer.SaveSetupScraper
+    Sub SaveSetupScraper(ByVal DoDispose As Boolean) Implements Interfaces.ScraperModule_Trailer_Movie.SaveSetupScraper
         SaveSettings()
         'ModulesManager.Instance.SaveSettings()
         If DoDispose Then
@@ -149,26 +145,21 @@ Public Class IMDB_trailer
         End If
     End Sub
 
-    Function Scraper(ByRef DBMovie As Structures.DBMovie, ByVal Type As Enums.ScraperCapabilities, ByRef URLList As List(Of Trailers)) As Interfaces.ModuleResult Implements Interfaces.EmberMovieScraperModule_Trailer.Scraper
-        logger.Error("Scraper started")
+    Function Scraper_Movie(ByRef DBMovie As Database.DBElement, ByVal Type As Enums.ModifierType, ByRef TrailerList As List(Of MediaContainers.Trailer)) As Interfaces.ModuleResult Implements Interfaces.ScraperModule_Trailer_Movie.Scraper
+        logger.Trace("[IMDB_Trailer] [Scraper_Movie] [Start]")
 
         Dim tIMDBID As String = String.Empty
 
-        If Not String.IsNullOrEmpty(DBMovie.Movie.IMDBID) Then
-            tIMDBID = DBMovie.Movie.IMDBID
+        If Not String.IsNullOrEmpty(DBMovie.Movie.IMDB) Then
+            Dim _scraper As New IMDBs.Scraper()
 
-            Dim tIMDBTrailer As New IMDBTrailer(tIMDBID)
-
-            If tIMDBTrailer.TrailerList.Count > 0 Then
-                URLList = tIMDBTrailer.TrailerList
-            End If
+            TrailerList = _scraper.GetTrailers(DBMovie.Movie.IMDB)
         End If
-        
-        logger.Error( "Scraper ended")
+        logger.Trace("[IMDB_Trailer] [Scraper_Movie] [Done]")
         Return New Interfaces.ModuleResult With {.breakChain = False}
     End Function
 
-    Public Sub ScraperOrderChanged() Implements EmberAPI.Interfaces.EmberMovieScraperModule_Trailer.ScraperOrderChanged
+    Public Sub ScraperOrderChanged() Implements EmberAPI.Interfaces.ScraperModule_Trailer_Movie.ScraperOrderChanged
         _setup.orderChanged()
     End Sub
 

@@ -18,6 +18,8 @@
     <RestorePackages>true</RestorePackages>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>veröffentlichen\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -51,18 +53,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
-    <DefineTrace>false</DefineTrace>
+    <DefineTrace>true</DefineTrace>
     <OutputPath>..\EmberMM - $(Configuration) - $(Platform)\</OutputPath>
-    <NoWarn>42353,42354,42355</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109</WarningsAsErrors>
+    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109,42353,42354,42355</WarningsAsErrors>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.vb</CodeAnalysisModuleSuppressionsFile>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\\Rule Sets;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\\Rule Sets;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\\Rule Sets;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\\Rule Sets;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
     <CodeAnalysisRuleDirectories>;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\FxCop\\Rules;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\FxCop\\Rules;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\FxCop\\Rules;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\FxCop\\Rules;D:\Applications\Development\Microsoft Visual Studio 2010\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <DocumentationFile>Ember Media Manager.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -70,10 +73,11 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\EmberMM - $(Configuration) - $(Platform)\</OutputPath>
     <Optimize>true</Optimize>
-    <NoWarn>42353,42354,42355</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109</WarningsAsErrors>
+    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109,42353,42354,42355</WarningsAsErrors>
     <CodeAnalysisLogFile>bin\Release\Ember Media Manager.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.vb</CodeAnalysisModuleSuppressionsFile>
@@ -89,10 +93,11 @@
     <OutputPath>..\EmberMM - $(Configuration) - $(Platform)\</OutputPath>
     <DocumentationFile>Ember Media Manager.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <NoWarn>42353,42354,42355</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109</WarningsAsErrors>
+    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109,42353,42354,42355</WarningsAsErrors>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -100,48 +105,72 @@
     <OutputPath>..\EmberMM - $(Configuration) - $(Platform)\</OutputPath>
     <DocumentationFile>Ember Media Manager.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <NoWarn>42353,42354,42355</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109</WarningsAsErrors>
+    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109,42353,42354,42355</WarningsAsErrors>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Ember Media Manager.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>
+    </NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109,42353,42354,42355</WarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Ember Media Manager.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>
+    </NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <WarningsAsErrors>41998,41999,42004,42016,42017,42018,42019,42020,42021,42022,42024,42025,42026,42029,42030,42031,42032,42036,42099,42104,42105,42106,42107,42108,42109,42353,42354,42355</WarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=3.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NLog.3.0.0.0\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="RestSharp, Version=104.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\RestSharp.104.4.0\lib\net4\RestSharp.dll</HintPath>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.92.0\lib\net45\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.99.0\lib\net45\System.Data.SQLite.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6">
-      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.92.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.99.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.92.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.99.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -149,7 +178,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
@@ -175,22 +203,22 @@
     <Compile Include="dlgAddEditActor.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="dlgCustomScraper.designer.vb">
+      <DependentUpon>dlgCustomScraper.vb</DependentUpon>
+    </Compile>
+    <Compile Include="dlgCustomScraper.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="dlgDeleteConfirm.Designer.vb">
       <DependentUpon>dlgDeleteConfirm.vb</DependentUpon>
     </Compile>
     <Compile Include="dlgDeleteConfirm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="dlgDVDProfilerSelect.Designer.vb">
-      <DependentUpon>dlgDVDProfilerSelect.vb</DependentUpon>
+    <Compile Include="dlgEditTVEpisode.Designer.vb">
+      <DependentUpon>dlgEditTVEpisode.vb</DependentUpon>
     </Compile>
-    <Compile Include="dlgDVDProfilerSelect.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="dlgEditEpisode.Designer.vb">
-      <DependentUpon>dlgEditEpisode.vb</DependentUpon>
-    </Compile>
-    <Compile Include="dlgEditEpisode.vb">
+    <Compile Include="dlgEditTVEpisode.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="dlgEditMovieSet.Designer.vb">
@@ -205,16 +233,16 @@
     <Compile Include="dlgEditMovie.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="dlgEditSeason.Designer.vb">
-      <DependentUpon>dlgEditSeason.vb</DependentUpon>
+    <Compile Include="dlgEditTVSeason.Designer.vb">
+      <DependentUpon>dlgEditTVSeason.vb</DependentUpon>
     </Compile>
-    <Compile Include="dlgEditSeason.vb">
+    <Compile Include="dlgEditTVSeason.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="dlgEditShow.Designer.vb">
-      <DependentUpon>dlgEditShow.vb</DependentUpon>
+    <Compile Include="dlgEditTVShow.Designer.vb">
+      <DependentUpon>dlgEditTVShow.vb</DependentUpon>
     </Compile>
-    <Compile Include="dlgEditShow.vb">
+    <Compile Include="dlgEditTVShow.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="dlgErrorViewer.Designer.vb">
@@ -241,12 +269,6 @@
     <Compile Include="dlgImgManual.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="dlgImgSelect.Designer.vb">
-      <DependentUpon>dlgImgSelect.vb</DependentUpon>
-    </Compile>
-    <Compile Include="dlgImgSelect.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="dlgImgView.Designer.vb">
       <DependentUpon>dlgImgView.vb</DependentUpon>
     </Compile>
@@ -259,10 +281,16 @@
     <Compile Include="dlgManualEdit.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="dlgMovieSource.Designer.vb">
-      <DependentUpon>dlgMovieSource.vb</DependentUpon>
+    <Compile Include="dlgProfileSelect.Designer.vb">
+      <DependentUpon>dlgProfileSelect.vb</DependentUpon>
     </Compile>
-    <Compile Include="dlgMovieSource.vb">
+    <Compile Include="dlgProfileSelect.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="dlgSourceMovie.Designer.vb">
+      <DependentUpon>dlgSourceMovie.vb</DependentUpon>
+    </Compile>
+    <Compile Include="dlgSourceMovie.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="dlgNewSet.Designer.vb">
@@ -277,22 +305,10 @@
     <Compile Include="dlgNewVersion.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="dlgOfflineHolder.designer.vb">
-      <DependentUpon>dlgOfflineHolder.vb</DependentUpon>
-    </Compile>
-    <Compile Include="dlgOfflineHolder.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="dlgRestart.Designer.vb">
       <DependentUpon>dlgRestart.vb</DependentUpon>
     </Compile>
     <Compile Include="dlgRestart.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="dlgSetsManager.Designer.vb">
-      <DependentUpon>dlgSetsManager.vb</DependentUpon>
-    </Compile>
-    <Compile Include="dlgSetsManager.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="dlgSettings.Designer.vb">
@@ -331,22 +347,22 @@
     <Compile Include="dlgTrailerSelect.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="dlgTVChangeEp.Designer.vb">
+      <DependentUpon>dlgTVChangeEp.vb</DependentUpon>
+    </Compile>
+    <Compile Include="dlgTVChangeEp.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="dlgTVRegExProfiles.Designer.vb">
       <DependentUpon>dlgTVRegExProfiles.vb</DependentUpon>
     </Compile>
     <Compile Include="dlgTVRegExProfiles.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="dlgTVSource.Designer.vb">
-      <DependentUpon>dlgTVSource.vb</DependentUpon>
+    <Compile Include="dlgSourceTVShow.Designer.vb">
+      <DependentUpon>dlgSourceTVShow.vb</DependentUpon>
     </Compile>
-    <Compile Include="dlgTVSource.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="dlgUpdateMedia.designer.vb">
-      <DependentUpon>dlgUpdateMedia.vb</DependentUpon>
-    </Compile>
-    <Compile Include="dlgUpdateMedia.vb">
+    <Compile Include="dlgSourceTVShow.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="dlgWizard.Designer.vb">
@@ -355,16 +371,16 @@
     <Compile Include="dlgWizard.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="dlgImgSelect.Designer.vb">
+      <DependentUpon>dlgImgSelect.vb</DependentUpon>
+    </Compile>
+    <Compile Include="dlgImgSelect.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
     </Compile>
     <Compile Include="frmMain.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmSplash.Designer.vb">
-      <DependentUpon>frmSplash.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmSplash.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -396,15 +412,15 @@
     <EmbeddedResource Include="dlgAddEditActor.resx">
       <DependentUpon>dlgAddEditActor.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="dlgCustomScraper.resx">
+      <DependentUpon>dlgCustomScraper.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="dlgDeleteConfirm.resx">
       <DependentUpon>dlgDeleteConfirm.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgDVDProfilerSelect.resx">
-      <DependentUpon>dlgDVDProfilerSelect.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="dlgEditEpisode.resx">
-      <DependentUpon>dlgEditEpisode.vb</DependentUpon>
+    <EmbeddedResource Include="dlgEditTVEpisode.resx">
+      <DependentUpon>dlgEditTVEpisode.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgEditMovieSet.resx">
       <DependentUpon>dlgEditMovieSet.vb</DependentUpon>
@@ -412,11 +428,11 @@
     <EmbeddedResource Include="dlgEditMovie.resx">
       <DependentUpon>dlgEditMovie.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgEditSeason.resx">
-      <DependentUpon>dlgEditSeason.vb</DependentUpon>
+    <EmbeddedResource Include="dlgEditTVSeason.resx">
+      <DependentUpon>dlgEditTVSeason.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgEditShow.resx">
-      <DependentUpon>dlgEditShow.vb</DependentUpon>
+    <EmbeddedResource Include="dlgEditTVShow.resx">
+      <DependentUpon>dlgEditTVShow.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgErrorViewer.resx">
       <DependentUpon>dlgErrorViewer.vb</DependentUpon>
@@ -430,18 +446,17 @@
     <EmbeddedResource Include="dlgImgManual.resx">
       <DependentUpon>dlgImgManual.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgImgSelect.resx">
-      <DependentUpon>dlgImgSelect.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="dlgImgView.resx">
       <DependentUpon>dlgImgView.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgManualEdit.resx">
       <DependentUpon>dlgManualEdit.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgMovieSource.resx">
-      <DependentUpon>dlgMovieSource.vb</DependentUpon>
+    <EmbeddedResource Include="dlgProfileSelect.resx">
+      <DependentUpon>dlgProfileSelect.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dlgSourceMovie.resx">
+      <DependentUpon>dlgSourceMovie.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgNewSet.resx">
       <DependentUpon>dlgNewSet.vb</DependentUpon>
@@ -449,15 +464,8 @@
     <EmbeddedResource Include="dlgNewVersion.resx">
       <DependentUpon>dlgNewVersion.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgOfflineHolder.resx">
-      <DependentUpon>dlgOfflineHolder.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="dlgRestart.resx">
       <DependentUpon>dlgRestart.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="dlgSetsManager.resx">
-      <DependentUpon>dlgSetsManager.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgSettings.resx">
       <DependentUpon>dlgSettings.vb</DependentUpon>
@@ -480,24 +488,25 @@
       <DependentUpon>dlgTrailerSelect.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="dlgTVChangeEp.resx">
+      <DependentUpon>dlgTVChangeEp.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="dlgTVRegExProfiles.resx">
       <DependentUpon>dlgTVRegExProfiles.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgTVSource.resx">
-      <DependentUpon>dlgTVSource.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="dlgUpdateMedia.resx">
-      <DependentUpon>dlgUpdateMedia.vb</DependentUpon>
+    <EmbeddedResource Include="dlgSourceTVShow.resx">
+      <DependentUpon>dlgSourceTVShow.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgWizard.resx">
       <DependentUpon>dlgWizard.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="dlgImgSelect.resx">
+      <DependentUpon>dlgImgSelect.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmSplash.resx">
-      <DependentUpon>frmSplash.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -508,6 +517,93 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Langs\html\template modernWallCard\bootstrap\css\bootstrap-theme.css.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\bootstrap\css\bootstrap.css.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\bootstrap\fonts\glyphicons-halflings-regular.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\bootstrap\fonts\glyphicons-halflings-regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\bootstrap\fonts\glyphicons-halflings-regular.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\bootstrap\fonts\glyphicons-halflings-regular.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\fa-icon\fontawesome-webfont.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\fa-icon\fontawesome-webfont.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\fa-icon\fontawesome-webfont.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\fa-icon\fontawesome-webfont.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\fa-icon\FontAwesome.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Italic.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Italic.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Italic.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Italic.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Light.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Light.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Light.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Light.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-LightItalic.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-LightItalic.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-LightItalic.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-LightItalic.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Regular.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Regular.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Regular.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\font\lato\Lato-Semibold.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Langs\html\template modernWallCard\LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -613,6 +709,243 @@
     <None Include="Resources\Wizard.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\valid2.png" />
+    <None Include="Resources\set.png" />
+    <None Include="Resources\imdb.png" />
+    <Content Include="Images\Countries\ar.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\bg.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\bs.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\ca.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\cs.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\da.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\de.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\el.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\en.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\es.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\et.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\fa.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\fi.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\fo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\fr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\gl.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\he.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\hi.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\hr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\hu.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\hy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\id.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\is.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\it.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\ja.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\kk.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\ko.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\lb.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\lt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\lv.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\mk.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\ms.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\nl.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\no.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\pb.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\pl.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\pt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\ro.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\ru.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\sk.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\sl.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\sq.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\sr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\sv.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\tr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\uk.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\vi.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Countries\zh.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Ratings\dk\dk_a.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Ratings\dk\dk_11.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Ratings\dk\dk_15.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Ratings\dk\dk_7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Ratings\movienr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Ratings\tvnr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Ratings\uk\uk_R18.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\hasSet.png" />
+    <None Include="Resources\ad.png" />
+    <Content Include="Langs\html\template modernWallCard\bootstrap\css\bootstrap-theme.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\bootstrap\css\bootstrap-theme.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\bootstrap\css\bootstrap.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\bootstrap\css\bootstrap.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\bootstrap\fonts\glyphicons-halflings-regular.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\bootstrap\js\bootstrap.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\bootstrap\js\bootstrap.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\bootstrap\js\npm.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\default-poster.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\English_%28en_US%29.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\font-awesome.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\font\fa-icon\fontawesome-webfont.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\latofonts.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Langs\html\template modernWallCard\style.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\heart.png" />
+    <Content Include="Resources\movieset-Default.xml" />
+    <Content Include="Resources\msaa.png" />
+    <None Include="Resources\starempty.png" />
+    <None Include="Resources\tmdb.png" />
+    <None Include="Resources\undo.png" />
+    <None Include="Resources\noposter.jpg" />
+    <None Include="Resources\tvtunes.png" />
+    <None Include="Resources\preview.png" />
+    <Content Include="Resources\tvdb.png" />
+    <Content Include="Themes\movie-BlackBeauty.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Themes\movieset-BlackBeauty.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Themes\tvep-BlackBeauty.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Themes\tvshow-BlackBeauty.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\hasBanner.png" />
     <None Include="Resources\hasCharacterArt.png" />
     <None Include="Resources\hasClearArt.png" />
@@ -633,12 +966,6 @@
     <Content Include="Resources\menuAdd.png" />
     <Content Include="Themes\movieset-Default.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="x64\SQLite.Interop.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="x86\SQLite.Interop.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="x64\ffmpeg.exe" />
     <None Include="x64\mediainfo-rar\mediainfo-rar.exe" />
@@ -5206,75 +5533,10 @@
       <Project>{208AA35E-C6AE-4D2D-A9DD-B6EFD19A4279}</Project>
       <Name>EmberAPI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FanartTVAPI\FanartTVAPI.csproj">
-      <Project>{70F651C6-6BB4-4E4D-AD6C-25C36CA1E9E6}</Project>
-      <Name>FanartTVAPI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Trakttv\Trakttv.csproj">
-      <Project>{857e14f3-060a-467e-9195-6165996d7ba3}</Project>
-      <Name>Trakttv</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WatTmdb\WatTmdb.csproj">
-      <Project>{EFC11645-FAB4-4C30-A498-29F5ECDF77E8}</Project>
-      <Name>WatTmdb</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Bin\" />
     <Folder Include="Settings\" />
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="AxAXVLC">
-      <Guid>{DF2BBE39-40A8-433B-A279-073F48DA94B6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="AxShockwaveFlashObjects">
-      <Guid>{D27CDB6B-AE6D-11CF-96B8-444553540000}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="AXVLC">
-      <Guid>{DF2BBE39-40A8-433B-A279-073F48DA94B6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="AxWMPLib">
-      <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="ShockwaveFlashObjects">
-      <Guid>{D27CDB6B-AE6D-11CF-96B8-444553540000}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="WMPLib">
-      <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -5295,9 +5557,16 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)$(PlatformName)" "$(TargetDir)Bin" /E /I /R /Y
-del "$(TargetDir)Bin\SQLite.Interop.dll" /F /Q</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
