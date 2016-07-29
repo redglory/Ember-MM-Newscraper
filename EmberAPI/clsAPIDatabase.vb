@@ -809,7 +809,7 @@ Public Class Database
     Public Function Connect_MyVideos() As Boolean
 
         'set database version
-        Dim MyVideosDBVersion As Integer = 40
+        Dim MyVideosDBVersion As Integer = 41
 
         'set database filename
         Dim MyVideosDB As String = String.Format("MyVideos{0}.emm", MyVideosDBVersion)
@@ -1103,10 +1103,11 @@ Public Class Database
     ''' </summary>
     ''' <param name="lTVEpisodeID">ID of the episode to remove, as stored in the database.</param>
     ''' <param name="BatchMode">Is this function already part of a transaction?</param>
-    ''' <returns>True if successful, false if deletion failed.</returns>
+    ''' <returns><c>True</c> if has been removed, <c>False</c> if has been changed to missing</returns>
     Public Function Delete_TVEpisode(ByVal lTVEpisodeID As Long, ByVal Force As Boolean, ByVal DoCleanSeasons As Boolean, ByVal BatchMode As Boolean) As Boolean
         Dim SQLtransaction As SQLiteTransaction = Nothing
         Dim doesExist As Boolean = False
+        Dim bHasRemoved As Boolean = False
 
         Dim _tvepisodeDB As Database.DBElement = Load_TVEpisode(lTVEpisodeID, True)
         ModulesManager.Instance.RunGeneric(Enums.ModuleEventType.Remove_TVEpisode, Nothing, Nothing, False, _tvepisodeDB)
@@ -1135,6 +1136,7 @@ Public Class Database
                             SQLECommand.ExecuteNonQuery()
 
                             If DoCleanSeasons Then Master.DB.Delete_Empty_TVSeasons(Convert.ToInt64(SQLReader("idShow")), True)
+                            bHasRemoved = True
                         ElseIf Not Convert.ToInt64(SQLReader("idFile")) = -1 Then 'already marked as missing, no need for another query
                             'check if there is another episode that use the same idFile
                             Dim multiEpisode As Boolean = False
@@ -1172,14 +1174,14 @@ Public Class Database
             SQLtransaction.Commit()
         End If
 
-        Return True
+        Return bHasRemoved
     End Function
 
-    Public Function Delete_TVEpisode(ByVal sPath As String, ByVal Force As Boolean, ByVal BatchMode As Boolean) As Boolean
+    Public Function Delete_TVEpisode(ByVal strPath As String, ByVal Force As Boolean, ByVal BatchMode As Boolean) As Boolean
         Dim SQLtransaction As SQLiteTransaction = Nothing
         If Not BatchMode Then SQLtransaction = _myvideosDBConn.BeginTransaction()
         Using SQLPCommand As SQLiteCommand = _myvideosDBConn.CreateCommand()
-            SQLPCommand.CommandText = String.Concat("SELECT idFile FROM files WHERE strFilename = """, sPath, """;")
+            SQLPCommand.CommandText = String.Concat("SELECT idFile FROM files WHERE strFilename = """, strPath, """;")
             Using SQLPReader As SQLiteDataReader = SQLPCommand.ExecuteReader
                 While SQLPReader.Read
                     Using SQLCommand As SQLiteCommand = _myvideosDBConn.CreateCommand()
@@ -1637,7 +1639,7 @@ Public Class Database
                     If Not DBNull.Value.Equals(SQLreader("NfoPath")) Then _movieDB.NfoPath = SQLreader("NfoPath").ToString
                     If Not DBNull.Value.Equals(SQLreader("EThumbsPath")) Then _movieDB.ExtrathumbsPath = SQLreader("EThumbsPath").ToString
                     If Not DBNull.Value.Equals(SQLreader("EFanartsPath")) Then _movieDB.ExtrafanartsPath = SQLreader("EFanartsPath").ToString
-                    If Not DBNull.Value.Equals(SQLreader("ThemePath")) Then _movieDB.ThemePath = SQLreader("ThemePath").ToString
+                    If Not DBNull.Value.Equals(SQLreader("ThemePath")) Then _movieDB.Theme.LocalFilePath = SQLreader("ThemePath").ToString
 
                     _movieDB.Source = Load_Source_Movie(Convert.ToInt64(SQLreader("idSource")))
 
@@ -1662,7 +1664,7 @@ Public Class Database
                         If Not DBNull.Value.Equals(SQLreader("Rating")) Then .Rating = SQLreader("Rating").ToString
                         If Not DBNull.Value.Equals(SQLreader("Votes")) Then .Votes = SQLreader("Votes").ToString
                         If Not DBNull.Value.Equals(SQLreader("MPAA")) Then .MPAA = SQLreader("MPAA").ToString
-                        If Not DBNull.Value.Equals(SQLreader("Top250")) AndAlso Integer.TryParse(SQLreader("Top250").ToString, 0) Then .Top250 = Convert.ToInt32(SQLreader("Top250"))
+                        If Not DBNull.Value.Equals(SQLreader("Top250")) Then .Top250 = Convert.ToInt32(SQLreader("Top250"))
                         If Not DBNull.Value.Equals(SQLreader("Outline")) Then .Outline = SQLreader("Outline").ToString
                         If Not DBNull.Value.Equals(SQLreader("Plot")) Then .Plot = SQLreader("Plot").ToString
                         If Not DBNull.Value.Equals(SQLreader("Tagline")) Then .Tagline = SQLreader("Tagline").ToString
@@ -2505,7 +2507,7 @@ Public Class Database
                     If Not DBNull.Value.Equals(SQLreader("Language")) Then _TVDB.Language = SQLreader("Language").ToString
                     If Not DBNull.Value.Equals(SQLreader("NfoPath")) Then _TVDB.NfoPath = SQLreader("NfoPath").ToString
                     If Not DBNull.Value.Equals(SQLreader("TVShowPath")) Then _TVDB.ShowPath = SQLreader("TVShowPath").ToString
-                    If Not DBNull.Value.Equals(SQLreader("ThemePath")) Then _TVDB.ThemePath = SQLreader("ThemePath").ToString
+                    If Not DBNull.Value.Equals(SQLreader("ThemePath")) Then _TVDB.Theme.LocalFilePath = SQLreader("ThemePath").ToString
 
                     _TVDB.Source = Load_Source_TVShow(Convert.ToInt64(SQLreader("idSource")))
 
@@ -2893,6 +2895,15 @@ Public Class Database
                 Select Case Args.currVersion
                     Case Is < 40
                         Prepare_IMDB(True)
+                End Select
+
+                SQLtransaction.Commit()
+            End Using
+
+            Using SQLtransaction As SQLiteTransaction = _myvideosDBConn.BeginTransaction()
+                Select Case Args.currVersion
+                    Case Is < 41
+                        Prepare_Top250(True)
                 End Select
 
                 SQLtransaction.Commit()
@@ -3302,6 +3313,20 @@ Public Class Database
         If Not BatchMode Then SQLtransaction.Commit()
     End Sub
 
+    Private Sub Prepare_Top250(ByVal BatchMode As Boolean)
+        bwPatchDB.ReportProgress(-1, "Fixing Top250...")
+
+        Dim SQLtransaction As SQLiteTransaction = Nothing
+        If Not BatchMode Then SQLtransaction = _myvideosDBConn.BeginTransaction()
+
+        Using SQLcommand As SQLiteCommand = _myvideosDBConn.CreateCommand()
+            SQLcommand.CommandText = "UPDATE movie SET Top250 = NULL WHERE Top250 = 0 OR Top250 = """";"
+            SQLcommand.ExecuteNonQuery()
+        End Using
+
+        If Not BatchMode Then SQLtransaction.Commit()
+    End Sub
+
     Private Sub Prepare_VotesCount(ByVal idField As String, ByVal table As String, ByVal BatchMode As Boolean)
         bwPatchDB.ReportProgress(-1, "Clean Votes count...")
 
@@ -3398,7 +3423,7 @@ Public Class Database
             Dim par_movie_Rating As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_Rating", DbType.String, 0, "Rating")
             Dim par_movie_Votes As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_Votes", DbType.String, 0, "Votes")
             Dim par_movie_MPAA As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_MPAA", DbType.String, 0, "MPAA")
-            Dim par_movie_Top250 As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_Top250", DbType.String, 0, "Top250")
+            Dim par_movie_Top250 As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_Top250", DbType.Int64, 0, "Top250")
             Dim par_movie_Outline As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_Outline", DbType.String, 0, "Outline")
             Dim par_movie_Plot As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_Plot", DbType.String, 0, "Plot")
             Dim par_movie_Tagline As SQLiteParameter = SQLcommand_movie.Parameters.Add("par_movie_Tagline", DbType.String, 0, "Tagline")
@@ -3520,7 +3545,8 @@ Public Class Database
             If ToDisk Then
                 _movieDB.ImagesContainer.SaveAllImages(_movieDB, ForceFileCleanup)
                 _movieDB.Movie.SaveAllActorThumbs(_movieDB)
-                _movieDB.Trailer.SaveAllTrailers(_movieDB)
+                _movieDB.Theme.SaveAllThemes(_movieDB, ForceFileCleanup)
+                _movieDB.Trailer.SaveAllTrailers(_movieDB, ForceFileCleanup)
             End If
 
             par_movie_MoviePath.Value = _movieDB.Filename
@@ -3530,7 +3556,7 @@ Public Class Database
             par_movie_ExtrafanartsPath.Value = _movieDB.ExtrafanartsPath
             par_movie_ExtrathumbsPath.Value = _movieDB.ExtrathumbsPath
             par_movie_NfoPath.Value = _movieDB.NfoPath
-            par_movie_ThemePath.Value = _movieDB.ThemePath
+            par_movie_ThemePath.Value = If(Not String.IsNullOrEmpty(_movieDB.Theme.LocalFilePath), _movieDB.Theme.LocalFilePath, String.Empty)
             par_movie_TrailerPath.Value = If(Not String.IsNullOrEmpty(_movieDB.Trailer.LocalFilePath), _movieDB.Trailer.LocalFilePath, String.Empty)
 
             If Not Master.eSettings.MovieImagesNotSaveURLToNfo Then
@@ -3572,7 +3598,9 @@ Public Class Database
                 par_movie_TMDBColID.Value = .TMDBColID
                 par_movie_Tagline.Value = .Tagline
                 par_movie_Title.Value = .Title
-                par_movie_Top250.Value = .Top250
+                If .Top250Specified Then 'need to be NOTHING instead of "0"
+                    par_movie_Top250.Value = .Top250
+                End If
                 par_movie_Trailer.Value = .Trailer
                 par_movie_Votes.Value = .Votes
                 par_movie_Year.Value = .Year
@@ -4861,13 +4889,14 @@ Public Class Database
             If ToNFO Then NFO.SaveToNFO_TVShow(_show)
             If ToDisk Then
                 _show.ImagesContainer.SaveAllImages(_show, False)
+                _show.Theme.SaveAllThemes(_show, False)
                 _show.TVShow.SaveAllActorThumbs(_show)
             End If
 
             parExtrafanartsPath.Value = _show.ExtrafanartsPath
             parNfoPath.Value = _show.NfoPath
             parTVShowPath.Value = _show.ShowPath
-            parThemePath.Value = _show.ThemePath
+            parThemePath.Value = If(Not String.IsNullOrEmpty(_show.Theme.LocalFilePath), _show.Theme.LocalFilePath, String.Empty)
 
             parNew.Value = Not _show.IDSpecified
             parListTitle.Value = _show.ListTitle
@@ -5270,7 +5299,7 @@ Public Class Database
         Private _sortmethod As Enums.SortMethod_MovieSet
         Private _source As New DBSource
         Private _subtitles As New List(Of MediaContainers.Subtitle)
-        Private _themepath As String
+        Private _theme As New MediaContainers.Theme
         Private _trailer As New MediaContainers.Trailer
         Private _tvepisode As MediaContainers.EpisodeDetails
         Private _tvseason As MediaContainers.SeasonDetails
@@ -5707,18 +5736,18 @@ Public Class Database
             End Get
         End Property
 
-        Public Property ThemePath() As String
+        Public Property Theme() As MediaContainers.Theme
             Get
-                Return _themepath
+                Return _theme
             End Get
-            Set(ByVal value As String)
-                _themepath = value
+            Set(ByVal value As MediaContainers.Theme)
+                _theme = value
             End Set
         End Property
 
-        Public ReadOnly Property ThemePathSpecified() As Boolean
+        Public ReadOnly Property ThemeSpecified() As Boolean
             Get
-                Return Not String.IsNullOrEmpty(_themepath)
+                Return _theme.ThemeOriginal IsNot Nothing AndAlso _theme.ThemeOriginal.hasMemoryStream
             End Get
         End Property
 
@@ -5831,7 +5860,7 @@ Public Class Database
             _sortmethod = Enums.SortMethod_MovieSet.Year
             _source = New DBSource
             _subtitles = New List(Of MediaContainers.Subtitle)
-            _themepath = String.Empty
+            _theme = New MediaContainers.Theme
             _trailer = New MediaContainers.Trailer
             _tvepisode = Nothing
             _tvseason = Nothing

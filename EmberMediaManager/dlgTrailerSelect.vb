@@ -37,7 +37,6 @@ Public Class dlgTrailerSelect
     Private _result As New MediaContainers.Trailer
     Private tArray As New List(Of String)
     Private tURL As String = String.Empty
-    Private sPath As String
     Private nList As New List(Of MediaContainers.Trailer)
     Private _noDownload As Boolean
     Private _withPlayer As Boolean
@@ -100,7 +99,6 @@ Public Class dlgTrailerSelect
         txtYouTubeSearch.Text = String.Concat(DBMovie.Movie.Title, " ", Master.eSettings.MovieTrailerDefaultSearch)
 
         tmpDBElement = DBMovie
-        sPath = DBMovie.Filename
 
         AddTrailersToList(tURLList)
 
@@ -159,7 +157,7 @@ Public Class dlgTrailerSelect
                     If _noDownload Then
                         Result.URLWebsite = txtLocalTrailer.Text
                     Else
-                        Result.TrailerOriginal.FromFile(txtLocalTrailer.Text)
+                        Result.TrailerOriginal.LoadFromFile(txtLocalTrailer.Text)
                     End If
 
                     DialogResult = DialogResult.OK
@@ -280,7 +278,7 @@ Public Class dlgTrailerSelect
         Try
             With ofdTrailer
                 .InitialDirectory = Directory.GetParent(tmpDBElement.Filename).FullName
-                .Filter = String.Concat("Supported Trailer Formats|*", Functions.ListToStringWithSeparator(Master.eSettings.FileSystemValidExts.ToArray(), ";*"))
+                .Filter = FileUtils.Common.GetOpenFileDialogFilter_Video(Master.eLang.GetString(1195, "Trailers"))
                 .FilterIndex = 0
             End With
 
@@ -400,7 +398,7 @@ Public Class dlgTrailerSelect
     Private Sub bwDownloadTrailer_DoWork(ByVal sender As Object, ByVal e As System.ComponentModel.DoWorkEventArgs) Handles bwDownloadTrailer.DoWork
         Dim Args As Arguments = DirectCast(e.Argument, Arguments)
         Try
-            Result.TrailerOriginal.FromWeb(Args.Parameter)
+            Result.TrailerOriginal.LoadFromWeb(Args.Parameter)
             Result.URLWebsite = Args.Parameter.VideoURL
         Catch ex As Exception
             logger.Error(ex, New StackFrame().GetMethod().Name)

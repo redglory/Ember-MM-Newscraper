@@ -1052,7 +1052,7 @@ Namespace Kodi
                     If mDBElement.Movie.RuntimeSpecified AndAlso Integer.TryParse(mDBElement.Movie.Runtime, 0) Then
                         mRuntime = CType(mDBElement.Movie.Runtime, Integer) * 60 'API requires runtime in seconds
                     End If
-                    Dim mTop250 As Integer = If(mDBElement.Movie.Top250Specified, CType(mDBElement.Movie.Top250, Integer), 0)
+                    Dim mTop250 As Integer = mDBElement.Movie.Top250
                     Dim mYear As Integer = If(mDBElement.Movie.YearSpecified, CType(mDBElement.Movie.Year, Integer), 0)
 
                     'arrays
@@ -1723,15 +1723,13 @@ Namespace Kodi
 
             Select Case tDBElement.ContentType
                 Case Enums.ContentType.Movie
-                    If FileUtils.Common.isBDRip(tDBElement.Filename) Then
-                        strLocalPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(tDBElement.Filename).FullName).FullName).FullName
-                    ElseIf FileUtils.Common.isVideoTS(tDBElement.Filename) Then
-                        strLocalPath = Directory.GetParent(Directory.GetParent(tDBElement.Filename).FullName).FullName
+                    If FileUtils.Common.isBDRip(tDBElement.Filename) OrElse FileUtils.Common.isVideoTS(tDBElement.Filename) Then
+                        strLocalPath = FileUtils.Common.GetMainPath(tDBElement.Filename).FullName
                     Else
                         If Path.GetFileNameWithoutExtension(tDBElement.Filename).ToLower = "video_ts" Then
                             strLocalPath = Directory.GetParent(Directory.GetParent(tDBElement.Filename).FullName).FullName
                         Else
-                            strLocalPath = Directory.GetParent(tDBElement.Filename).FullName
+                            strLocalPath = FileUtils.Common.GetMainPath(tDBElement.Filename).FullName
                         End If
                     End If
                 Case Enums.ContentType.TVEpisode, Enums.ContentType.TVSeason, Enums.ContentType.TVShow
